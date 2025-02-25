@@ -28,10 +28,10 @@ const Sidebar = () => {
         <Menu.Item key="2" icon={<InfoCircleOutlined />}>
           <Link to="/books">Books</Link>
         </Menu.Item>
-         {/*<Menu.Item key="3" icon={<UserOutlined />}>
-          <Link to="/profile">Profile</Link>
+        <Menu.Item key="3" icon={<InfoCircleOutlined/>}>
+          <Link to="/codes">Codes</Link>
         </Menu.Item>
-        <Menu.Item key="4" icon={<SettingOutlined />}>
+         {/*<Menu.Item key="4" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
         </Menu.Item> */}
       </Menu>

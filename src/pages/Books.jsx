@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Table, Typography, Spin, Alert, Button, Space, Popconfirm, message } from "antd";
-import { fetchBooks, deleteBook } from "../Redux/bookSlice";
+import { fetchBooks, deleteBook } from "../Redux/Slices/bookSlice";
 import AddBookModal from "../Modals/AddBookModal";
 import EditBookModal from "../Modals/EditBookModal"; // Import edit modal
 
