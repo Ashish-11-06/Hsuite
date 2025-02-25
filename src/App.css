@@ -5,7 +5,7 @@ body {
   }
 
   .ant-layout-sider {
-    background: #adedf8 !important;
+    background: #ade2f8 !important;
 }
   
   .layout {
@@ -29,7 +29,7 @@ body {
   color: #000 !important;
 }
 .ant-menu-item:hover {
-  background-color: #62baca65 !important;
+  background-color: #5cb3ff7f !important;
 }
 
 /* Ensure text color is black in the Menu when hovered or selected */
@@ -38,12 +38,12 @@ body {
   color: #000 !important;
 }
   .header {
-    background-color: #adedf8 !important; /* Override AntD default header col   or */
+    background-color: #ade2f8 !important; /* Override AntD default header col   or */
   }
 
   .ant-layout-header {
     padding: 0 0px !important;
-    background-color: #adedf8 !important;
+    background-color: #ade2f8 !important;
 }
 
   .footer {
@@ -53,21 +53,17 @@ body {
     padding: 10px;
   }
   
-  .ant-btn-primary {
-    background-color: #adedf8 !important;
-    border-color: #adedf8 !important;
-    color: #000 !important;
-  }
+ 
   
   .ant-btn-primary:hover {
-    background-color: #84dcec !important;
+    /* background-color: #5cb3ff !important; */
     border-color: #62bbca !important;
   }
   
   .ant-menu-dark {
-    background-color: #adedf8 !important;
+    background-color: #ade2f8 !important;
   }
   
   .ant-menu-item-selected{
-    background-color: #84dcec !important;
+    background-color: #5cb3ff !important;
   }

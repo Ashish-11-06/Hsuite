@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Books from "../pages/Books.jsx";
-import Code from "../pages/Code.jsx";
+import Codes from "../pages/Codes.jsx";
 
 const MainContent = () => {
   return (
@@ -10,7 +10,7 @@ const MainContent = () => {
       <Route path="/" element={<Home />} />
       <Route path="/books" element={<Books />} />
       <Route path="/about" element={<About />} />
-      <Route path="/code" element={<Code></Code>}></Route>
+      <Route path="/codes" element={<Codes />} />
     </Routes>
   );
 };

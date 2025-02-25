@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Button, message } from "antd";
 import { useDispatch } from "react-redux";
-import { editBook } from "../Redux/bookSlice";
+import { editBook } from "../Redux/Slices/bookSlice";
 
 const EditBookModal = ({ open, onClose, book }) => {
   const [form] = Form.useForm();

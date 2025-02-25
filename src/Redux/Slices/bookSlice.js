@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import booksAPIs from "./API/bookApi"; // Ensure correct import path
+import booksAPIs from "../API/bookApi";
 
 // Async thunk for fetching books
 export const fetchBooks = createAsyncThunk("books/fetchBooks", async () => {
