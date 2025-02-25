@@ -16,14 +16,19 @@ const AddCodeModal = ({ visible, onCancel }) => {
     };
   
     try {
-      const response = await dispatch(addCode(formattedData)).unwrap(); // Dispatch to Redux and wait for the result
-      message.success(response.message || "Code added successfully!");
+        const response = await dispatch(addCode(formattedData)).unwrap(); // Dispatch action and wait for response
   
-      form.resetFields();
-      onCancel(); // Close the modal
-    } catch (error) {
-      console.error("Error adding code:", error);
-    }
+        // Ensure success notification only if API call is successful
+        message.success(response?.message || "Code added successfully!");
+  
+        form.resetFields();
+        setTimeout(() => {
+          onCancel(); // Close modal with a slight delay
+        }, 500);
+      } catch (error) {
+        console.error("Error adding code:", error);
+        message.error(error?.message || "Failed to add code!");
+      }
   };
 
   return (
