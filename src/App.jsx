@@ -1,6 +1,6 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import { Layout } from "antd";
-import HeaderComponent from "./components/HeaderComponent.jsx";
+import HeaderComponent from "./Components/HeaderComponent.jsx";
 import FooterComponent from "./components/FooterComponent.jsx";
 import MainContent from "./components/MainContent.jsx";
 import Sidebar from "./components/Sidebar.jsx"; 
