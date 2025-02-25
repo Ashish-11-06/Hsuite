@@ -1,0 +1,73 @@
+body {
+    background-color: #f1fdff; /* Background color from theme */
+    color: #343A40; /* Text color */
+    font-family: "Arial", sans-serif;
+  }
+
+  .ant-layout-sider {
+    background: #adedf8 !important;
+}
+  
+  .layout {
+    min-height: 100vh;
+  }
+
+  :where(.css-dev-only-do-not-override-1v613y0) a {
+    color: #000000 !important;
+    text-decoration: none;
+    background-color: transparent;
+}  
+/* a:hover {
+    color: #000000 !important;
+    text-decoration: none;
+    background-color: transparent;
+} */
+
+
+ /* Ensure text color is black in the Menu */
+.ant-menu-light .ant-menu-item a {
+  color: #000 !important;
+}
+.ant-menu-item:hover {
+  background-color: #62baca65 !important;
+}
+
+/* Ensure text color is black in the Menu when hovered or selected */
+.ant-menu-light .ant-menu-item:hover a,
+.ant-menu-light .ant-menu-item-selected a {
+  color: #000 !important;
+}
+  .header {
+    background-color: #adedf8 !important; /* Override AntD default header col   or */
+  }
+
+  .ant-layout-header {
+    padding: 0 0px !important;
+    background-color: #adedf8 !important;
+}
+
+  .footer {
+    text-align: center;
+    background-color: #84dcec;
+    color: white;
+    padding: 10px;
+  }
+  
+  .ant-btn-primary {
+    background-color: #adedf8 !important;
+    border-color: #adedf8 !important;
+    color: #000 !important;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #84dcec !important;
+    border-color: #62bbca !important;
+  }
+  
+  .ant-menu-dark {
+    background-color: #adedf8 !important;
+  }
+  
+  .ant-menu-item-selected{
+    background-color: #84dcec !important;
+  }
