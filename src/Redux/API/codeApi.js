@@ -1,4 +1,3 @@
-import { deleteBook } from "../Slices/bookSlice.js";
 import axiosInstance from "./axiosInstance.js";
 
 const codeAPIs = {
@@ -14,8 +13,15 @@ const codeAPIs = {
   addCode: (newBook) => {
     return axiosInstance.post(`/book-details`, newBook);
   },
+
+  editCode: (codeData)=>{
+  //   console.log("Editing code with ID:", id); // Log the ID
+    console.log("Data being sent:", codeData);
+    return axiosInstance.put(`/book-details`, codeData);
+  },
+
   deleteCode:(id) =>{
-    return axiosInstance.delete(`/book-details`, deleteBook);
+    return axiosInstance.delete(`book-details/delete/${id}`);
   },
   
  

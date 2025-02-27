@@ -24,9 +24,9 @@ export const addCode = createAsyncThunk("codes/addCode", async (newCode) => {
 });
 
 // Async thunk for editing a code
-export const editCode = createAsyncThunk("codes/editCode", async ({ id, codeData }) => {
+export const editCode = createAsyncThunk("codes/editCode", async (codeData ) => {
   try {
-    const response = await codesAPI.editCode(id, codeData);
+    const response = await codesAPI.editCode(codeData);
     return response.data;
   } catch (error) {
     console.error("Error editing code:", error);
@@ -37,7 +37,7 @@ export const editCode = createAsyncThunk("codes/editCode", async ({ id, codeData
 // Async thunk for deleting a code
 export const deleteCode = createAsyncThunk("codes/deleteCode", async (id) => {
   try {
-    await codesAPI.deleteCode(id); // No response needed
+    await codesAPI.deleteCode(id); // Call the delete API
     return id; // Return the deleted code ID
   } catch (error) {
     console.error("Error deleting code:", error);
@@ -89,10 +89,10 @@ const codeSlice = createSlice({
       })
       .addCase(editCode.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const index = state.codes.findIndex((code) => code.id === action.payload.id);
-        if (index !== -1) {
-          state.codes[index] = action.payload; // Update edited code
-        }
+        // const index = state.codes.findIndex((code) => code.id === action.payload.id);
+        // if (index !== -1) {
+        //   state.codes[index] = action.payload; // Update edited code
+        // }
       })
       .addCase(editCode.rejected, (state, action) => {
         state.status = "failed";
