@@ -1,11 +1,6 @@
 import React from "react";
 import { Menu, Layout } from "antd";
-import {
-  HomeOutlined,
-  InfoCircleOutlined,
-  UserOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import {HomeOutlined, InfoCircleOutlined, UserOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const { Sider } = Layout;
@@ -34,8 +29,8 @@ const Sidebar = () => {
          {/*<Menu.Item key="4" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
         </Menu.Item> */}
-        <Menu.Item key="3">
-          <Link to="/code">Code</Link>
+        <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
+          <Link to="/login">Login</Link>
         </Menu.Item>
       </Menu>
     </Sider>

@@ -1,21 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import codeAPIs from "../API/codeApi";
+import codesAPI from "../API/codeApi";
 
-// Async thunk for fetching books
-export const fetchCodes = createAsyncThunk("books/fetchCodes", async () => {
+// Async thunk for fetching codes
+export const fetchCodes = createAsyncThunk("codes/fetchCodes", async () => {
   try {
-    const response = await codeAPIs.getCodes();
+    const response = await codesAPI.getCodes();
     return response.data;
   } catch (error) {
-    console.error("Error fetching books:", error);
+    console.error("Error fetching codes:", error);
     throw error;
   }
 });
 
 // Async thunk for adding a code
-export const addCode = createAsyncThunk("books/addCode", async (newCode) => {
+export const addCode = createAsyncThunk("codes/addCode", async (newCode) => {
   try {
-    const response = await codeAPIs.addCode(newCode);
+    const response = await codesAPI.addCode(newCode);
     return response.data;
   } catch (error) {
     console.error("Error adding code:", error);
@@ -24,28 +24,28 @@ export const addCode = createAsyncThunk("books/addCode", async (newCode) => {
 });
 
 // Async thunk for editing a code
-// export const editBook = createAsyncThunk("books/editBook", async ({ id, bookData }) => {
-//   try {
-//     const response = await codeAPIs.editBook(id, bookData);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error editing code:", error);
-//     throw error;
-//   }
-// });
+export const editCode = createAsyncThunk("codes/editCode", async ({ id, codeData }) => {
+  try {
+    const response = await codesAPI.editCode(id, codeData);
+    return response.data;
+  } catch (error) {
+    console.error("Error editing code:", error);
+    throw error;
+  }
+});
 
-// // Async thunk for deleting a code
-// export const deleteBook = createAsyncThunk("books/deleteBook", async (id) => {
-//   try {
-//     await codeAPIs.deleteBook(id); // No need to return response for delete
-//     return id; // Return deleted code ID to remove it from Redux state
-//   } catch (error) {
-//     console.error("Error deleting code:", error);
-//     throw error;
-//   }
-// });
+// Async thunk for deleting a code
+export const deleteCode = createAsyncThunk("codes/deleteCode", async (id) => {
+  try {
+    await codesAPI.deleteCode(id); // No response needed
+    return id; // Return the deleted code ID
+  } catch (error) {
+    console.error("Error deleting code:", error);
+    throw error;
+  }
+});
 
-// Book Slice
+// Code Slice
 const codeSlice = createSlice({
   name: "codes",
   initialState: {
@@ -56,61 +56,61 @@ const codeSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Books Cases
-    //   .addCase(fetchCodes.pending, (state) => {
-    //     state.status = "loading";
-    //     state.error = null;
-    //   })
-    //   .addCase(fetchCodes.fulfilled, (state, action) => {
-    //     state.status = "succeeded";
-    //     state.books = action.payload;
-    //   })
-    //   .addCase(fetchCodes.rejected, (state, action) => {
-    //     state.status = "failed";
-    //     state.error = action.error.message || "Failed to fetch data";
-    //   })
+      // Fetch Codes Cases
+      .addCase(fetchCodes.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchCodes.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.codes = action.payload;
+      })
+      .addCase(fetchCodes.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to fetch codes";
+      })
 
-      // Add Book Cases
+      // Add Code Cases
       .addCase(addCode.pending, (state) => {
         state.status = "loading";
       })
       .addCase(addCode.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.books.push(action.payload);
+        state.codes.push(action.payload);
       })
       .addCase(addCode.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to add code";
       })
 
-      // Edit Book Cases
-    //   .addCase(editBook.pending, (state) => {
-    //     state.status = "loading";
-    //   })
-    //   .addCase(editBook.fulfilled, (state, action) => {
-    //     state.status = "succeeded";
-    //     const index = state.books.findIndex((code) => code.id === action.payload.id);
-    //     if (index !== -1) {
-    //       state.books[index] = action.payload; // Update the edited code
-    //     }
-    //   })
-    //   .addCase(editBook.rejected, (state, action) => {
-    //     state.status = "failed";
-    //     state.error = action.error.message || "Failed to edit code";
-    //   })
+      // Edit Code Cases
+      .addCase(editCode.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(editCode.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const index = state.codes.findIndex((code) => code.id === action.payload.id);
+        if (index !== -1) {
+          state.codes[index] = action.payload; // Update edited code
+        }
+      })
+      .addCase(editCode.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to edit code";
+      })
 
-    //   // Delete Book Cases
-    //   .addCase(deleteBook.pending, (state) => {
-    //     state.status = "loading";
-    //   })
-    //   .addCase(deleteBook.fulfilled, (state, action) => {
-    //     state.status = "succeeded";
-    //     state.books = state.books.filter((code) => code.id !== action.payload); // Remove deleted code
-    //   })
-    //   .addCase(deleteBook.rejected, (state, action) => {
-    //     state.status = "failed";
-    //     state.error = action.error.message || "Failed to delete code";
-    //   });
+      // Delete Code Cases
+      .addCase(deleteCode.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteCode.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.codes = state.codes.filter((code) => code.id !== action.payload); // Remove deleted code
+      })
+      .addCase(deleteCode.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to delete code";
+      });
   },
 });
 
