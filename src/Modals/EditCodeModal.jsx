@@ -1,52 +1,86 @@
-import React from "react";
-import { Modal, Form, Input, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Button, Space } from "antd";
+import { MinusCircleOutlined } from "@ant-design/icons";
 
 const EditCodeModal = ({ open, onClose, code, onEdit }) => {
     const [form] = Form.useForm();
+    const [description, setDescription] = useState("");
+    const [subDescriptions, setSubDescriptions] = useState([]);
+    const [codeValue, setCodeValue] = useState("");
 
-    console.log(code);
-
-    React.useEffect(() => {
+    useEffect(() => {
         if (code) {
-            form.setFieldsValue({
-                description: code.description,
-                sub_descriptions: code.sub_descriptions.map(sub => sub.sub_description).join(", "),
-                sub_descriptions_code: code.sub_descriptions.map(sub => sub.code).join(", "),
-            });
+            setCodeValue(code.code || "");
+            setDescription(code.description || "");
+            setSubDescriptions(code.sub_descriptions ? [...code.sub_descriptions] : []);
         }
-    }, [code, form]);
+    }, [code]);
 
-    const onFinish = (values) => {
-        // console.log(values);
+    // Handle input changes
+    const handleDescriptionChange = (e) => setDescription(e.target.value);
+    
+    const handleSubDescriptionChange = (index, field, value) => {
+        const updatedSubDescriptions = [...subDescriptions];
+        updatedSubDescriptions[index] = {
+            ...updatedSubDescriptions[index],
+            [field]: value
+        };
+        setSubDescriptions(updatedSubDescriptions);
+    };
+
+    const handleAddSubDescription = () => {
+        setSubDescriptions([...subDescriptions, { code: "", sub_description: "" }]);
+    };
+
+    const handleRemoveSubDescription = (index) => {
+        setSubDescriptions(subDescriptions.filter((_, i) => i !== index));
+    };
+
+    const onFinish = () => {
         const updatedData = {
             id: code?.id,
-            description: values.description,
-            sub_descriptions: values.sub_descriptions.split(",").map((desc, index) => ({
-                code: values.sub_descriptions_code.split(",")[index] || `sub_${index + 1}`,
-                sub_description: desc.trim(),
-            })),
+            code: codeValue,
+            description,
+            sub_descriptions: subDescriptions,
         };
-        console.log("Form values submitted:", values); // Log the form values
-        console.log("Updated data prepared for submission:", updatedData);
         onEdit(updatedData);
+        onClose();
     };
 
     return (
         <Modal title="Edit Code" open={open} onCancel={onClose} footer={null}>
-            <Form form={form} onFinish={onFinish} layout="vertical">
-                <Form.Item label="Description" name="description" rules={[{ required: true, message: "Please input the description!" }]}>
-                    <Input placeholder="Enter description" />
+            <Form layout="vertical" onFinish={onFinish}>
+                <Form.Item label="Code">
+                    <Input value={codeValue}  onChange={(e) => setCodeValue(e.target.value)}// Allow editing
+                         placeholder="Enter code" />
                 </Form.Item>
-                <Form.Item label="Sub-Descriptions" name="sub_descriptions">
-                    <Input placeholder="Enter sub-descriptions" />
+
+                <Form.Item label="Description">
+                    <Input value={description} onChange={handleDescriptionChange} placeholder="Enter description" />
                 </Form.Item>
-                <Form.Item label="Sub-Description Codes" name="sub_descriptions_code">
-                    <Input placeholder="Enter sub-description codes" />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        Update Code
-                    </Button>
+
+                <label><strong>Sub-Descriptions</strong></label>
+                {subDescriptions.map((sub, index) => (
+                    <Space key={index} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                        <Input
+                            placeholder="Enter code"
+                            value={sub.code}
+                            onChange={(e) => handleSubDescriptionChange(index, "code", e.target.value)}
+                        />
+                        <Input
+                            placeholder="Enter sub-description"
+                            value={sub.sub_description}
+                            onChange={(e) => handleSubDescriptionChange(index, "sub_description", e.target.value)}
+                        />
+                        
+                        <div onClick={() => handleRemoveSubDescription(index)}><MinusCircleOutlined style={{color: "red", fontSize: 20}}/></div>
+                    </Space>
+                ))}
+                
+                <Button type="dashed" onClick={handleAddSubDescription} style={{ marginTop: 10 }}>+ Add Sub-Description</Button>
+
+                <Form.Item style={{ marginTop: 20 }}>
+                    <Button type="primary" htmlType="submit">Update Code</Button>
                 </Form.Item>
             </Form>
         </Modal>

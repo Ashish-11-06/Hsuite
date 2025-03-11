@@ -3,8 +3,8 @@ import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Books from "../pages/Books.jsx";
 import Codes from "../pages/Codes.jsx";
-import Login from "../pages/Login.jsx";
-
+import Profile from "../pages/Profile.jsx";
+import Users from "../pages/Users.jsx";
 
 const MainContent = () => {
   return (
@@ -13,7 +13,8 @@ const MainContent = () => {
       <Route path="/books" element={<Books />} />
       <Route path="/about" element={<About />} />
       <Route path="/codes" element={<Codes />} />
-      <Route path="/login" element={<Login></Login>}></Route>
+      <Route path="/profile" element={<Profile />}></Route>
+      <Route path="/users" element={<Users />}></Route>
     </Routes>
   );
 };

@@ -46,13 +46,13 @@ const AddBookModal = ({ open, onClose }) => {
         </Form.Item>
 
         {/* First Published Year */}
-        <Form.Item
+        {/* <Form.Item
           name="first_publish_year"
           label="First Published Year"
           rules={[{ required: true, message: "Please enter the year" }]}
         >
           <Input placeholder="Enter year" />
-        </Form.Item>
+        </Form.Item> */}
 
         {/* Submit Button */}
         <Form.Item>

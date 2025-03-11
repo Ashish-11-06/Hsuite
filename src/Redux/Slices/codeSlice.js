@@ -5,9 +5,21 @@ import codesAPI from "../API/codeApi";
 export const fetchCodes = createAsyncThunk("codes/fetchCodes", async () => {
   try {
     const response = await codesAPI.getCodes();
+    //console.log("Fetched Codes Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error fetching codes:", error);
+    //console.error("Error fetching codes:", error);
+    throw error;
+  }
+});
+
+// Async thunk for fetching books
+export const fetchBooks = createAsyncThunk("books/fetchBooks", async () => {
+  try {
+    const response = await codesAPI.getBooks(); // Use the new API function
+    return response.data; // Assuming the response is an array of books
+  } catch (error) {
+    //console.error("Error fetching books:", error);
     throw error;
   }
 });
@@ -18,7 +30,7 @@ export const addCode = createAsyncThunk("codes/addCode", async (newCode) => {
     const response = await codesAPI.addCode(newCode);
     return response.data;
   } catch (error) {
-    console.error("Error adding code:", error);
+    //console.error("Error adding code:", error);
     throw error;
   }
 });
@@ -29,7 +41,7 @@ export const editCode = createAsyncThunk("codes/editCode", async (codeData ) => 
     const response = await codesAPI.editCode(codeData);
     return response.data;
   } catch (error) {
-    console.error("Error editing code:", error);
+    //console.error("Error editing code:", error);
     throw error;
   }
 });
@@ -40,16 +52,44 @@ export const deleteCode = createAsyncThunk("codes/deleteCode", async (id) => {
     await codesAPI.deleteCode(id); // Call the delete API
     return id; // Return the deleted code ID
   } catch (error) {
-    console.error("Error deleting code:", error);
+    //console.error("Error deleting code:", error);
     throw error;
   }
 });
+
+// Async thunk for reviewing a code
+export const reviewCode = createAsyncThunk("codes/reviewCode", async ({ id, status }) => {
+  try {
+    console.log(`Updating reviewStatus for code ${id} to ${status}`);
+    const response = await codesAPI.reviewCode(id, status); // Call the review API
+    console.log("Response Data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating review status:", error.response?.data || error.message);
+    throw error;
+  }
+});
+
+//Async thunk for fetching code history
+export const fetchCodeHistory = createAsyncThunk(
+  "codes/fetchCodeHistory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await codesAPI.getCodeHistory(id); // Correct route
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch history");
+    }
+  }
+);
 
 // Code Slice
 const codeSlice = createSlice({
   name: "codes",
   initialState: {
     codes: [],
+    books: [],
+    history: [],
     status: "idle",
     error: null,
   },
@@ -70,13 +110,26 @@ const codeSlice = createSlice({
         state.error = action.error.message || "Failed to fetch codes";
       })
 
+      // Fetch Books Cases
+      .addCase(fetchBooks.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.books = action.payload; // Store the fetched books
+      })
+      .addCase(fetchBooks.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to fetch books";
+      })
+
       // Add Code Cases
       .addCase(addCode.pending, (state) => {
         state.status = "loading";
       })
       .addCase(addCode.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.codes.push(action.payload);
+        // state.codes.push(action.payload);
       })
       .addCase(addCode.rejected, (state, action) => {
         state.status = "failed";
@@ -89,9 +142,21 @@ const codeSlice = createSlice({
       })
       .addCase(editCode.fulfilled, (state, action) => {
         state.status = "succeeded";
+    const updatedCode = action.payload;
+    state.codes = state.codes.map(code => 
+        code.id === updatedCode.id ? updatedCode : code);
+       // code.id === updatedCode.id || code._id === updatedCode._id ? updatedCode : code);
+
         // const index = state.codes.findIndex((code) => code.id === action.payload.id);
         // if (index !== -1) {
         //   state.codes[index] = action.payload; // Update edited code
+        // }
+
+        // const index = state.codes.details.findIndex(code => code.id === action.payload.id);
+        // if (index !== -1) {
+        //     state.codes.details[index] = action.payload;
+        // } else {
+        //     console.error("Code not found in Redux state!", action.payload);
         // }
       })
       .addCase(editCode.rejected, (state, action) => {
@@ -105,12 +170,41 @@ const codeSlice = createSlice({
       })
       .addCase(deleteCode.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.codes = state.codes.filter((code) => code.id !== action.payload); // Remove deleted code
+        // state.codes = state.codes.filter((code) => code.id !== action.payload); // Remove deleted code
       })
       .addCase(deleteCode.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to delete code";
+      })
+
+      //fetch code history cases
+      .addCase(fetchCodeHistory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCodeHistory.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.history = action.payload; // ✅ Store history in state
+      })
+      .addCase(fetchCodeHistory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+
+      //review code cases
+      .addCase(reviewCode.fulfilled, (state, action) => {
+        const { id, reviewStatus } = action.payload;
+        const index = state.codes.findIndex((code) => code.id === id);
+        if (index !== -1) {
+          state.codes[index].reviewStatus = reviewStatus; // Ensure it updates correctly
+        } else {
+          console.error("Code not found in Redux state!", action.payload);
+        }
       });
+
+      
+      
+         
   },
 });
 

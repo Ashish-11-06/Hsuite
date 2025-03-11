@@ -33,9 +33,9 @@ const EditBookModal = ({ open, onClose, book }) => {
         <Form.Item name="version" label="Version" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="first_publish_year" label="First Published Year" rules={[{ required: true }]}>
+        {/* <Form.Item name="first_publish_year" label="First Published Year" rules={[{ required: true }]}>
           <Input />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Save Changes

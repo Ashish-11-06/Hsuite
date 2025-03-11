@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Table, Typography, Spin, Alert, Button, Space, Popconfirm, message } from "antd";
+import { Table, Typography, Spin, Alert, Button, Space, Popconfirm, message, Input } from "antd";
 import { fetchBooks, deleteBook } from "../Redux/Slices/bookSlice";
+import {EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddBookModal from "../Modals/AddBookModal";
 import EditBookModal from "../Modals/EditBookModal"; // Import edit modal
 
@@ -13,6 +14,7 @@ const Books = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // State for Add modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing
+  const [searchTerm, setSearchTerm] = useState(""); // 🔍 Add search term state
 
   useEffect(() => {
     if (status === "idle") {
@@ -38,6 +40,12 @@ const Books = () => {
       .then(() => message.success("Book deleted successfully!"))
       .catch(() => message.error("Failed to delete book"));
   };
+
+    // 🔍 Filter books based on search term
+    const filteredBooks = books.filter((book) =>
+      book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.version.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   // Define table columns
   const columns = [
@@ -66,8 +74,12 @@ const Books = () => {
       key: "actions",
       render: (text, record) => (
         <Space>
-          <Button type="primary" onClick={() => showEditModal(record)}>
-            Edit
+          <Button type="primary" onClick={() => showEditModal(record)}
+            //icon ={<EditOutlined />}
+            style={{ backgroundColor: "#ff9f00", 
+              borderColor: "#ff9f00", 
+              color: "black" }}
+            >Edit
           </Button>
           <Popconfirm
             title="Are you sure you want to delete this book?"
@@ -75,7 +87,9 @@ const Books = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button type="danger">Delete</Button>
+            <Button type="primary" style={{backgroundColor: "#d90027", borderColor: "#d90027"}}
+            //icon = {<DeleteOutlined />}
+            >Delete</Button>
           </Popconfirm>
         </Space>
       ),
@@ -85,6 +99,14 @@ const Books = () => {
   return (
     <div style={{ padding: 20 }}>
       <Title level={2}>Books List</Title>
+
+       {/* 🔍 Search Bar */}
+       <Input
+        placeholder="Search books by name or version..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: 16, width: "300px", marginRight: "65%" }}
+      />
 
       {/* Button to open the modal */}
       <Button type="primary" onClick={showModal} style={{ marginBottom: 20 }}>
@@ -99,7 +121,7 @@ const Books = () => {
 
       {/* Show table when data is available */}
       {status === "succeeded" && (
-        <Table columns={columns} dataSource={books.map((book, index) => ({ ...book, key: index }))} bordered />
+        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index }))} bordered />
       )}
 
       {/* Add Book Modal */}
