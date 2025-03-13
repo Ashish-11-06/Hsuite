@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Space } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 
-const EditCodeModal = ({ open, onClose, code, onEdit }) => {
+const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
     const [form] = Form.useForm();
     const [description, setDescription] = useState("");
     const [subDescriptions, setSubDescriptions] = useState([]);
@@ -33,7 +33,9 @@ const EditCodeModal = ({ open, onClose, code, onEdit }) => {
     };
 
     const handleRemoveSubDescription = (index) => {
-        setSubDescriptions(subDescriptions.filter((_, i) => i !== index));
+        setSubDescriptions((prevSubDescriptions) =>
+            prevSubDescriptions.filter((_, i) => i !== index)
+        );
     };
 
     const onFinish = () => {
@@ -41,13 +43,14 @@ const EditCodeModal = ({ open, onClose, code, onEdit }) => {
             id: code?.id,
             code: codeValue,
             description,
-            sub_descriptions: subDescriptions,
+            user_id: loggedInUserId,
+            sub_descriptions: [...subDescriptions],
         };
         onEdit(updatedData);
         onClose();
     };
 
-    return (
+    return ( 
         <Modal title="Edit Code" open={open} onCancel={onClose} footer={null}>
             <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item label="Code">
@@ -58,7 +61,7 @@ const EditCodeModal = ({ open, onClose, code, onEdit }) => {
                 <Form.Item label="Description">
                     <Input value={description} onChange={handleDescriptionChange} placeholder="Enter description" />
                 </Form.Item>
-
+                 
                 <label><strong>Sub-Descriptions</strong></label>
                 {subDescriptions.map((sub, index) => (
                     <Space key={index} style={{ display: "flex", marginBottom: 8 }} align="baseline">

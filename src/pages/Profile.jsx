@@ -96,7 +96,7 @@ const Profile = () => {
 
             {/* Buttons Row */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 30 }}>
-              <Button
+              {/* <Button
                 type="default"
                 onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
                 icon={isEditing ? <SaveOutlined /> : <EditOutlined />}
@@ -108,7 +108,7 @@ const Profile = () => {
                 }}
               >
                 {isEditing ? "Save" : "Edit"}
-              </Button>
+              </Button> */}
 
               <Button
                 type="primary"

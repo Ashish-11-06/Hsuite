@@ -1,16 +1,21 @@
 import React from "react";
 import { Modal, Form, Input, Button, message } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addBook } from "../Redux/Slices/bookSlice";
 
-const AddBookModal = ({ open, onClose }) => {
+const AddBookModal = ({ open, onClose, loggedInUserId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch(); // ✅ Use Redux dispatch
+  const user = useSelector((state) => state.auth.user);
 
   // Function to handle form submission
   const handleSubmit = async (values) => {
     try {
-      await dispatch(addBook(values)).unwrap(); // ✅ Dispatch addBook action
+      await dispatch(addBook({...values, 
+         user_id: loggedInUserId,  
+         created_by: user?.username, // Username
+        //created_by: { id: user.id, username: user.username },
+      })).unwrap(); // ✅ Dispatch addBook action
       message.success("Book added successfully!");
       form.resetFields(); // Reset form fields
       onClose(); // Close the modal

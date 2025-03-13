@@ -5,10 +5,10 @@ import codesAPI from "../API/codeApi";
 export const fetchCodes = createAsyncThunk("codes/fetchCodes", async () => {
   try {
     const response = await codesAPI.getCodes();
-    //console.log("Fetched Codes Response:", response.data);
+    //console.log("📡 API Response for Codes:", response.data); // Debugging
     return response.data;
   } catch (error) {
-    //console.error("Error fetching codes:", error);
+    //console.error("❌ Error fetching codes:", error.response?.data || error.message);
     throw error;
   }
 });
@@ -30,7 +30,7 @@ export const addCode = createAsyncThunk("codes/addCode", async (newCode) => {
     const response = await codesAPI.addCode(newCode);
     return response.data;
   } catch (error) {
-    //console.error("Error adding code:", error);
+    console.error("Error adding code:", error);
     throw error;
   }
 });
@@ -71,17 +71,15 @@ export const reviewCode = createAsyncThunk("codes/reviewCode", async ({ id, stat
 });
 
 //Async thunk for fetching code history
-export const fetchCodeHistory = createAsyncThunk(
-  "codes/fetchCodeHistory",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await codesAPI.getCodeHistory(id); // Correct route
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch history");
-    }
-  }
-);
+// Async thunk for fetching code history
+export const fetchCodeHistory = createAsyncThunk("codes/fetchCodeHistory", async (id) => {
+  const response = await codesAPI.getCodeHistory(id);
+  return response.data; // Ensure the response data is returned
+});
+
+
+
+
 
 // Code Slice
 const codeSlice = createSlice({
@@ -103,9 +101,11 @@ const codeSlice = createSlice({
       })
       .addCase(fetchCodes.fulfilled, (state, action) => {
         state.status = "succeeded";
+        //console.log("✅ Redux Store Updated with Codes:", action.payload);
         state.codes = action.payload;
       })
       .addCase(fetchCodes.rejected, (state, action) => {
+        //console.error("❌ Error Fetching Codes:", action.error);
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch codes";
       })
@@ -177,19 +177,19 @@ const codeSlice = createSlice({
         state.error = action.error.message || "Failed to delete code";
       })
 
-      //fetch code history cases
-      .addCase(fetchCodeHistory.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchCodeHistory.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.history = action.payload; // ✅ Store history in state
-      })
-      .addCase(fetchCodeHistory.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-
+      // Fetch Code History Cases
+        .addCase(fetchCodeHistory.pending, (state) => {
+            state.status = "loading"; // Set loading state
+        })
+        .addCase(fetchCodeHistory.fulfilled, (state, action) => {
+          state.status = "succeeded"; // Set succeeded state
+          state.history = action.payload; // Store the fetched history
+        })
+        .addCase(fetchCodeHistory.rejected, (state, action) => {
+            state.status = "failed"; // Set failed state
+            state.error = action.error.message; // Store error message
+          })
+      
 
       //review code cases
       .addCase(reviewCode.fulfilled, (state, action) => {

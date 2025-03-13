@@ -7,9 +7,10 @@ import { addCode, fetchCodes, fetchBooks, reviewCode } from "../Redux/Slices/cod
 const { Text } = Typography;
 const { Option } = Select;
 
-const AddCodeModal = ({ open, onClose }) => {
+const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   
   // Get books and codes from Redux state (moved to top level)
   const { books, codes } = useSelector((state) => state.codes); 
@@ -20,12 +21,16 @@ const AddCodeModal = ({ open, onClose }) => {
   }, [dispatch]);
 
   const onFinish = async (values) => {
+
     //console.log(books); // Check if books are properly loaded
 
     const formattedData = {
       book: parseInt(values.book, 10),
       code: values.code,
       description: values.description,
+      //updated_by: { id: user.id, username: user.username },
+       user_id: loggedInUserId,
+       updated_by: user?.username, // Username
       sub_descriptions: values.sub_descriptions.map((item, index) => ({
         code: item.code || `sub_${index + 1}`,
         sub_description: item.sub_description.trim(),

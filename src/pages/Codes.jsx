@@ -18,8 +18,10 @@ const Codes = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
   const [selectedReviewCode, setSelectedReviewCode] = useState(null);
+  const currentUser = useSelector((state) => state.auth.user);
   const [selectedCode, setSelectedCode] = useState(null); // Store selected code for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Search term state
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     if (status === "idle") {
@@ -29,38 +31,22 @@ const Codes = () => {
   }, [status ,dispatch]);
 
   useEffect(() => {
-    //console.log("Fetched Books from Redux:", books);
-  }, [books]);
-
-  useEffect(() => {
-    loadCodes();
-  }, []);
-
-  const loadCodes = async () => {
-    try {
-      const response = await codeAPIs.getCodes();
-      setCodes(response.data);
-    } catch (error) {
-      message.error("Failed to load codes.");
-    }
-  };
+    console.log("Redux codes updated:", codes);
+  }, [codes]);
 
   // ✅ View Code History
-  const handleViewHistory = async (id) => {
-    dispatch(fetchCodeHistory(id))
-      .unwrap()
-      .then((data) => {
-        console.log("Fetched history data:", data);
-        setHistoryData(data.history || []); // Ensure history is an array
-        setIsHistoryModalOpen(true); // Open the modal to show the history
-      })
-      .catch(() => message.error("Failed to fetch history"));
-  };
-  
-
+//   const handleViewHistory = async (id) => {
+//     dispatch(fetchCodeHistory(id))
+//         .unwrap()
+//         .then((data) => {
+//             setHistoryData(data.history || []); // Ensure history is an array
+//             setIsHistoryModalOpen(true); // Open the modal to show the history
+//         })
+//         .catch(() => message.error("Failed to fetch history"));
+// };
 
   // console.log("Books: ", books);
-  // console.log("codes: ", codes);
+  //console.log("codes: ", codes);
 
   //console.log("Fetched Codes from Redux:", codes);
   //console.log("Fetched Books from Redux:", books);
@@ -97,17 +83,18 @@ const Codes = () => {
 
     dispatch(editCode(updatedData))
       .unwrap()
-      .then((updatedData) => {
+      .then(() => {
         message.success("Code updated successfully!");
         //console.log("Updated successfully");
 
         dispatch(fetchCodes()); // ✅ No useSelector inside here
+        setRefresh((prev) => !prev); // 🔄 Force component to re-render
 
         setIsEditModalOpen(false);
         setSelectedCode(null);
       })
       .catch((error) => {
-        //console.error("Failed to update code", error);
+        console.error("Failed to update code", error);
         message.error("Failed to update code");
       });
   };
@@ -215,48 +202,48 @@ const handleReview = (id, status) => {
             >Delete</Button>
           </Popconfirm>
           {/* ✅ View History Button */}
-          <Button type="default" onClick={() => handleViewHistory(record.id)}>
+          {/* <Button type="default" onClick={() => handleViewHistory(record.id)}>
             View History
-          </Button>
+          </Button> */}
         </Space>
       ),
     },
-    {
-      title: "Review",
-      key: "review",
-      render: (text, record) => (
-        <Space>
-          {!record.reviewStatus ? ( // Show button only if not reviewed
-            <Button type="primary" onClick={() => showReviewModal(record)} style={{backgroundColor: "#007f5f", borderColor: 
-              "#007f5f"
-            }}>Review</Button>
-          ) : record.reviewStatus === "approved" ? (
-            <span style={{ fontSize: "18px", cursor: "default", color: "green" }}><CheckOutlined /></span>
-          ) : (
-            <span style={{ fontSize: "18px", cursor: "default", color: "red" }}><CloseOutlined /></span> // Different color for rejected
-          )}
-        </Space>
-      ),
-    },
+    // {
+    //   title: "Review",
+    //   key: "review",
+    //   render: (text, record) => (
+    //     <Space>
+    //       {!record.reviewStatus ? ( // Show button only if not reviewed
+    //         <Button type="primary" onClick={() => showReviewModal(record)} style={{backgroundColor: "#007f5f", borderColor: 
+    //           "#007f5f"
+    //         }}>Review</Button>
+    //       ) : record.reviewStatus === "approved" ? (
+    //         <span style={{ fontSize: "18px", cursor: "default", color: "green" }}><CheckOutlined /></span>
+    //       ) : (
+    //         <span style={{ fontSize: "18px", cursor: "default", color: "red" }}><CloseOutlined /></span> // Different color for rejected
+    //       )}
+    //     </Space>
+    //   ),
+    // },
     
-    {
-      title: "Review Status",
-      dataIndex: "reviewStatus",
-      key: "reviewStatus",
-      render: (status) => {
-        if (status === "approved") {
-          return <span style={{ color: "green" }}><CheckOutlined /> Approved</span>;
-        } else if (status === "rejected") {
-          return <span style={{ color: "red" }}><CloseOutlined /> Rejected</span>;
-        } else {
-          return (
-            <span style={{ color: "#505050", fontSize: "18px" }}>
-              <CloseOutlined /><CloseOutlined /><CloseOutlined />
-            </span>
-          ); // Default: Three ❌ in purple
-        }
-      },
-    },
+    // {
+    //   title: "Review Status",
+    //   dataIndex: "reviewStatus",
+    //   key: "reviewStatus",
+    //   render: (status) => {
+    //     if (status === "approved") {
+    //       return <span style={{ color: "green" }}><CheckOutlined /> Approved</span>;
+    //     } else if (status === "rejected") {
+    //       return <span style={{ color: "red" }}><CloseOutlined /> Rejected</span>;
+    //     } else {
+    //       return (
+    //         <span style={{ color: "#505050", fontSize: "18px" }}>
+    //           <CloseOutlined /><CloseOutlined /><CloseOutlined />
+    //         </span>
+    //       ); // Default: Three ❌ in purple
+    //     }
+    //   },
+    // },
     
     
   ];
@@ -301,12 +288,15 @@ const handleReview = (id, status) => {
         <Alert message="No codes available" type="info" showIcon />
       )}
 
-      <AddCodeModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddCodeModal open={isModalOpen} onClose={() => setIsModalOpen(false)} 
+         loggedInUserId={currentUser?.id}
+        />
       <EditCodeModal 
         open={isEditModalOpen} 
         onClose={() => setIsEditModalOpen(false)} 
         code={selectedCode} 
         onEdit={handleEdit} // ✅ Pass correct function
+        loggedInUserId={currentUser?.id}
       />
        <ReviewCodeModal open={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} onReview={handleReview} code={selectedReviewCode} />
 

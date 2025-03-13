@@ -13,6 +13,7 @@ const Books = () => {
   const { books, status, error } = useSelector((state) => state.books);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for Add modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
+   const currentUser = useSelector((state) => state.auth.user);
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Add search term state
 
@@ -64,6 +65,21 @@ const Books = () => {
       dataIndex: "version",
       key: "version",
     },
+    // {
+    //   title: "Updated By",
+    //   dataIndex: "updated_by",
+    //   key: "updated_by",
+    //   render: (updated_by) => updated_by?.username, // Handle missing username
+    // },
+    // {
+    //   title: "Created By",
+    //   dataIndex: "created_by",
+    //   key: "created_by",
+    //   render: (created_by) => created_by?.username,
+    // },
+    
+    
+   
     // {
     //   title: "Published Year",
     //   dataIndex: "first_publish_year",
@@ -121,11 +137,13 @@ const Books = () => {
 
       {/* Show table when data is available */}
       {status === "succeeded" && (
-        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index }))} bordered />
+        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered />
       )}
 
       {/* Add Book Modal */}
-      <AddBookModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddBookModal open={isModalOpen} onClose={() => setIsModalOpen(false)} 
+       loggedInUserId={currentUser?.id} 
+        />
 
       {/* Edit Book Modal */}
       {selectedBook && (
@@ -133,6 +151,7 @@ const Books = () => {
           open={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           book={selectedBook}
+          loggedInUserId={currentUser?.id}
         />
       )}
     </div>

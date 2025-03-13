@@ -57,9 +57,9 @@ const Sidebar = () => {
           <Link to="/settings">Settings</Link>
         </Menu.Item> */}
 
-        <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
+        {/* <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
           <Link to="/users">Users</Link>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
 
       {/* Show Logout only if the user is logged in */}

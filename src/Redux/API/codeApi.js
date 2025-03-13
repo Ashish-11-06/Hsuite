@@ -11,13 +11,18 @@ const codeAPIs = {
     return axiosInstance.get(`/book-details/${id}`); 
   },
 
-  addCode: (newBook) => {
-    return axiosInstance.post(`/book-details`, newBook);
+  addCode: (newCode) => {
+    return axiosInstance.post(`/book-details`, newCode);
   },
 
   editCode: (codeData)=>{
-  //   console.log("Editing code with ID:", id); // Log the ID
-    //console.log("Data being sent:", codeData);
+    if (!codeData.id) {
+      console.error("❌ Error: ID is missing in codeData");
+      return Promise.reject("ID is undefined");
+  }
+
+   console.log("Editing code with ID:", codeData.id); // Log the ID
+    console.log("Data being sent:", codeData);
     return axiosInstance.put(`/book-details`, codeData);
   },
 
@@ -34,9 +39,10 @@ const codeAPIs = {
   },
 
   //Fetch code history
-  getCodeHistory: (id) => {
-    return axiosInstance.put(`/book-details`)
-  },
+  // getCodeHistory: () => {
+  //   //console.log("✅ Calling API with ID:", id); // Add log here
+  //   return axiosInstance.put(`/book-details`)
+  // },
 };
 
 export default codeAPIs;

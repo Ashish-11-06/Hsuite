@@ -1,28 +1,32 @@
-import React from "react";
-import { Modal, Alert } from "antd"; // Ensure Modal and Alert are imported from Ant Design
+import React, { useEffect } from "react";
+import { Modal, List, Spin, Alert } from "antd";
 
 const HistoryModal = ({ open, onClose, history }) => {
+  useEffect(() => {
+      //console.log("🔵 Rendering HistoryModal with data:", history);
+  }, [history]);
+
   return (
-    <Modal
-      title="Code History"
-      open={open} // Open state is passed as prop
-      onCancel={onClose} // onClose function to close modal
-      footer={null} // No footer buttons for now
-      width={600}
-    >
-      {/* Check if history data is available */}
-      {history && history.length > 0 ? (
-        history.map((entry, index) => (
-          <div key={index}>
-            <p><strong>Date:</strong> {entry.date}</p> {/* Adjust field names based on your history data */}
-            <p><strong>Description:</strong> {entry.description}</p> {/* Adjust field names based on your history data */}
-          </div>
-        ))
-      ) : (
-        <Alert message="No history available" type="info" showIcon />
-      )}
-    </Modal>
+      <Modal title="History" open={open} onCancel={onClose} footer={null}>
+          {history.length === 0 ? (
+              <Alert message="No history available" type="info" showIcon />
+          ) : (
+              <List
+                  bordered
+                  dataSource={history}
+                  renderItem={(item) => (
+                      <List.Item>
+                          <div>
+                              <strong>{item.changes.code || "No Code"}</strong>
+                              <p>{item.changes.sub_description || "No Description"}</p>
+                              <p>Updated by: {item.updated_by}</p>
+                              <p>Updated at: {new Date(item.updated_at).toLocaleString()}</p>
+                          </div>
+                      </List.Item>
+                  )}
+              />
+          )}
+      </Modal>
   );
 };
-
 export default HistoryModal;
