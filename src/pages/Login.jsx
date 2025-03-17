@@ -103,13 +103,13 @@ const Login = () => {
           </Button>
         </Form.Item>
       </Form>
-
+{/* 
       <p>
         Don't have an account?{" "}
         <Button type="link" onClick={() => setIsModalVisible(true)}>
           Register
         </Button>
-      </p>
+      </p> */}
 
       {/* 🔹 Registration Modal */}
       <Modal title="Register" open={isModalVisible} onCancel={() => setIsModalVisible(false)} footer={null}>

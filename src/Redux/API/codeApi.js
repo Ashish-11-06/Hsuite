@@ -21,8 +21,8 @@ const codeAPIs = {
       return Promise.reject("ID is undefined");
   }
 
-   console.log("Editing code with ID:", codeData.id); // Log the ID
-    console.log("Data being sent:", codeData);
+   //console.log("Editing code with ID:", codeData.id); // Log the ID
+    //console.log("Data being sent:", codeData);
     return axiosInstance.put(`/book-details`, codeData);
   },
 

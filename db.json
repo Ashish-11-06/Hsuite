@@ -1,17 +1,26 @@
 {
-  "users": [
+  "assessments": [
     {
-      "id": "2",
-      "username": "medic_coder",
-      "email": "medic_coder@example.com",
-      "password": "medic123",
-      "role": "Editor"
+      "id": 1,
+      "type": "multiple-choice",
+      "question": "How do you approach problem-solving?",
+      "options": [
+        "Logical analysis",
+        "Creative thinking",
+        "Following a structured plan",
+        "Trial and error"
+      ]
     },
     {
-      "id": "3",
-      "username": "health_guru",
-      "email": "health_guru@example.com",
-      "password": "guru123"
+      "id": 2,
+      "type": "statement-based",
+      "question": "Which statement describes you best?",
+      "statements": [
+        "I prefer working alone and focusing deeply.",
+        "I enjoy collaborating and brainstorming with others."
+      ]
     }
-  ]
+  ],
+  "responses": [],
+  "results": []
 }

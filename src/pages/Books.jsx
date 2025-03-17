@@ -42,6 +42,8 @@ const Books = () => {
       .catch(() => message.error("Failed to delete book"));
   };
 
+  
+
     // 🔍 Filter books based on search term
     const filteredBooks = books.filter((book) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,6 +61,18 @@ const Books = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: "Author",
+      dataIndex: "author",
+      key: "author",
+      render: (author) => author || "N/A",
+    },
+    {
+      title: "Code Sets", // 📌 Add Code Sets Column
+      dataIndex: "codeSets",
+      key: "codeSets",
+      render: (codeSets) => (codeSets?.length > 0 ? codeSets.join(", ") : "No Code Sets"), // Show comma-separated codes
     },
     {
       title: "Version",

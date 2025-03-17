@@ -16,6 +16,10 @@ const booksAPIs = {
   deleteBook: (id) => {
     return axiosInstance.delete(`/books/${id}`);
   },
+  // Add Code Set to an existing book
+  addCodeSetToBook: (id, codeSet) => {
+    return axiosInstance.patch(`/books/${id}`, codeSet );
+  },
 
 //   addSubUser: (id, data) => {
 //     return axiosInstance.post(`/accounts/add-sub-user/${id}`, data);

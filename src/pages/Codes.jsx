@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Checkbox, Tooltip } from "antd";
+import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Checkbox, Tooltip, Select } from "antd";
 import { fetchCodes, deleteCode, editCode, fetchBooks, reviewCode, fetchCodeHistory } from "../Redux/Slices/codeSlice";
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
@@ -21,6 +21,9 @@ const Codes = () => {
   const currentUser = useSelector((state) => state.auth.user);
   const [selectedCode, setSelectedCode] = useState(null); // Store selected code for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Search term state
+  const [selectedBook, setSelectedBook] = useState(null); // Track selected book
+    const [codeSearchTerm, setCodeSearchTerm] = useState(null); // 🔍 Search term for code
+    const [globalSearch, setGlobalSearch] = useState("");
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ const Codes = () => {
   }, [status ,dispatch]);
 
   useEffect(() => {
-    console.log("Redux codes updated:", codes);
+   // console.log("Redux codes updated:", codes);
   }, [codes]);
 
   // ✅ View Code History
@@ -79,11 +82,12 @@ const Codes = () => {
   };
 
   const handleEdit = (updatedData) => {
-    //console.log("Updated data to be sent:", updatedData);
+    console.log("Updated data to be sent:", updatedData);
 
     dispatch(editCode(updatedData))
       .unwrap()
       .then(() => {
+        //console.log("✅ Server Response:", response);  // Debug server response
         message.success("Code updated successfully!");
         //console.log("Updated successfully");
 
@@ -107,22 +111,22 @@ const Codes = () => {
 //   return bookName.toLowerCase().includes(searchTerm.toLowerCase());
 // }) : [];
 
-const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
-  const bookName = code.book?.name || "Unknown Book"; // Get book name safely
-  const mainCode = code.code || ""; // Get main code safely
-  const description = code.description || ""; // Get description safely
+// const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
+//   const bookName = code.book?.name || "Unknown Book"; // Get book name safely
+//   const mainCode = code.code || ""; // Get main code safely
+//   const description = code.description || ""; // Get description safely
 
-  // Extract sub_descriptions as a string (joining sub codes and sub descriptions)
-  const subDescriptions = (code.sub_descriptions || [])
-    .map(sub => `${sub.code} ${sub.sub_description}`)
-    .join(" ") // Converts array to a searchable string
+//   // Extract sub_descriptions as a string (joining sub codes and sub descriptions)
+//   const subDescriptions = (code.sub_descriptions || [])
+//     .map(sub => `${sub.code} ${sub.sub_description}`)
+//     .join(" ") // Converts array to a searchable string
 
-  // Convert everything to lowercase and check if search term exists in any field
-  return [bookName, mainCode, description, subDescriptions]
-    .join(" ") // Combine all fields into a single searchable string
-    .toLowerCase()
-    .includes(searchTerm.toLowerCase());
-}) : [];
+//   // Convert everything to lowercase and check if search term exists in any field
+//   return [bookName, mainCode, description, subDescriptions]
+//     .join(" ") // Combine all fields into a single searchable string
+//     .toLowerCase()
+//     .includes(searchTerm.toLowerCase());
+// }) : [];
 
 
 
@@ -141,10 +145,74 @@ const handleReview = (id, status) => {
   setIsReviewModalOpen(false);
 };
 
+// Function to handle book selection
+const handleBookChange = (value) => {
+  setSelectedBook(value);
+};
+
+// // Filter codes based on book selection
+// const bookFilteredCodes = Array.isArray(codes) ? codes.filter((code) => {
+//   const bookName = code.book?.name || "Unknown Book"; 
+//   const mainCode = code.code || ""; 
+//   const description = code.description || ""; 
+
+//   const subDescriptions = (code.sub_descriptions || [])
+//     .map(sub => `${sub.code} ${sub.sub_description}`)
+//     .join(" ");
+
+//   const matchesSearch = [bookName, mainCode, description, subDescriptions]
+//     .join(" ")
+//     .toLowerCase()
+//     .includes(searchTerm.toLowerCase());
+
+//   const matchesSelectedBook = !selectedBook || bookName === selectedBook; 
+
+//   return matchesSearch && matchesSelectedBook; 
+// }) : [];
+
+
+  // Filtering logic with three search bars
+  const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
+    const bookName = code.book?.name || "Unknown Book"; 
+    const mainCode = code.code || ""; 
+    const description = code.description || ""; 
+  
+    const subDescriptions = (code.sub_descriptions || [])
+      .map(sub => `${sub.code} ${sub.sub_description}`)
+      .join(" ");
+  
+    // Global search across all fields
+    const globalMatch = [bookName, mainCode, description, subDescriptions]
+      .join(" ")
+      .toLowerCase()
+      .includes(globalSearch.toLowerCase());
+  
+    // Book and Code dropdown filter
+    const bookMatch = !selectedBook || bookName === selectedBook;
+    const codeMatch = !codeSearchTerm || mainCode === codeSearchTerm;
+  
+    return globalMatch && bookMatch && codeMatch;
+  }) : [];
 
   const columns = [
     {
-      title: "Book",
+      title: (
+        <div>
+          Book
+          <Select
+            showSearch
+            placeholder="Filter by book"
+            value={selectedBook}
+            onChange={(value) => setSelectedBook(value)}
+            allowClear
+            style={{ width: 150, marginLeft: 10 }}
+            options={books?.map((book) => ({
+              label: book.name,
+              value: book.name,
+            }))}
+          />
+        </div>
+      ),
       dataIndex: "book",
       render: (book) => book?.name || "Unknown Book",
         //console.log("Record:", record); // Debugging log
@@ -153,9 +221,27 @@ const handleReview = (id, status) => {
       key: "book",
     }, 
     {
+      // title: (
+      //   <div>
+      //     Code
+      //     <Select
+      //       showSearch
+      //       placeholder="Filter by Code"
+      //       value={codeSearchTerm}
+      //       onChange={(value) => setCodeSearchTerm(value)}
+      //       allowClear
+      //       style={{ width: 150, marginLeft: 10 }}
+      //       options={codes?.map((code) => ({
+      //         label: code.code,
+      //         value: code.code,
+      //       }))}
+      //     />
+      //   </div>
+      // ),
       title: "Code",
       dataIndex: "code",
       key: "code",
+      width: 250
     },
     {
       title: "Description",
@@ -257,9 +343,9 @@ const handleReview = (id, status) => {
        {/* 🔍 Search Bar */}
        <Input
         placeholder="Search by book name..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginBottom: "16px", width: "300px", marginRight: "65%" }}
+        value={globalSearch}
+        onChange={(e) => setGlobalSearch(e.target.value)}
+        style={{ marginBottom: "16px", width: "500px", marginRight: "40%" }}
       />
 
       <Button type="primary" onClick={showModal} style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>

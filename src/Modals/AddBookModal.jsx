@@ -1,28 +1,53 @@
-import React from "react";
-import { Modal, Form, Input, Button, message } from "antd";
+import React, {useState} from "react";
+import { Modal, Form, Input, Button, message, Space, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { addBook } from "../Redux/Slices/bookSlice";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+
+const { Text } = Typography;
 
 const AddBookModal = ({ open, onClose, loggedInUserId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch(); // ✅ Use Redux dispatch
   const user = useSelector((state) => state.auth.user);
+  const [codeSets, setCodeSets] = useState([{ code: "" }]); // Initialize as objects
 
   // Function to handle form submission
   const handleSubmit = async (values) => {
     try {
       await dispatch(addBook({...values, 
+        codeSets,
          user_id: loggedInUserId,  
          created_by: user?.username, // Username
         //created_by: { id: user.id, username: user.username },
       })).unwrap(); // ✅ Dispatch addBook action
       message.success("Book added successfully!");
       form.resetFields(); // Reset form fields
+      setCodeSets([""]); // Reset codeSets fields after submission
       onClose(); // Close the modal
     } catch (error) {
       message.error("Failed to add book");
     }
   };
+
+ 
+// Function to add a new code set field
+const addCodeSet = () => {
+  setCodeSets([...codeSets, { code: "" }]); // Maintain object structure
+};
+
+// Function to update a code set field
+const updateCodeSet = (index, value) => {
+  const newCodeSets = [...codeSets];
+  newCodeSets[index].code = value;
+  setCodeSets(newCodeSets);
+};
+
+// Function to remove a specific code set field
+const removeCodeSet = (index) => {
+  setCodeSets(codeSets.filter((_, i) => i !== index));
+};
+
 
   return (
     <Modal
@@ -58,6 +83,39 @@ const AddBookModal = ({ open, onClose, loggedInUserId }) => {
         >
           <Input placeholder="Enter year" />
         </Form.Item> */}
+
+         {/* Author Name */}
+         <Form.Item name="author" label="Author" rules={[{ required: true, message: "Please enter the author's name" }]}>
+          <Input placeholder="Enter author name" />
+        </Form.Item>
+
+       {/* Code Sets Section - Matching AddCodeModal Styling */}
+       <Text strong>Code Sets</Text>
+        <Form.Item>
+          {codeSets.map((set, index) => (
+            <Space key={index} style={{ display: "flex", marginBottom: 8, width: "100%" }} align="baseline">
+              <Input
+                placeholder="Enter Code Set"
+                value={codeSets[index].code}
+                onChange={(e) => updateCodeSet(index, e.target.value)}
+                // onChange={(e) => {
+                //   const newCodeSets = [...codeSets];
+                //   newCodeSets[index].code = e.target.value;
+                //   setCodeSets(newCodeSets);
+                // }}
+                style={{ width: "100%" }} // Ensuring consistent width
+              />
+              {codeSets.length > 1 && (
+                <MinusCircleOutlined onClick={() => removeCodeSet(index)} style={{ color: "red", fontSize: 20 }} />
+              )}
+            </Space>
+          ))}
+          <Button type="dashed" onClick={addCodeSet} block icon={<PlusOutlined />} style={{ marginTop: 8, width: "100%" }}>
+            Add Code Set
+          </Button>
+        </Form.Item>
+
+
 
         {/* Submit Button */}
         <Form.Item>

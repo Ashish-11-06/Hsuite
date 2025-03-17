@@ -32,23 +32,52 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         setSubDescriptions([...subDescriptions, { code: "", sub_description: "" }]);
     };
 
+    // const handleRemoveSubDescription = (index) => {
+    //     setSubDescriptions((prevSubDescriptions) =>
+    //         prevSubDescriptions.filter((_, i) => i !== index)
+    //     );
+    // };
+
     const handleRemoveSubDescription = (index) => {
-        setSubDescriptions((prevSubDescriptions) =>
-            prevSubDescriptions.filter((_, i) => i !== index)
-        );
+        setSubDescriptions((prevSubDescriptions) => {
+            const updatedSubDescriptions = prevSubDescriptions.filter((_, i) => i !== index);
+            return [...updatedSubDescriptions]; // Ensure a new array is created
+        });
     };
+    
+
+    // const onFinish = () => {
+    //     const updatedData = {
+    //         id: code?.id,
+    //         code: codeValue,
+    //         description,
+    //         user_id: loggedInUserId,
+    //         //sub_descriptions: [...subDescriptions],
+    //         sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
+    //     };
+    //     onEdit(updatedData);
+    //     onClose();
+    // };
 
     const onFinish = () => {
+        const filteredSubDescriptions = subDescriptions.filter(
+            sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""
+        );
+    
         const updatedData = {
             id: code?.id,
             code: codeValue,
             description,
             user_id: loggedInUserId,
-            sub_descriptions: [...subDescriptions],
+            sub_descriptions: filteredSubDescriptions, // Use the latest filtered data
         };
+    
+        console.log("Updated Data Sent:", updatedData); // Debugging to check data before sending
+    
         onEdit(updatedData);
         onClose();
     };
+    
 
     return ( 
         <Modal title="Edit Code" open={open} onCancel={onClose} footer={null}>

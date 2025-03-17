@@ -45,6 +45,17 @@ export const deleteBook = createAsyncThunk("books/deleteBook", async (id) => {
   }
 });
 
+// Add a Code Set to a book
+export const addCodeSetToBook = createAsyncThunk("books/addCodeSet", async ({ id, codeSet }) => {
+  try {
+    const response = await booksAPIs.addCodeSetToBook(id, codeSet);
+    return { id, codeSet };
+  } catch (error) {
+    console.error("Error adding Code Set:", error);
+    throw error;
+  }
+});
+
 // Book Slice
 const bookSlice = createSlice({
   name: "books",
@@ -89,10 +100,10 @@ const bookSlice = createSlice({
       })
       .addCase(editBook.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const index = state.books.findIndex((book) => book.id === action.payload.id);
-        if (index !== -1) {
-          state.books[index] = action.payload; // Update the edited book
-        }
+        // const index = state.books.findIndex((book) => book.id === action.payload.id);
+        // if (index !== -1) {
+        //   state.books[index] = action.payload; // Update the edited book
+        // }
       })
       .addCase(editBook.rejected, (state, action) => {
         state.status = "failed";
@@ -110,6 +121,14 @@ const bookSlice = createSlice({
       .addCase(deleteBook.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to delete book";
+      })
+
+       // Add Code Set to Book
+       .addCase(addCodeSetToBook.fulfilled, (state, action) => {
+        const book = state.books.find(book => book.id === action.payload.id);
+        if (book) {
+          book.codeSets = [...book.codeSets, action.payload.codeSet];
+        }
       });
   },
 });

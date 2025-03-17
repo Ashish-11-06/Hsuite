@@ -145,6 +145,8 @@ const codeSlice = createSlice({
     const updatedCode = action.payload;
     state.codes = state.codes.map(code => 
         code.id === updatedCode.id ? updatedCode : code);
+
+        console.log("✅ Updated Redux State:", state.codes); // Debug log
        // code.id === updatedCode.id || code._id === updatedCode._id ? updatedCode : code);
 
         // const index = state.codes.findIndex((code) => code.id === action.payload.id);
@@ -170,7 +172,7 @@ const codeSlice = createSlice({
       })
       .addCase(deleteCode.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // state.codes = state.codes.filter((code) => code.id !== action.payload); // Remove deleted code
+        state.codes = state.codes.filter((code) => code.id !== action.payload); // Remove deleted code
       })
       .addCase(deleteCode.rejected, (state, action) => {
         state.status = "failed";
