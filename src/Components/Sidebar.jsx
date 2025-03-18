@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../Redux/Slices/authSlice";
 
 const { Sider } = Layout;
+const { SubMenu } = Menu; // Import SubMenu from Menu
 
 const Sidebar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -25,6 +26,7 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/codes")) return "3";
     if (location.pathname.startsWith("/profile")) return "4";
     if (location.pathname.startsWith("/users")) return "5";
+    if (location.pathname.startsWith("/assessents")) return "6";
     return "1"; // Default to Home
   };
 
@@ -49,6 +51,15 @@ const Sidebar = () => {
         <Menu.Item key="3" icon={<InfoCircleOutlined />}>
           <Link to="/codes">Codes</Link>
         </Menu.Item>
+        {/* SubMenu for Assessments */}
+        <SubMenu key="6" icon={<InfoCircleOutlined />} title="Assessments">
+          <Menu.Item key="6-1">
+            <Link to="/assessents">Test</Link>
+          </Menu.Item>
+          <Menu.Item key="6-2">
+            <Link to="/report">Report</Link>
+          </Menu.Item>
+        </SubMenu>
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>
         </Menu.Item>
@@ -60,6 +71,7 @@ const Sidebar = () => {
         {/* <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
           <Link to="/users">Users</Link>
         </Menu.Item> */}
+        
       </Menu>
 
       {/* Show Logout only if the user is logged in */}

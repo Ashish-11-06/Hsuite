@@ -1,7 +1,7 @@
 {
-  "assessments": [
+  "questions": [
     {
-      "id": 1,
+      "id": "1",
       "type": "multiple-choice",
       "question": "How do you approach problem-solving?",
       "options": [
@@ -12,15 +12,102 @@
       ]
     },
     {
-      "id": 2,
+      "id": "2",
+      "type": "multiple-choice",
+      "question": "Which best describes your decision-making style?",
+      "options": [
+        "Data-driven",
+        "Intuitive",
+        "Consensus-based",
+        "Spontaneous"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "multiple-choice",
+      "question": "What motivates you the most?",
+      "options": [
+        "Solving complex problems",
+        "Creating something new",
+        "Helping others",
+        "Achieving personal goals"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "multiple-choice",
+      "question": "How do you learn best?",
+      "options": [
+        "Reading and research",
+        "Hands-on experience",
+        "Group discussions",
+        "Trial and error"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "multiple-choice",
+      "question": "Which of these activities do you enjoy?",
+      "options": [
+        "Math puzzles",
+        "Painting",
+        "Debating",
+        "Exploring new places"
+      ]
+    },
+    {
+      "id": "6",
       "type": "statement-based",
       "question": "Which statement describes you best?",
       "statements": [
         "I prefer working alone and focusing deeply.",
         "I enjoy collaborating and brainstorming with others."
       ]
+    },
+    {
+      "id": "7",
+      "type": "statement-based",
+      "question": "Which of these do you value most?",
+      "statements": [
+        "Logic and structure.",
+        "Creativity and freedom."
+      ]
+    },
+    {
+      "id": "8",
+      "type": "statement-based",
+      "question": "How do you handle challenges?",
+      "statements": [
+        "I analyze and break it down logically.",
+        "I find creative ways to solve it."
+      ]
+    },
+    {
+      "id": "9",
+      "type": "statement-based",
+      "question": "Which best describes your personality?",
+      "statements": [
+        "I am highly organized.",
+        "I am spontaneous and adventurous."
+      ]
+    },
+    {
+      "id": "10",
+      "type": "statement-based",
+      "question": "How do you handle pressure?",
+      "statements": [
+        "I stay calm and think logically.",
+        "I find innovative solutions."
+      ]
     }
   ],
-  "responses": [],
-  "results": []
+  "assessments": [
+    
+  ],
+  "results": [
+    
+  ],
+  "responses": [
+
+  ]
 }
