@@ -6,7 +6,7 @@ const booksAPIs = {
   },
 
   addBook: (newBook) => {
-    return axiosInstance.post(`/books`, newBook);
+    return axiosInstance.post(`/books/`, newBook);
   },
   
   editBook: (id, bookData) => {
