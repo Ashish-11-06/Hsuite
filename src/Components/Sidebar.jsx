@@ -52,14 +52,14 @@ const Sidebar = () => {
           <Link to="/codes">Codes</Link>
         </Menu.Item>
         {/* SubMenu for Assessments */}
-        <SubMenu key="6" icon={<InfoCircleOutlined />} title="Assessments">
+        {/* <SubMenu key="6" icon={<InfoCircleOutlined />} title="Assessments">
           <Menu.Item key="6-1">
             <Link to="/assessents">Test</Link>
           </Menu.Item>
           <Menu.Item key="6-2">
             <Link to="/report">Report</Link>
           </Menu.Item>
-        </SubMenu>
+        </SubMenu> */}
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>
         </Menu.Item>
