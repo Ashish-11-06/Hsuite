@@ -67,3 +67,13 @@ body {
   .ant-menu-item-selected{
     background-color: #5cb3ff !important;
   }
+
+  :where(.css-1v613y0) a {
+    color: black;
+    text-decoration: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    -webkit-text-decoration-skip: objects;
+}
