@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
 import { Layout } from "antd";
 import HeaderComponent from "./Components/HeaderComponent.jsx";
-import FooterComponent from "./components/FooterComponent.jsx";
-import MainContent from "./components/MainContent.jsx";
+import FooterComponent from "./Components/FooterComponent.jsx";
+import MainContent from "./Components/MainContent.jsx";
 import "./App.css";
 import Login from "./pages/Login.jsx";
 import Sidebar from "./Components/Sidebar.jsx";

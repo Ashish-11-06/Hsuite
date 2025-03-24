@@ -1,48 +1,85 @@
-import React, { useEffect, useState } from "react";
-import { Card, Spin, Alert } from "antd";
-import { getUserResults } from "../Redux/API/assessmentapi";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAssessmentHistory } from "../Redux/Slices/assessmentSlice";
+import { Table, Card } from "antd";
 
-const Report = ({ userId }) => {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+export const Report = ({ userId }) => {
+  const dispatch = useDispatch();
+  const history = useSelector((state) => state.assessments.history);
+  const loading = useSelector((state) => state.assessments.loading);
+  const error = useSelector((state) => state.assessments.error);
+
+  userId=1;
+  // Check if userId is defined
+  if (!userId) {
+    return <p>User ID is not available. Please log in.</p>;
+  }
 
   useEffect(() => {
-    fetchUserHistory();
-  }, []);
-
-  const fetchUserHistory = async () => {
-    setLoading(true);
-    try {
-      const { data } = await getUserResults(userId);
-      setHistory(data);
-    } catch (err) {
-      setError("Error fetching assessment history.");
+    if (userId) { // Only dispatch if userId is defined
+      dispatch(fetchAssessmentHistory(userId));
     }
-    setLoading(false);
-  };
+  }, [dispatch, userId]);
 
-  if (loading) return <Spin tip="Loading assessment history..." />;
-  if (error) return <Alert message={error} type="error" />;
+  console.log("History Data:", history)
+
+  // Define columns for the table
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Logical",
+      dataIndex: "logical",
+      key: "logical",
+    },
+    {
+      title: "Analytical",
+      dataIndex: "analytical",
+      key: "analytical",
+    },
+    {
+      title: "Strategic",
+      dataIndex: "strategic",
+      key: "strategic",
+    },
+    {
+      title: "Thinking",
+      dataIndex: "thinking",
+      key: "thinking",
+    },
+    {
+      title: "Skipped",
+      dataIndex: "skip",
+      key: "skip",
+    },
+    {
+      title: "Total",
+      dataIndex: "total",
+      key: "total",
+    },
+    {
+      title: "Date",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (date) => new Date(date).toLocaleString(),
+    },
+  ];
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Assessment History</h2>
-      {history.length > 0 ? (
-        history.map((assessment, index) => (
-          <Card key={index} style={{ marginBottom: 10 }}>
-            <p><strong>Date:</strong> {new Date(assessment.date).toLocaleString()}</p>
-            <p><strong>Primary Trait:</strong> {Object.keys(assessment.scores)[0] || "Unknown"}</p>
-            {Object.entries(assessment.scores).map(([trait, percentage]) => (
-              <p key={trait}>{trait}: {percentage}%</p>
-            ))}
-          </Card>
-        ))
+    <Card title="Assessment History" style={{ margin: "20px" }}>
+      {loading ? (
+        <p>Loading history...</p>
       ) : (
-        <p>No past assessments found.</p>
+        <Table
+          dataSource={history || []}
+          columns={columns}
+          rowKey="id"
+          pagination={{ pageSize: 5 }} // Add pagination
+        />
       )}
-    </div>
+    </Card>
   );
 };
-
-export default Report;

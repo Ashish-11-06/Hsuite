@@ -42,7 +42,7 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await authAPI.loginUser(credentials);
       //console.log("🔹 Login Response:", response.data);
-
+      
       if (!response.data || !response.data.token || !response.data.user) {
         return rejectWithValue("Invalid login response");
       }
@@ -127,6 +127,7 @@ const authSlice = createSlice({
     
         localStorage.setItem("token", action.payload.token); // 🛠 Ensure token is stored
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("role", action.payload.user.role);
     
         window.location.href = "/"; // 🔥 Force Redirect After Login
     })

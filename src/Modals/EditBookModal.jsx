@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, message, Space, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { editBook } from "../Redux/Slices/bookSlice";
+import { editBook, fetchBooks } from "../Redux/Slices/bookSlice";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -10,45 +10,55 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const [codeSets, setCodeSets] = useState([]);
+  const [code_sets, setCodeSets] = useState([]);
 
   useEffect(() => {
     if (book) {
       form.setFieldsValue(book); // Set form values
-      setCodeSets(book.codeSets || [{ code: "" }]);
+      setCodeSets(book.code_sets || [{ name: "" }]);
     }
   }, [book, form]);
 
-   // Function to update a specific code set
-   const updateCodeSet = (index, value) => {
-    const newCodeSets = [...codeSets];
-    newCodeSets[index].code = value;
-    setCodeSets(newCodeSets);
+  const updateCodeSet = (index, value) => {
+    setCodeSets((prevCodeSets) => 
+      prevCodeSets.map((set, i) => 
+        i === index ? { ...set, name: value } : set
+      )
+    );
   };
 
   // Function to add a new code set field
   const addCodeSet = () => {
-    setCodeSets([...codeSets, { code: "" }]);
+    setCodeSets([...code_sets, { name: "" }]);
   };
 
   // Function to remove a specific code set field
   const removeCodeSet = (index) => {
-    setCodeSets(codeSets.filter((_, i) => i !== index));
+    setCodeSets(code_sets.filter((_, i) => i !== index));
   };
 
-
-  // Handle form submission
   const handleSubmit = async (values) => {
     try {
-      await dispatch(editBook({ id: book.id, 
-         bookData: {...values, codeSets},
-         user_id: loggedInUserId,
-         created_by: user?.username,
-        })).unwrap();
-      message.success("Book updated successfully!");
-      onClose();
+      const response = await dispatch(
+        editBook({ 
+          id: book.id, 
+          bookData: { ...values, code_sets },
+          user_id: loggedInUserId,
+          created_by: user?.username,
+        })
+      ).unwrap(); // ✅ Ensure we get a valid response
+  
+      if (response) {
+        message.success("Book updated successfully!"); // ✅ Success Message
+        form.resetFields(); // ✅ Clear form fields
+        onClose(); // ✅ Close modal
+        dispatch(fetchBooks()); // ✅ Refresh list
+      } else {
+        throw new Error("No response from server"); // ❌ Handle unexpected response
+      }
     } catch (error) {
-      message.error("Failed to update book");
+      //console.error("Edit Book Error:", error);
+      message.error("Failed to update book"); // ❌ Error Message
     }
   };
 
@@ -73,15 +83,15 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
          {/* Code Sets Section */}
          <Text strong>Code Sets</Text>
         <Form.Item>
-          {codeSets.map((set, index) => (
+          {code_sets.map((set, index) => (
             <Space key={index} style={{ display: "flex", marginBottom: 8, width: "100%" }} align="baseline">
               <Input
                 placeholder="Enter Code Set"
-                value={set.code}
+                value={set.name}
                 onChange={(e) => updateCodeSet(index, e.target.value)}
                 style={{ width: "100%" }}
               />
-              {codeSets.length > 1 && (
+              {code_sets.length > 1 && (
                 <MinusCircleOutlined onClick={() => removeCodeSet(index)} style={{ color: "red", fontSize: 20 }} />
               )}
             </Space>
