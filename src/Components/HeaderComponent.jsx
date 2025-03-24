@@ -1,25 +1,30 @@
-import { Menu, Avatar, Badge, Space} from "antd";
-import { UserOutlined, DashboardOutlined } from "@ant-design/icons";
+import { Menu } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const HeaderComponent = () => {
-  // Define the menu items using the `items` prop
-  const items = [
-   
-  ];
+  const user = useSelector((state) => state.auth.user); // Get user data
+  
 
   return (
     <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-      <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}
-      items={items} // Use the `items` prop 
-      style={{ flexGrow: 1 }} />
+      
+      {/* Centered Menu */}
+      <div style={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+        <Menu mode="horizontal" defaultSelectedKeys={["1"]} />
+      </div>
 
-      <div style={{ marginLeft: "auto", paddingRight: "20px", color: "black", fontWeight: "bold", display: "flex", alignItems: "center" }}>
-        <Link to="/profile" style={{  fontSize: "24px",  textDecoration: "none"  }}>
-           {<UserOutlined style={{ fontSize: "28px" }}  />} 
-          
+      {/* Welcome Message + Profile Icon (Right-Aligned) */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto", paddingRight: "20px" }}>
+        <h2 style={{ margin: 0, fontSize: "20px", whiteSpace: "nowrap", paddingRight: "20px" }}>
+          Welcome, <span style={{ color: "blue" }}>{user?.username || "Guest"}</span>
+        </h2>
+        <Link to="/profile">
+          <UserOutlined style={{ fontSize: "28px" }} />
         </Link>
       </div>
+
     </div>
   );
 };

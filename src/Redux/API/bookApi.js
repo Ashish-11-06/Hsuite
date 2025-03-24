@@ -2,7 +2,7 @@ import axiosInstance from "./axiosInstance.js";
 
 const booksAPIs = {
   getBooks: () => {
-    return axiosInstance.get(`/books`); 
+    return axiosInstance.get(`/books/`); 
   },
 
   addBook: (newBook) => {
@@ -17,9 +17,9 @@ const booksAPIs = {
     return axiosInstance.delete(`/books/${id}`);
   },
   // Add Code Set to an existing book
-  addCodeSetToBook: (id, codeSet) => {
-    return axiosInstance.patch(`/books/${id}`, codeSet );
-  },
+  // addCodeSetToBook: (id, codeSet) => {
+  //   return axiosInstance.patch(`/books/${id}`, codeSet );
+  // },
 
 //   addSubUser: (id, data) => {
 //     return axiosInstance.post(`/accounts/add-sub-user/${id}`, data);

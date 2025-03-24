@@ -100,6 +100,13 @@ const bookSlice = createSlice({
       })
       .addCase(editBook.fulfilled, (state, action) => {
         state.status = "succeeded";
+
+        const updatedBook = action.payload; // Ensure API returns the updated book
+        const index = state.books.findIndex((book) => book.id === updatedBook.id);
+      
+        if (index !== -1) {
+          state.books[index] = updatedBook; // ✅ Update state immediately
+        }
         // const index = state.books.findIndex((book) => book.id === action.payload.id);
         // if (index !== -1) {
         //   state.books[index] = action.payload; // Update the edited book

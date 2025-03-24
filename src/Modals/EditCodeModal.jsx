@@ -46,37 +46,20 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
     };
     
 
-    // const onFinish = () => {
-    //     const updatedData = {
-    //         id: code?.id,
-    //         code: codeValue,
-    //         description,
-    //         user_id: loggedInUserId,
-    //         //sub_descriptions: [...subDescriptions],
-    //         sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
-    //     };
-    //     onEdit(updatedData);
-    //     onClose();
-    // };
-
     const onFinish = () => {
-        const filteredSubDescriptions = subDescriptions.filter(
-            sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""
-        );
-    
         const updatedData = {
             id: code?.id,
             code: codeValue,
             description,
             user_id: loggedInUserId,
-            sub_descriptions: filteredSubDescriptions, // Use the latest filtered data
+            //sub_descriptions: [...subDescriptions],
+            sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
         };
-    
-        console.log("Updated Data Sent:", updatedData); // Debugging to check data before sending
-    
         onEdit(updatedData);
         onClose();
     };
+
+   
     
 
     return ( 

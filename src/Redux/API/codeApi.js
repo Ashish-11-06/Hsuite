@@ -17,13 +17,12 @@ const codeAPIs = {
 
   editCode: (codeData)=>{
     if (!codeData.id) {
-      console.error("❌ Error: ID is missing in codeData");
       return Promise.reject("ID is undefined");
   }
 
    //console.log("Editing code with ID:", codeData.id); // Log the ID
     //console.log("Data being sent:", codeData);
-    return axiosInstance.put(`/books/book-details`, codeData);
+    return axiosInstance.put(`/books/book-details/`, codeData);
   },
 
   deleteCode:(id) =>{
