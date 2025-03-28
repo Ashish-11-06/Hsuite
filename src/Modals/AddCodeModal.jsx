@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Modal, Form, Input, Button, message, Space, Typography, Select } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { addCode, fetchCodes, fetchBooks, reviewCode } from "../Redux/Slices/codeSlice";
+import { addCode, fetchCodes, fetchBooks } from "../Redux/Slices/codeSlice";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -15,10 +15,10 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
   // Get books and codes from Redux state (moved to top level)
   const { books, codes } = useSelector((state) => state.codes); 
   
-  useEffect(() => {
-    dispatch(fetchBooks()); // Fetch books when the modal opens
-    dispatch(fetchCodes());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchBooks()); // Fetch books when the modal opens
+  //   dispatch(fetchCodes());
+  // }, [dispatch]);
 
   const onFinish = async (values) => {
 

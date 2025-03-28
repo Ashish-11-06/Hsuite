@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
-import { Modal, List, Spin, Alert } from "antd";
+import { Modal, List, Spin, Alert, Table, Typography } from "antd";
+
+const { Title } = Typography;
 
 const HistoryModal = ({ open, onClose, history }) => {
     useEffect(() => {
@@ -9,9 +11,37 @@ const HistoryModal = ({ open, onClose, history }) => {
     // Ensure history is defined and has the expected structure
     const mainHistory = history?.mainHistory || [];
     const subHistories = history?.subHistories || [];
+
+      // Table columns for Main History
+  const mainColumns = [
+    { title: "Code", dataIndex: ["changes", "code"], key: "code" },
+    { title: "Description", dataIndex: ["changes", "description"], key: "description" },
+    { title: "Updated By", dataIndex: "updated_by", key: "updated_by" },
+    { 
+      title: "Updated At", 
+      dataIndex: "updated_at", 
+      key: "updated_at", 
+      render: (date) => new Date(date).toLocaleString() 
+    },
+  ];
+
+  // Table columns for Sub-description History
+  const subColumns = [
+    { title: "Code", dataIndex: ["changes", "code"], key: "code" },
+    { title: "Sub-description", dataIndex: ["changes", "sub_description"], key: "sub_description" },
+    { title: "Updated By", dataIndex: "updated_by", key: "updated_by" },
+    { 
+      title: "Updated At", 
+      dataIndex: "updated_at", 
+      key: "updated_at", 
+      render: (date) => new Date(date).toLocaleString() 
+    },
+  ];
   
     return (
-      <Modal title="History" open={open} onCancel={onClose} footer={null}>
+      <Modal title="History" open={open} onCancel={onClose} footer={null}  width={900}
+      styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }} >
+        
         {mainHistory.length === 0 && subHistories.every(sub => sub.history.length === 0) ? (
           <Alert message="No history available" type="info" showIcon />
         ) : (
@@ -27,6 +57,15 @@ const HistoryModal = ({ open, onClose, history }) => {
                     <p>Updated at: {new Date(item.updated_at).toLocaleString()}</p>
                     <hr />
                   </div>
+
+              //     <Table
+              //   dataSource={mainHistory}
+              //   columns={mainColumns}
+              //   rowKey={(record, index) => index}
+              //   pagination={false}
+              //   bordered
+              //   size="small"
+              // />
                 ))}
               </>
             )}
@@ -46,6 +85,14 @@ const HistoryModal = ({ open, onClose, history }) => {
                           <p>Updated at: {new Date(item.updated_at).toLocaleString()}</p>
                           <hr />
                         </div>
+                      //   <Table
+                      //   dataSource={sub.history}
+                      //   columns={subColumns}
+                      //   rowKey={(record, subIndex) => subIndex}
+                      //   pagination={false}
+                      //   bordered
+                      //   size="small"
+                      // />
                       ))
                     ) : (
                       <p>No history available for this sub-description.</p>

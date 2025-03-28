@@ -12,7 +12,7 @@ const codeAPIs = {
   },
 
   addCode: (newCode) => {
-    return axiosInstance.post(`/books/book-details`, newCode);
+    return axiosInstance.post(`/books/book-details/`, newCode);
   },
 
   editCode: (codeData)=>{
@@ -32,10 +32,6 @@ const codeAPIs = {
   getBooks: () => {
     return axiosInstance.get(`/books`); // Adjust the endpoint as necessary
   },
- 
-  reviewCode: (id, status) =>{
-    return axiosInstance.patch(`/books/book-details/${id}`, { reviewStatus: status });
-  },
 
   //Fetch code history
   getCodeHistory: (code, description) => {
@@ -45,6 +41,10 @@ const codeAPIs = {
     }
   
     return axiosInstance.get(`books/book-details`);
+  },
+
+  addReaction: ({ user_id, description_id, action }) => {
+    return axiosInstance.post(`books/code-reaction/`, { user_id, description_id, action });
   },
   
 };

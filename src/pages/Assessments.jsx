@@ -13,21 +13,35 @@ const Assessments = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const responses = useSelector((state) => state.assessments?.responses || []);
-  const [history, setHistory] = useState([]);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10); // Timer for 7 seconds
   const timerRef = useRef(null); // Store timer ID
   const [testType, setTestType] = useState("");
+  const [isShowResultsEnabled, setIsShowResultsEnabled] = useState(false);
 
   // Use the useResults hook
-  const { resultData, isResultModalOpen, setIsResultModalOpen, handleShowResults, ResultsModal } = useResults(
+  const { resultData, 
+    isResultModalOpen, setIsResultModalOpen, handleShowResults, ResultsModal } = useResults(
     loggedInUserId,
     responses,
     currentQuestions,
     testType,
     multipleChoiceQuestions,
     statementBasedQuestions,
+    setIsModalOpen 
   );
+
+  useEffect(() => {
+    console.log("isShowResultsEnabled:", isShowResultsEnabled);
+  }, [isShowResultsEnabled]);  
+  useEffect(() => {
+    if (currentIndex + 1 === currentQuestions.length) {
+      setIsShowResultsEnabled(true);
+    } else {
+      setIsShowResultsEnabled(false); // Ensure it's disabled while the test is ongoing
+    }
+  }, [currentIndex, currentQuestions.length]);
+  
+  
 
   useEffect(() => {
     dispatch(fetchMultipleChoiceQuestions());
@@ -35,57 +49,52 @@ const Assessments = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("Statement Based Questions:", statementBasedQuestions);
-  }, [statementBasedQuestions]);
-
+    if (!isModalOpen || !currentQuestions.length) return;
+  
+    setTimeLeft(10);
+    setSelectedAnswer(responses[currentIndex]?.selectedOption || null);
+  
+    startTimer();
+  
+    return () => clearInterval(timerRef.current);
+  }, [currentIndex, isModalOpen]);
+  
   const startTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
+    if (timerRef.current) clearInterval(timerRef.current);
+  
     setTimeLeft(5);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev === 1) {
           clearInterval(timerRef.current);
           timerRef.current = null;
-          if (currentIndex + 1 < currentQuestions.length) {
-            handleNextQuestion();
-          } else {
-            handleShowResults();
-          }
+          handleAutoSubmit();
+  
+          // if (currentIndex + 1 < currentQuestions.length) {
+          //   handleNextQuestion();
+          // } else {
+          //   handleShowResults();
+          // }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
   };
-
+  
   useEffect(() => {
-    if (currentIndex < currentQuestions.length) {
-      startTimer();
-      if (timerRef.current) clearInterval(timerRef.current);
-
-      setTimeLeft(5);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev === 1) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-            handleNextQuestion();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => clearInterval(timerRef.current);
-  }, [currentIndex, currentQuestions.length]);
+    console.log("Current state:", {
+      index: currentIndex,
+      selected: selectedAnswer,
+      timeLeft,
+      responses: [...responses],
+    });
+  }, [currentIndex, selectedAnswer, timeLeft, responses]);
 
   const handleOpenModal = (type) => {
     dispatch(clearResponses());
-    setTestType(type);
+    const normalizedType = type === "multiple-choice" ? "mcq" : type;
+  setTestType(normalizedType);
 
     let allQuestions;
     if (type === "multiple-choice") {
@@ -104,16 +113,31 @@ const Assessments = () => {
         return;
       }
 
-      allQuestions = statementBasedQuestions.options.map((question) => ({
-        ...question,
-        question: "What do you think suits you?",
-        statements: [
+      allQuestions = statementBasedQuestions.options.map((question) => {
+        const allStatements = [
           question.logical,
           question.analytical,
           question.strategic,
           question.thinking,
-        ],
-      }));
+        ].filter(Boolean); // Filter out any undefined/null values
+        
+        // Shuffle and pick 2 random statements
+        const shuffled = [...allStatements].sort(() => 0.5 - Math.random());
+        const selectedStatements = shuffled.slice(0, 2);
+        return {
+          ...question,
+          statements: selectedStatements,
+  
+        // ...question,
+        // question: "What do you think suits you?",
+        // statements: [
+        //   question.logical,
+        //   question.analytical,
+        //   question.strategic,
+        //   question.thinking,
+        // ],
+      };
+    });
     }
 
     console.log("All Questions:", allQuestions);
@@ -124,40 +148,64 @@ const Assessments = () => {
     startTimer();
   };
 
-  const handleAnswerSelect = (e) => {
-    setSelectedAnswer(e.target.value);
+const handleAnswerSelect = (e) => {
+  const selectedValue = e.target.value;
+  setSelectedAnswer(selectedValue);
+  
+  // Create and dispatch the response immediately
+  const newResponse = {
+    userId: loggedInUserId,
+    assessmentId: currentQuestions[currentIndex]?.id,
+    selectedOption: selectedValue
   };
 
-  const handleNextQuestion = () => {
-    let newResponse = {
-      userId: loggedInUserId,
-      assessmentId: currentQuestions[currentIndex]?.id || null,
-      selectedOption: selectedAnswer || "Not Answered",
-    };
-    dispatch(setResponses([...responses, newResponse]));
-    console.log("Added response:", newResponse);
-    setSelectedAnswer(null);
+  // Update the responses array properly
+  const updatedResponses = [...responses];
+  updatedResponses[currentIndex] = newResponse;
+  
+  dispatch(setResponses(updatedResponses));
+};
 
+const handleAutoSubmit = () => {
+  // Only proceed if no answer was selected
+  if (!selectedAnswer) {
+    const newResponse = {
+      userId: loggedInUserId,
+      assessmentId: currentQuestions[currentIndex]?.id,
+      selectedOption: "Not Answered"
+    };
+
+    const updatedResponses = [...responses];
+    updatedResponses[currentIndex] = newResponse;
+    dispatch(setResponses(updatedResponses));
+  }
+  if (currentIndex + 1 < currentQuestions.length) {
+    setCurrentIndex(currentIndex + 1);
+  } else {
+    setIsShowResultsEnabled(true); // ✅ Enables "Show Results" if auto-submitting the last question
+  }
+  
+};
+  const handleNextQuestion = () => {
+    if (!selectedAnswer) return; // Prevent moving forward without selecting an answer
+
+  const newResponse = {
+    userId: loggedInUserId,
+    assessmentId: currentQuestions[currentIndex]?.id,
+    selectedOption: selectedAnswer || "Not Answered",
+  };
+
+  const updatedResponses = [...responses];
+  updatedResponses[currentIndex] = newResponse;
+  dispatch(setResponses(updatedResponses)); // Save the response
+    setSelectedAnswer(null);
     if (currentIndex + 1 < currentQuestions.length) {
       setCurrentIndex(currentIndex + 1);
       startTimer();
     } else {
-      // Ensure the last response is added only once
-      if (responses.length < currentQuestions.length) {
-        let lastResponse = {
-          userId: loggedInUserId,
-          assessmentId: currentQuestions[currentQuestions.length - 1]?.id || null,
-          selectedOption: selectedAnswer || "Not Answered",
-        };
-        dispatch(setResponses([...responses, lastResponse]));
-        console.log("Added last response:", lastResponse);
-      }
-  
-      // Ensure handleShowResults is only called once
-      if (!isResultModalOpen) {
-        handleShowResults();
-      }
+      setIsShowResultsEnabled(true); // ✅ Enables "Show Results" after the last question
     }
+    
   };
 
   const handleCloseModal = () => {
@@ -166,11 +214,6 @@ const Assessments = () => {
     setCurrentQuestions([]);
     clearInterval(timerRef.current);
   };
-
-  // const handleCloseResultModal = () => {
-  //   setIsResultModalOpen(false);
-  //   handleCloseModal();
-  // };
 
   return (
     <div>
@@ -302,9 +345,12 @@ const Assessments = () => {
         <Button onClick={handleNextQuestion} type="primary" disabled={!selectedAnswer}>
           Next
         </Button>
-        <Button onClick={handleShowResults} type="primary">
-          Show Results
-        </Button>
+        <Button onClick={handleShowResults} type="primary" 
+  disabled={!isShowResultsEnabled || currentIndex < currentQuestions.length - 1} 
+>
+  Show Results
+</Button>
+
       </div>
           </>
         )}

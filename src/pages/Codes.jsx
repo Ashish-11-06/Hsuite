@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Checkbox, Tooltip, Select } from "antd";
-import { fetchCodes, deleteCode, editCode, fetchBooks, reviewCode, fetchCodeHistory } from "../Redux/Slices/codeSlice";
+import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Select } from "antd";
+import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactionMessage } from "../Redux/Slices/codeSlice";
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
-import ReviewCodeModal from "../Modals/ReviewCodeModal";
 import HistoryModal from "../Modals/HistoryModal";
-import {EditOutlined, DeleteOutlined, CloseOutlined, CheckCircleOutlined, HistoryOutlined } from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled } from "@ant-design/icons";
 
 const Codes = () => {
   const dispatch = useDispatch();
@@ -14,10 +13,8 @@ const Codes = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
-  const [selectedReviewCode, setSelectedReviewCode] = useState(null);
   const currentUser = useSelector((state) => state.auth.user);
   const [selectedCode, setSelectedCode] = useState(null); // Store selected code for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Search term state
@@ -33,11 +30,7 @@ const Codes = () => {
       dispatch(fetchCodes());
       dispatch(fetchBooks());
     }
-  }, [status ,dispatch]);
-
-  useEffect(() => {
-   // console.log("Redux codes updated:", codes);
-  }, [codes]);
+  }, []);
 
 const handleViewHistory = async (code) => {
   //console.log("Fetching history for:", code); // Debugging
@@ -83,12 +76,6 @@ const handleViewHistory = async (code) => {
     setIsEditModalOpen(true);
   };
 
-  //review code model
-  const showReviewModal = (code) => {
-    setSelectedReviewCode(code);
-    setIsReviewModalOpen(true);
-  };
-
   const handleDelete = (id) => {
     if (id) {
       dispatch(deleteCode(id))
@@ -125,24 +112,6 @@ const handleViewHistory = async (code) => {
       });
   };
 
-//for handle review of codes
-const handleReview = (id, status) => {
-  dispatch(reviewCode({ id, status }))
-    .unwrap()
-    .then(() => {
-      message.success(`Review marked as ${status}`);
-      dispatch(fetchCodes()); // Refresh list after review
-    })
-    .catch(() => message.error("Failed to update review"));
-
-  setIsReviewModalOpen(false);
-};
-
-// Function to handle book selection
-const handleBookChange = (value) => {
-  setSelectedBook(value);
-};
-
   // Filtering logic with three search bars
   const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
     const bookName = code.book?.name || "Unknown Book"; 
@@ -166,6 +135,46 @@ const handleBookChange = (value) => {
     return globalMatch && bookMatch && codeMatch;
   }) : [];
 
+  // ✅ Handle Like/Dislike Click
+  const handleReaction = (description_id, action) => {
+    const user_id = currentUser?.id; // ✅ Get userId from the logged-in user
+
+    if (!user_id) {
+      message.error("User not found. Please log in.");
+      return;
+    }
+    const reactionData = { user_id, description_id, action };
+
+    // console.log("🚀 Sending Reaction Payload:", reactionData); // ✅ Debug log
+  
+    // dispatch(addReaction(reactionData))
+    //   .unwrap()
+    //   .then((response) => {
+    //     // console.log("✅ API Response:", response); // ✅ Debug server response
+    //     message.success(`You ${action}d this code!`);
+    //     dispatch(fetchCodes());
+    //   })
+    //   .catch((error) => {
+    //     console.error("❌ Failed to react:", error);
+    //     message.error("Failed to react to code");
+    //   });
+    dispatch(addReaction(reactionData))
+    .unwrap()
+    .then((response) => {
+      if (response.message) {
+        message.success(response.message); // ✅ Show success message from API
+      } else {
+        message.success(`You ${action}d this code!`);
+      }
+      dispatch(fetchCodes());
+      dispatch(clearReactionMessage()); // ✅ Clear any previous messages
+    })
+    .catch((error) => {
+      console.error("❌ Failed to react:", error);
+      message.error("Failed to react to code");
+    });
+  };
+
   const columns = [
     {
       title: (
@@ -187,30 +196,10 @@ const handleBookChange = (value) => {
       ),
       dataIndex: "book",
       render: (book) => book?.name || "Unknown Book",
-        //console.log("Record:", record); // Debugging log
-     //getBookNameById(record.bookId || record.book),
-
       key: "book",
       width: 150
     }, 
     {
-      // title: (
-      //   <div>
-      //     Code
-      //     <Select
-      //       showSearch
-      //       placeholder="Filter by Code"
-      //       value={codeSearchTerm}
-      //       onChange={(value) => setCodeSearchTerm(value)}
-      //       allowClear
-      //       style={{ width: 150, marginLeft: 10 }}
-      //       options={codes?.map((code) => ({
-      //         label: code.code,
-      //         value: code.code,
-      //       }))}
-      //     />
-      //   </div>
-      // ),
       title: "Code",
       dataIndex: "code",
       key: "code",
@@ -292,49 +281,54 @@ const handleBookChange = (value) => {
       });
     }
 
-    if (userRole === "Admin" || userRole === "Reviewer") {
-      columns.push({
-        title: "Review",
-        key: "review",
-        
-        render: (text, record) => (
-          <Space>
-            {!record.reviewStatus || record.reviewStatus === "pending" ? (
-              <Button type="primary" onClick={() => showReviewModal(record)}>
-                Review
-              </Button>
-            ) : record.reviewStatus === "approved" ? (
-              <span style={{ fontSize: "18px", color: "green" }}><CheckCircleOutlined /></span>
-            ) : (
-              <span style={{ fontSize: "18px", color: "red" }}><CloseOutlined /></span>
-            )}
-          </Space>
-        ),
-      });
-    }
-    
+    // ✅ Add Reactions column LAST and make it visible only for Admin, Contributor, and Reviewer
+if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
+  columns.push({
+    title: "Reactions",
+    key: "reactions",
+    render: (text, record) => {
+      const userReaction = record.reactions?.find(reaction => reaction.user_id === currentUser?.id);
+      const userLiked = userReaction?.action === "like";
+      const userDisliked = userReaction?.action === "dislike";
 
-    if (userRole === "Admin" || userRole === "Reviewer" || userRole === "contributor") {
-      columns.push({
-        title: "Review Status",
-        dataIndex: "reviewStatus",
-        key: "reviewStatus",
-        width: "110px",
-        render: (status) => {
-          if (status === "approved") {
-            return <span style={{ color: "green" }}><CheckCircleOutlined /> Approved</span>;
-          } else if (status === "rejected") {
-            return <span style={{ color: "red" }}><CloseOutlined /> Rejected</span>;
-          } else {
-            return (
-              <span style={{ color: "#505050", fontSize: "18px" }}>
-                <CloseOutlined /> <CloseOutlined /> <CloseOutlined />
-              </span>
-            ); // ✅ Default: Three ❌ icons for "Pending Review"
-          }
-        },
-      });
-    }
+      return (
+        <Space size="middle">
+        {/* Like Button */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Button
+            type="text"
+            icon={
+              // userLiked ? (
+                <LikeFilled style={{ color: "#1890ff", fontSize: "24px" }} /> // ✅ Always Blue
+              // ) : (
+              //   <LikeOutlined style={{ color: "#1890ff", fontSize: "24px" }} /> // Always Blue
+              // )
+            }
+            onClick={() => handleReaction(record.id, "like")}
+          />
+          <span>{record.like_count || 0}</span>
+        </div>
+
+        {/* Dislike Button */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Button
+            type="text"
+            icon={
+              // userDisliked ? (
+                <DislikeFilled style={{ color: "#f5222d", fontSize: "24px" }} /> // ✅ Always Red
+              // ) : (
+                // <DislikeOutlined style={{ color: "#f5222d", fontSize: "24px" }} /> // Always Red
+              // )
+            }
+            onClick={() => handleReaction(record.id, "dislike")}
+          />
+          <span>{record.dislike_count || 0}</span>
+        </div>
+      </Space>
+      );
+    },
+  });
+}
     
   return (
     <div style={{ padding: "20px" }}>
@@ -382,8 +376,7 @@ const handleBookChange = (value) => {
         onEdit={handleEdit} // ✅ Pass correct function
         loggedInUserId={currentUser?.id}
       />
-       <ReviewCodeModal open={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} onReview={handleReview} code={selectedReviewCode} />
-
+       
         {/* ✅ History Modal */}
       <HistoryModal
         open={isHistoryModalOpen}

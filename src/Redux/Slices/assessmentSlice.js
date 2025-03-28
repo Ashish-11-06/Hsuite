@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import assessmentApi from "../API/assessmentapi";
+import { message } from "antd";
 
 // Fetch assessments
 export const fetchAssessments = createAsyncThunk(
@@ -100,6 +101,7 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
       history:[],
       loading: false,
       error: null,
+      message: "",
     },
     reducers: {
       setResponses: (state, action) => {
@@ -148,6 +150,7 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
       console.log("Redux - Result saved:", action.payload);
       state.loading = false;
       state.results.push(action.payload);
+      state.message = action.payload.message || "Test submitted successfully!";
     })
     .addCase(saveResult.rejected, (state, action) => {
       console.error("saveResult rejected:", action.payload);

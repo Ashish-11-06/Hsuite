@@ -8,7 +8,7 @@ export const fetchCodes = createAsyncThunk("codes/fetchCodes", async () => {
     //console.log("📡 API Response for Codes:", response.data); // Debugging
     return response.data;
   } catch (error) {
-    //console.error("❌ Error fetching codes:", error.response?.data || error.message);
+    // console.error("❌ Error fetching codes:", error.response?.data || error.message);
     throw error;
   }
 });
@@ -57,29 +57,25 @@ export const deleteCode = createAsyncThunk("codes/deleteCode", async (id) => {
   }
 });
 
-// Async thunk for reviewing a code
-export const reviewCode = createAsyncThunk("codes/reviewCode", async ({ id, status }) => {
-  try {
-    console.log(`Updating reviewStatus for code ${id} to ${status}`);
-    const response = await codesAPI.reviewCode(id, status); // Call the review API
-    console.log("Response Data:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating review status:", error.response?.data || error.message);
-    throw error;
-  }
-});
-
-//Async thunk for fetching code history
 // Async thunk for fetching code history
 export const fetchCodeHistory = createAsyncThunk("codes/fetchCodeHistory", async (id) => {
   const response = await codesAPI.getCodeHistory(id);
   return response.data; // Ensure the response data is returned
 });
 
-
-
-
+// Async thunk for adding reactions (like/dislike)
+export const addReaction = createAsyncThunk(
+  "codes/addReaction",
+  async ({ user_id, description_id, action }) => {
+    try {
+      const response = await codesAPI.addReaction({ user_id, description_id, action });
+      return response.data; // API should return updated like/dislike counts
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+      throw error;
+    }
+  }
+);
 
 // Code Slice
 const codeSlice = createSlice({
@@ -90,8 +86,13 @@ const codeSlice = createSlice({
     history: [],
     status: "idle",
     error: null,
+    reactionMessage: null,
   },
-  reducers: {},
+  reducers: {
+    clearReactionMessage: (state) => {
+      state.reactionMessage = null; // Clear message when needed
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Fetch Codes Cases
@@ -147,19 +148,6 @@ const codeSlice = createSlice({
         code.id === updatedCode.id ? updatedCode : code);
 
         console.log("✅ Updated Redux State:", state.codes); // Debug log
-       // code.id === updatedCode.id || code._id === updatedCode._id ? updatedCode : code);
-
-        // const index = state.codes.findIndex((code) => code.id === action.payload.id);
-        // if (index !== -1) {
-        //   state.codes[index] = action.payload; // Update edited code
-        // }
-
-        // const index = state.codes.details.findIndex(code => code.id === action.payload.id);
-        // if (index !== -1) {
-        //     state.codes.details[index] = action.payload;
-        // } else {
-        //     console.error("Code not found in Redux state!", action.payload);
-        // }
       })
       .addCase(editCode.rejected, (state, action) => {
         state.status = "failed";
@@ -190,24 +178,18 @@ const codeSlice = createSlice({
         .addCase(fetchCodeHistory.rejected, (state, action) => {
             state.status = "failed"; // Set failed state
             state.error = action.error.message; // Store error message
-          })
-      
+        })
 
-      //review code cases
-      .addCase(reviewCode.fulfilled, (state, action) => {
-        const { id, reviewStatus } = action.payload;
-        const index = state.codes.findIndex((code) => code.id === id);
-        if (index !== -1) {
-          state.codes[index].reviewStatus = reviewStatus; // Ensure it updates correctly
-        } else {
-          console.error("Code not found in Redux state!", action.payload);
-        }
-      });
-
-      
-      
-         
+         // Add Reaction Cases
+         .addCase(addReaction.fulfilled, (state, action) => {
+          state.status = "succeeded";
+          state.reactionMessage = action.payload.message;
+          const { description_id, like_count, dislike_count } = action.payload;
+          state.codes = state.codes.map((code) =>
+            code.id === description_id ? { ...code, like_count, dislike_count } : code
+          );
+        });
   },
 });
-
+export const { clearReactionMessage } = codeSlice.actions; // Export action
 export default codeSlice.reducer;

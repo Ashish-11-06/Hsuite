@@ -18,8 +18,8 @@ const AddBookModal = ({ open, onClose, loggedInUserId }) => {
       await dispatch(addBook({...values, 
         code_sets,
          user_id: loggedInUserId,  
-         created_by: user?.username, // Username
-        //created_by: { id: user.id, username: user.username },
+         created_by: user?.id, // Username
+        // created_by: { id: user.id, username: user.username },
       })).unwrap(); // ✅ Dispatch addBook action
       message.success("Book added successfully!");
       form.resetFields(); // Reset form fields

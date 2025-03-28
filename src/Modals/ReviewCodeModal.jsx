@@ -3,7 +3,7 @@ import { Modal, Button } from "antd";
 import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import EditReviewModal from "./EditReviewModal";
 
-const ReviewCodeModal = ({ open, onClose, onReview, code }) => {
+const ReviewCodeModal = ({ open, onClose, onReview, code, currentUser }) => {
   const [isEditReviewModalOpen, setIsEditReviewModalOpen] = useState(false);
   const [currentCode, setCurrentCode] = useState(code); // Initialize with the `code` prop
 
@@ -19,7 +19,20 @@ const ReviewCodeModal = ({ open, onClose, onReview, code }) => {
       onClose(updatedData); // Notify the parent component (optional)
     }
   };
-
+  const handleReview = async (status) => {
+    try {
+      await onReview({
+        description_id: currentCode.id,  // Changed from 'id' to 'description_id'
+        user_id: 45,       // Changed from 'userId' to 'user_id'
+        approved: status === "approved", // Convert to boolean
+        updated: true
+      });
+      onClose();
+    } catch (error) {
+      console.error("Review failed:", error);
+    }
+  };
+  
   return (
     <>
       <Modal title="Review Code" open={open} onCancel={onClose} footer={null}>
@@ -48,7 +61,7 @@ const ReviewCodeModal = ({ open, onClose, onReview, code }) => {
 
         <p style={ {textAlign: "center", color: "blue", paddingTop: 20}}>Is everything correct?</p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <Button type="primary" onClick={() => onReview(currentCode.id, "approved")}>
+          <Button type="primary"  onClick={() => handleReview("approved")}>
             <CheckOutlined /> Yes
           </Button>
           <Button danger onClick={() => setIsEditReviewModalOpen(true)}>

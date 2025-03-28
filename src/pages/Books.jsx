@@ -91,52 +91,6 @@ const Books = () => {
       dataIndex: "version",
       key: "version",
     },
-    // {
-    //   title: "Updated By",
-    //   dataIndex: "updated_by",
-    //   key: "updated_by",
-    //   render: (updated_by) => updated_by?.username, // Handle missing username
-    // },
-    // {
-    //   title: "Created By",
-    //   dataIndex: "created_by",
-    //   key: "created_by",
-    //   render: (created_by) => created_by?.username,
-    // },
-    
-    
-   
-    // {
-    //   title: "Published Year",
-    //   dataIndex: "first_publish_year",
-    //   key: "first_publish_year",
-    // },
-
-    // {
-    //   title: "Actions",
-    //   key: "actions",
-    //   render: (text, record) => (
-    //     <Space>
-    //       <Button type="primary" onClick={() => showEditModal(record)}
-    //         //icon ={<EditOutlined />}
-    //         style={{ backgroundColor: "#ff9f00", 
-    //           borderColor: "#ff9f00", 
-    //           color: "black" }}
-    //         >Edit
-    //       </Button>
-    //       <Popconfirm
-    //         title="Are you sure you want to delete this book?"
-    //         onConfirm={() => handleDelete(record.id)}
-    //         okText="Yes"
-    //         cancelText="No"
-    //       >
-    //         <Button type="primary" style={{backgroundColor: "#d90027", borderColor: "#d90027"}}
-    //         //icon = {<DeleteOutlined />}
-    //         >Delete</Button>
-    //       </Popconfirm>
-    //     </Space>
-    //   ),
-    // },
   ];
 
   if (userRole === "Admin" || userRole === "Contributor") {

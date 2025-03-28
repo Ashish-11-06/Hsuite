@@ -36,9 +36,9 @@ function App() {
                 </Content>
 
                 {/* Footer */}
-                <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
+                {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
                   <FooterComponent />
-                </Footer>
+                </Footer> */}
               </Layout>
             </Layout>
             </ProtectedRoute>
