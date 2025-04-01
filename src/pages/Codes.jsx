@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Select } from "antd";
-import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactionMessage } from "../Redux/Slices/codeSlice";
+import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactionMessage, setUserReaction } from "../Redux/Slices/codeSlice";
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
 import HistoryModal from "../Modals/HistoryModal";
@@ -9,7 +9,7 @@ import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutl
 
 const Codes = () => {
   const dispatch = useDispatch();
-  const { codes, status, error, books } = useSelector((state) => state.codes); 
+  const { codes, status, error, books, userReactions } = useSelector((state) => state.codes); 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
@@ -22,15 +22,10 @@ const Codes = () => {
     const [codeSearchTerm, setCodeSearchTerm] = useState(null); // 🔍 Search term for code
     const [globalSearch, setGlobalSearch] = useState("");
   const [refresh, setRefresh] = useState(false);
+  // const [optimisticReactions, setOptimisticReactions] = useState({});
 
+  console.log(codes);
   const userRole = currentUser?.role; // Get user role
-
-  useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchCodes());
-      dispatch(fetchBooks());
-    }
-  }, []);
 
 const handleViewHistory = async (code) => {
   //console.log("Fetching history for:", code); // Debugging
@@ -137,42 +132,31 @@ const handleViewHistory = async (code) => {
 
   // ✅ Handle Like/Dislike Click
   const handleReaction = (description_id, action) => {
-    const user_id = currentUser?.id; // ✅ Get userId from the logged-in user
-
+    const user_id = currentUser?.id;
+    
     if (!user_id) {
       message.error("User not found. Please log in.");
       return;
     }
-    const reactionData = { user_id, description_id, action };
-
-    // console.log("🚀 Sending Reaction Payload:", reactionData); // ✅ Debug log
   
-    // dispatch(addReaction(reactionData))
-    //   .unwrap()
-    //   .then((response) => {
-    //     // console.log("✅ API Response:", response); // ✅ Debug server response
-    //     message.success(`You ${action}d this code!`);
-    //     dispatch(fetchCodes());
-    //   })
-    //   .catch((error) => {
-    //     console.error("❌ Failed to react:", error);
-    //     message.error("Failed to react to code");
-    //   });
+    // Optimistic update - immediately show the reaction
+    dispatch(setUserReaction({ descriptionId: description_id, action }));
+    const reactionData = { user_id, description_id, action };
+    
     dispatch(addReaction(reactionData))
-    .unwrap()
-    .then((response) => {
-      if (response.message) {
-        message.success(response.message); // ✅ Show success message from API
-      } else {
-        message.success(`You ${action}d this code!`);
-      }
-      dispatch(fetchCodes());
-      dispatch(clearReactionMessage()); // ✅ Clear any previous messages
-    })
-    .catch((error) => {
-      console.error("❌ Failed to react:", error);
-      message.error("Failed to react to code");
-    });
+      .unwrap()
+      .then((response) => {
+        if (response.message) {
+          message.success(response.message);
+        }
+        dispatch(fetchCodes()); // Refresh data from server
+      })
+      .catch((error) => {
+        console.error("Failed to react:", error);
+        message.error("Failed to react to code");
+        // Roll back optimistic update if failed
+        dispatch(setUserReaction({ descriptionId: description_id, action: null }));
+        });
   };
 
   const columns = [
@@ -197,18 +181,27 @@ const handleViewHistory = async (code) => {
       dataIndex: "book",
       render: (book) => book?.name || "Unknown Book",
       key: "book",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       width: 150
     }, 
     {
       title: "Code",
       dataIndex: "code",
       key: "code",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       width: 90
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       width: 250
     },
     {
@@ -228,6 +221,9 @@ const handleViewHistory = async (code) => {
         ) : (
           "N/A"
         ),
+        onHeaderCell: () => ({
+          style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+        }),
     },
   ];
 
@@ -235,6 +231,9 @@ const handleViewHistory = async (code) => {
       columns.push({
         title: "Actions",
         key: "actions",
+        onHeaderCell: () => ({
+          style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+        }),
         render: (text, record) => (
           <Space direction="vertical" style={{ width: "180px"}}>
             <div>
@@ -286,47 +285,72 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
   columns.push({
     title: "Reactions",
     key: "reactions",
+    onHeaderCell: () => ({
+      style: { backgroundColor: "#5cb3ff7f", fontWeight: "bold", textAlign: "center" }, // Light green header
+    }),
     render: (text, record) => {
-      const userReaction = record.reactions?.find(reaction => reaction.user_id === currentUser?.id);
-      const userLiked = userReaction?.action === "like";
-      const userDisliked = userReaction?.action === "dislike";
+      // Get both server and client-side reactions
+      const finalReaction = userReactions[record.id] ?? 
+      record.reactions?.find(r => r.user_id === currentUser?.id)?.action;
+
+      
+      const isLiked = finalReaction === 'like';
+      const isDisliked = finalReaction === 'dislike';
 
       return (
         <Space size="middle">
-        {/* Like Button */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Button
-            type="text"
-            icon={
-              // userLiked ? (
-                <LikeFilled style={{ color: "#1890ff", fontSize: "24px" }} /> // ✅ Always Blue
-              // ) : (
-              //   <LikeOutlined style={{ color: "#1890ff", fontSize: "24px" }} /> // Always Blue
-              // )
-            }
-            onClick={() => handleReaction(record.id, "like")}
-          />
-          <span>{record.like_count || 0}</span>
-        </div>
+          {/* Like Button */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '0 8px',
+            border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
+            borderRadius: '4px'
+          }}>
+            <Button
+              type="text"
+              icon={<LikeFilled style={{
+                color: isLiked ? "#52c41a" : "#d9d9d9",
+                fontSize: "20px"
+              }} />}
+              onClick={() => handleReaction(record.id, "like")}
+            />
+            <span style={{
+              color: isLiked ? "#52c41a" : "#8c8c8c",
+              fontWeight: isLiked ? "600" : "400"
+            }}>
+              {record.like_count || 0}
+            </span>
+          </div>
 
-        {/* Dislike Button */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Button
-            type="text"
-            icon={
-              // userDisliked ? (
-                <DislikeFilled style={{ color: "#f5222d", fontSize: "24px" }} /> // ✅ Always Red
-              // ) : (
-                // <DislikeOutlined style={{ color: "#f5222d", fontSize: "24px" }} /> // Always Red
-              // )
-            }
-            onClick={() => handleReaction(record.id, "dislike")}
-          />
-          <span>{record.dislike_count || 0}</span>
-        </div>
-      </Space>
+          {/* Dislike Button */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '0 8px',
+            border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
+            borderRadius: '4px'
+          }}>
+            <Button
+              type="text"
+              icon={<DislikeFilled style={{
+                color: isDisliked ? "#f5222d" : "#d9d9d9",
+                fontSize: "20px"
+              }} />}
+              onClick={() => handleReaction(record.id, "dislike")}
+            />
+            <span style={{
+              color: isDisliked ? "#f5222d" : "#8c8c8c",
+              fontWeight: isDisliked ? "600" : "400"
+            }}>
+              {record.dislike_count || 0}
+            </span>
+          </div>
+        </Space>
       );
-    },
+    }
   });
 }
     
@@ -336,7 +360,7 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
 
        {/* 🔍 Search Bar */}
        <Input
-        placeholder="Search by book name..."
+        placeholder="Search by book name, Code, Description, Sub-description and code..."
         value={globalSearch}
         onChange={(e) => setGlobalSearch(e.target.value)}
         style={{ marginBottom: "16px", width: "500px", marginRight: "40%" }}
@@ -361,6 +385,7 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
         }))}
         columns={columns}
         bordered
+        style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
       />
       ) : (
         <Alert message="No codes available" type="info" showIcon />

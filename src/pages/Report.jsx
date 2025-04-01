@@ -63,11 +63,17 @@ export const Report = ({ userId }) => {
     {
       title: "S.No.",
       key: "sno",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (_, __, index) => index + 1, // Serial Number
     },
     {
       title: "Type",
       key: "type",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (_, record) => (
         <Tag color={record.type === 'statement-based' ? 'green' : 'blue'}>
         {record.type === 'statement-based' ? 'Statement Based' : 'MCQ'}
@@ -78,31 +84,49 @@ export const Report = ({ userId }) => {
       title: "Logical",
       dataIndex: "logical",
       key: "logical",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Analytical",
       dataIndex: "analytical",
       key: "analytical",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Strategic",
       dataIndex: "strategic",
       key: "strategic",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Thinking",
       dataIndex: "thinking",
       key: "thinking",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Skipped",
       dataIndex: "skip",
       key: "skip",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Total",
       // dataIndex: "total",
       key: "total",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (_, record) => 
         (record.logical || 0) + 
         (record.analytical || 0) + 
@@ -113,6 +137,9 @@ export const Report = ({ userId }) => {
     {
       title: "Result",
       key: "result",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (_, record) => {
         return record.result ? (
           <Tag color={resultColors[record.result] || "default"}>{record.result}</Tag>
@@ -126,10 +153,17 @@ export const Report = ({ userId }) => {
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => new Date(date).toLocaleString(),
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Action",
       key: "action",
+      align: "center",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (_, record) => (
         <Button type="link" onClick={() => handleView(record)}>
           View Details
@@ -159,28 +193,49 @@ export const Report = ({ userId }) => {
         dataSource={filteredData}
           columns={columns}
           rowKey="id"
-          pagination={{ pageSize: 10 }} // Add pagination
+          // pagination={{ pageSize: 10 }} // Add pagination
+          style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
         />
       )}
 
        {/* View Modal */}
        <Modal
-        title={`Assessment Details (${isStatementBased ? 'Statement Based' : 'MCQ'})`}
+       title={
+        <Text strong style={{ fontSize: "18px", textAlign: "center" }}>
+          Assessment Details ({isStatementBased ? "Statement Based" : "MCQ"})
+        </Text>
+      }
         open={isModalOpen}
         onCancel={handleCloseModal}
+        width={500} 
         footer={null}
+        styles={{ maxHeight: "80vh", overflow: "hidden" }}
       >
-        {selectedRow && (
-           <Card style={{ borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}>
-             <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
-        <Text strong>Test Type:</Text> {selectedRow.type === 'statement-based' ? 'Statement Based' : 'MCQ'}
-      </p>
-             <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
-            <Text strong>User ID:</Text> {selectedRow.id}
-          </p>
-          <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
-            <Text strong>Date:</Text>  {new Date(selectedRow.created_at).toLocaleString()}
-          </p>
+      {selectedRow && (
+          <Card
+            style={{
+              borderRadius: "10px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+              // padding: "15px",
+            }}
+          >
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+              <Text strong style={{ fontSize: "16px" }}>Test Type:</Text>{" "}
+              <Tag color={selectedRow.type === "statement-based" ? "green" : "blue"}>
+                {selectedRow.type === "statement-based" ? "Statement Based" : "MCQ"}
+              </Tag>
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+              <Text strong style={{ fontSize: "16px" }}>User ID:</Text>{" "}
+              <Text>{selectedRow.id}</Text>
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+              <Text strong style={{ fontSize: "16px" }}>Date:</Text>{" "}
+              <Text>{new Date(selectedRow.created_at).toLocaleString()}</Text>
+            </div>
+          
 
          <Table
          dataSource={[
@@ -199,17 +254,28 @@ export const Report = ({ userId }) => {
           //  { category: "Date", count: new Date(selectedRow.created_at).toLocaleString() },
          ]}
          columns={[
-           { title: "Category", dataIndex: "category", key: "category" },
-           { title: "Count", dataIndex: "count", key: "count" },
+           { title: "Category", dataIndex: "category", key: "category",  align: "center"  },
+           { title: "Count", dataIndex: "count", key: "count",  align: "center"  },
          ]}
          pagination={false} // Disable pagination to avoid scrolling
          size="small" // Reduce row size for compact view
          bordered // Add table borders
+         style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
+         components={{
+          header: {
+            cell: ({ children }) => (
+              <th style={{ backgroundColor: "#004080", color: "white", textAlign: "center" }}>
+                {children}
+              </th>
+            ),
+          },
+        }}
+
        />
        <div style={{ textAlign: "center", marginTop: "15px" }}>
-         <Text strong>Result: </Text>
+       <Text strong style={{ fontSize: "16px" }}>Result: </Text>
          {selectedRow.result ? (
-           <Tag color={resultColors[selectedRow.result] || "default"}>
+           <Tag color={resultColors[selectedRow.result] || "default"} style={{ fontSize: "14px", padding: "5px 10px" }}>
            {selectedRow.result}
          </Tag>
          ) : (

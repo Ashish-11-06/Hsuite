@@ -42,7 +42,9 @@ const Sidebar = () => {
           fontWeight: "bold", alignItems: "center",
           justifyContent: "center", }}
       >
-       <span>Medical Coding</span>
+        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+          Medical Coding
+        </Link>
       </div>
 
       <Menu theme="" mode="inline" selectedKeys={[getSelectedKey()]} style={{ color: "#000", flexGrow: 1, fontWeight: 500, paddingTop: 10  }}>

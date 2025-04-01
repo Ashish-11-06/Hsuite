@@ -122,6 +122,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
+        state.currentUserId = action.payload.id; 
     
         //console.log("🔹 Login Successful:", action.payload); // Debugging Log
     

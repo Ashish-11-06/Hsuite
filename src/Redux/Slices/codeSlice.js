@@ -87,10 +87,21 @@ const codeSlice = createSlice({
     status: "idle",
     error: null,
     reactionMessage: null,
+    userReactions: {},
+    currentUserId: null,
   },
   reducers: {
     clearReactionMessage: (state) => {
       state.reactionMessage = null; // Clear message when needed
+    },
+    // New reducer to set user reaction
+    setUserReaction: (state, action) => {
+      const { descriptionId, action: reactionAction } = action.payload;
+      state.userReactions[descriptionId] = reactionAction;
+    },
+    // New reducer to clear reactions (useful on logout)
+    clearUserReactions: (state) => {
+      state.userReactions = {};
     },
   },
   extraReducers: (builder) => {
@@ -104,6 +115,12 @@ const codeSlice = createSlice({
         state.status = "succeeded";
         //console.log("✅ Redux Store Updated with Codes:", action.payload);
         state.codes = action.payload;
+        action.payload.forEach(code => {
+          const userReaction = code.reactions?.find(r => r.user_id === state.currentUserId);
+          if (userReaction) {
+            state.userReactions[code.id] = userReaction.action;
+          }
+        });
       })
       .addCase(fetchCodes.rejected, (state, action) => {
         //console.error("❌ Error Fetching Codes:", action.error);
@@ -181,6 +198,11 @@ const codeSlice = createSlice({
         })
 
          // Add Reaction Cases
+         .addCase(addReaction.pending, (state, action) => {
+          const { description_id, action: reactionAction } = action.meta.arg;
+          // Optimistically update the reaction
+          state.userReactions[description_id] = reactionAction;
+        })
          .addCase(addReaction.fulfilled, (state, action) => {
           state.status = "succeeded";
           state.reactionMessage = action.payload.message;
@@ -188,8 +210,16 @@ const codeSlice = createSlice({
           state.codes = state.codes.map((code) =>
             code.id === description_id ? { ...code, like_count, dislike_count } : code
           );
-        });
+        })
+        .addCase(addReaction.rejected, (state, action) => {
+          const { description_id } = action.meta.arg;
+          // Roll back the optimistic update
+          delete state.userReactions[description_id];
+          state.status = "failed";
+          state.error = action.error.message || "Failed to add reaction";
+        })
+  
   },
 });
-export const { clearReactionMessage } = codeSlice.actions; // Export action
+export const { clearReactionMessage, setUserReaction, clearUserReactions } = codeSlice.actions; // Export action
 export default codeSlice.reducer;

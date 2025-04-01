@@ -44,8 +44,6 @@ const Books = () => {
       .catch(() => message.error("Failed to delete book"));
   };
 
-  
-
     // 🔍 Filter books based on search term
     const filteredBooks = books.filter((book) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,17 +56,26 @@ const Books = () => {
       title: "Sr. No.",
       key: "srNo",
       render: (text, record, index) => index + 1,
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Author",
       dataIndex: "author",
       key: "author",
       render: (author) => author || "N/A",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Code Sets", // 📌 Add Code Sets Column
@@ -85,11 +92,17 @@ const Books = () => {
       ) : (
         "No Code Sets"
       ),
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Version",
       dataIndex: "version",
       key: "version",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
   ];
 
@@ -97,6 +110,9 @@ const Books = () => {
     columns.push({
       title: "Actions",
       key: "actions",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
       render: (text, record) => (
         <Space>
           {/* Contributor & Admin can edit */}
@@ -124,8 +140,9 @@ const Books = () => {
         </Space>
       ),
     });
+    
   }
-
+  
   return (
     <div style={{ padding: 20 }}>
       <Title level={2}>Books List</Title>
@@ -153,7 +170,9 @@ const Books = () => {
 
       {/* Show table when data is available */}
       {status === "succeeded" && (
-        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered />
+        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered 
+        style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
+        />
       )}
 
       {/* Add Book Modal */}

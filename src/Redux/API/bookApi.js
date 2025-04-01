@@ -10,7 +10,7 @@ const booksAPIs = {
   },
   
   editBook: (id, bookData) => {
-    return axiosInstance.put(`/books/${id}`, bookData);
+    return axiosInstance.put(`/books/${id}/`, bookData);
   },
 
   deleteBook: (id) => {

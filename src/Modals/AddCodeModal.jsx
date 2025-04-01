@@ -15,10 +15,10 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
   // Get books and codes from Redux state (moved to top level)
   const { books, codes } = useSelector((state) => state.codes); 
   
-  // useEffect(() => {
-  //   dispatch(fetchBooks()); // Fetch books when the modal opens
-  //   dispatch(fetchCodes());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchBooks()); // Fetch books when the modal opens
+    dispatch(fetchCodes());
+  }, [dispatch]);
 
   const onFinish = async (values) => {
 

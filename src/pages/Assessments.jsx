@@ -127,15 +127,6 @@ const Assessments = () => {
         return {
           ...question,
           statements: selectedStatements,
-  
-        // ...question,
-        // question: "What do you think suits you?",
-        // statements: [
-        //   question.logical,
-        //   question.analytical,
-        //   question.strategic,
-        //   question.thinking,
-        // ],
       };
     });
     }
@@ -215,6 +206,62 @@ const handleAutoSubmit = () => {
     clearInterval(timerRef.current);
   };
 
+  const cardStyle = {
+      width: 600,
+      height: 300,
+      color: "black",
+      borderRadius: 12,
+      padding: 20,
+      textAlign: "center",
+      transition: "all 0.3s ease", // Smooth transition for all properties
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      cursor: "pointer",
+      // boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.1)",
+      // Add these new properties:
+      // background: "linear-gradient(135deg, #f5fdff 0%, #e0f7ff 100%)",
+      border: "1px solid #ade2f8",
+      ":hover": {
+        transform: "translateY(-5px)",
+        boxShadow: "0 10px 20px rgba(0, 0, 0, 1)",
+        borderColor: "#5cb3ff",
+        // background: "linear-gradient(135deg, #e0f7ff 0%, #c7f0ff 100%)"
+    }
+  };
+  
+  const buttonStyle = {
+    backgroundColor: "#ffcc00",
+    color: "#333",
+    fontWeight: "bold",
+    border: "none",
+    borderRadius: 5,
+    padding: "8px 15px",
+    cursor: "pointer",
+    transition: "all 0.3s ease", // Smooth transition
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+    ":hover": {
+      backgroundColor: "#ffd633",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      color: "#000"
+    },
+    ":active": {
+      transform: "translateY(0)",
+      boxShadow: "0 2px 3px rgba(0, 0, 0, 0.1)"
+    }
+  };
+  
+  const listStyle = {
+    textAlign: "left",
+    fontSize: 14,
+    paddingLeft: 15,
+  };
+  const timerStyle = {
+    color: "red",
+    fontWeight: "bold",
+  };
+
   return (
     <div>
       <h2>Assessments</h2>
@@ -225,23 +272,12 @@ const handleAutoSubmit = () => {
         <Row gutter={[10, 0]}>
           <Col>
             <Card
-              style={{
-                width: "600px",
-                height: "300px",
-                backgroundColor: "#f0f8ff",
-                color: "#000",
-                borderRadius: "8px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
+              style={cardStyle}
               title="Multiple-Choice Test"
               hoverable
             >
               <p><strong>Test your knowledge with multiple-choice questions.</strong></p>
-              <ul style={{ textAlign: "left", fontSize: "12px", paddingLeft: "15px" }}>
+              <ul style={listStyle}>
                 <li>The test consists of 40 questions.</li>
                 <li>Each question has a timer of 10 seconds.</li>
                 <li>Each question has 4 options, and only one answer should be chosen.</li>
@@ -251,7 +287,7 @@ const handleAutoSubmit = () => {
               <Button
                 type="primary"
                 onClick={() => handleOpenModal("multiple-choice")}
-                style={{ marginTop: "10px" }}
+                style={buttonStyle}
               >
                 Take Test
               </Button>
@@ -259,23 +295,12 @@ const handleAutoSubmit = () => {
           </Col>
           <Col>
             <Card
-              style={{
-                width: "600px",
-                height: "300px",
-                backgroundColor: "#f0f8ff",
-                color: "#000",
-                borderRadius: "8px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
+              style={cardStyle}
               title="Statement-Based Test"
               hoverable
             >
               <p><strong>Choose statements that best describe you.</strong></p>
-              <ul style={{ textAlign: "left", fontSize: "12px", paddingLeft: "15px" }}>
+              <ul style={listStyle}>
                 <li>The test consists of 40 questions.</li>
                 <li>Each question has a timer of 10 seconds.</li>
                 <li>Each question has 2 statements, and only one answer should be chosen.</li>
@@ -285,7 +310,7 @@ const handleAutoSubmit = () => {
               <Button
                 type="primary"
                 onClick={() => handleOpenModal("statement-based")}
-                style={{ marginTop: "10px" }}
+                style={buttonStyle}
               >
                 Take Test
               </Button>
@@ -305,23 +330,38 @@ const handleAutoSubmit = () => {
         {currentQuestions.length > 0 && currentIndex < currentQuestions.length && (
           <>
             <p>{currentQuestions[currentIndex].question}</p>
-            <p style={{ color: "red" }}>Time Left: {timeLeft}s</p>
-            <Radio.Group
-              onChange={handleAnswerSelect}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              {currentQuestions[currentIndex]?.options?.map((option, index) => (
-                <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
-                  {option}
-                </Radio>
-              ))}
-              {currentQuestions[currentIndex]?.statements?.map((statement, index) => (
-                <Radio key={index} value={statement} style={{ marginBottom: "10px" }}>
-                  {statement}
-                </Radio>
-              ))}
-            </Radio.Group>
-
+            <p style={timerStyle}>Time Left: {timeLeft}s</p>
+            {testType === "mcq" ? (
+  <Radio.Group
+    onChange={handleAnswerSelect}
+    style={{ display: "flex", flexDirection: "column" }}
+  >
+    {currentQuestions[currentIndex]?.options?.map((option, index) => (
+      <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
+        {option}
+      </Radio>
+    ))}
+  </Radio.Group>
+) : (
+  <Row gutter={[16, 16]}>
+    {currentQuestions[currentIndex]?.statements?.map((statement, index) => (
+      <Col key={index} span={12}>
+        <Card
+          hoverable
+          style={{
+            textAlign: "center",
+            padding: "10px",
+            border: selectedAnswer === statement ? "2px solid #1890ff" : "",
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedAnswer(statement)}
+        >
+          {statement}
+        </Card>
+      </Col>
+    ))}
+  </Row>
+)}
             <br />
             <br />
 

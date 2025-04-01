@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Modal, List, Spin, Alert, Table, Typography } from "antd";
+import { Modal, List, Spin, Alert, Table, Typography, Card } from "antd";
 
-const { Title } = Typography;
+const { Title,Text } = Typography;
 
 const HistoryModal = ({ open, onClose, history }) => {
     useEffect(() => {
@@ -39,7 +39,12 @@ const HistoryModal = ({ open, onClose, history }) => {
   ];
   
     return (
-      <Modal title="History" open={open} onCancel={onClose} footer={null}  width={900}
+      <Modal 
+      title="History" 
+      open={open} 
+      onCancel={onClose} 
+      footer={null}  
+      width={900}
       styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }} >
         
         {mainHistory.length === 0 && subHistories.every(sub => sub.history.length === 0) ? (
@@ -48,15 +53,18 @@ const HistoryModal = ({ open, onClose, history }) => {
           <>
             {mainHistory.length > 0 && (
               <>
-                <h3>Main Code History</h3>
+                <Title level={4} style={{ marginBottom: 10 }}>Main Code History</Title>
                 {mainHistory.map((item, index) => (
-                  <div key={index}>
-                    <strong>Code: {item.changes.code}</strong>
-                    <p>Description: {item.changes.description}</p>
-                    <p>Updated by: {item.updated_by}</p>
-                    <p>Updated at: {new Date(item.updated_at).toLocaleString()}</p>
-                    <hr />
+                  <Card key={index} style={{ marginBottom: 10, borderLeft: "5px solid #1890ff" }}>
+                  <Text strong style={{ fontSize: 16 }}>Code: {item.changes.code}</Text>
+                  <p>Description: {item.changes.description}</p>
+
+                  {/* 🔹 Flexbox for Side-by-Side layout */}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <Text type="secondary">Updated by: {item.updated_by}</Text>
+                    <Text type="secondary">Updated at: {new Date(item.updated_at).toLocaleString()}</Text>
                   </div>
+                </Card>
 
               //     <Table
               //   dataSource={mainHistory}
@@ -72,19 +80,22 @@ const HistoryModal = ({ open, onClose, history }) => {
   
             {subHistories.length > 0 && (
               <>
-                <h3>Sub-description Histories</h3>
+              <Title level={4} style={{ marginTop: 20 }}>Sub-description Histories</Title>
                 {subHistories.map((sub, index) => (
                   <div key={index}>
-                    <h4>Sub-description: {sub.sub_description}</h4>
+                    <Title level={5} style={{ marginBottom: 5 }}>Sub-description: {sub.sub_description}</Title>
                     {sub.history.length > 0 ? (
                       sub.history.map((item, subIndex) => (
-                        <div key={subIndex}>
-                          <strong>Code: {item.changes.code}</strong>
-                          <p>Sub-description: {item.changes.sub_description}</p>
-                          <p>Updated by: {item.updated_by}</p>
-                          <p>Updated at: {new Date(item.updated_at).toLocaleString()}</p>
-                          <hr />
+                        <Card key={subIndex} style={{ marginBottom: 10, borderLeft: "5px solid #fa541c" }}>
+                        <Text strong style={{ fontSize: 16 }}>Code: {item.changes.code}</Text>
+                        <p>Sub-description: {item.changes.sub_description}</p>
+
+                        {/* 🔹 Flexbox for Side-by-Side layout */}
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                          <Text type="secondary">Updated by: {item.updated_by}</Text>
+                          <Text type="secondary">Updated at: {new Date(item.updated_at).toLocaleString()}</Text>
                         </div>
+                      </Card>
                       //   <Table
                       //   dataSource={sub.history}
                       //   columns={subColumns}
