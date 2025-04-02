@@ -13,7 +13,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
 
   const calculateScores = () => {
     if (!responses || !Array.isArray(responses)) {
-      console.error("Responses array is missing or not valid:", responses);
+      // console.error("Responses array is missing or not valid:", responses);
       return {};
     }
     let logical = 0;
@@ -24,7 +24,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
 
     responses.forEach((response) => {
       if (!response || !response.assessmentId) {
-        console.error("Invalid response object:", response);
+        // console.error("Invalid response object:", response);
         return;
       }
       let question;
@@ -35,7 +35,8 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
         question = statementBasedQuestions.options.find((q) => q.id === response.assessmentId);
       }
       if (!question) {
-        console.error(`Question with ID ${response.assessmentId} not found!`);
+        // console.error(`Question with ID ${response.assessmentId} not found!`);
+
         return;
       }
 
@@ -50,7 +51,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
       } else if (response.selectedOption === question.thinking) {
         thinking++;
       } else {
-        console.error(`Invalid option selected for question ${question.id}: ${response.selectedOption}`);
+        // console.error(`Invalid option selected for question ${question.id}: ${response.selectedOption}`);
       }
     });
 
@@ -84,11 +85,11 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
   };
 
   const handleShowResults = () => {
-    console.log("Responses:", responses);
-    console.log("Current Questions:", currentQuestions);
+    // console.log("Responses:", responses);
+    // console.log("Current Questions:", currentQuestions);
     // if (responses.length !== currentQuestions.length) {
       if (!responses || responses.length !== currentQuestions.length) {
-        console.error("Missing responses! Expected:", currentQuestions.length, "Received:", responses.length);
+        // console.error("Missing responses! Expected:", currentQuestions.length, "Received:", responses.length);
         
         return;
       }
@@ -116,7 +117,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
       }
 
       if (!question) {
-        console.error(`Question with ID ${response.assessmentId} not found!`);
+        // console.error(`Question with ID ${response.assessmentId} not found!`);
         return "";
       }
 
@@ -157,7 +158,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
         setIsResultModalOpen(true); // Open the modal
       })
       .catch((error) => {
-        console.error("Save failed:", error);
+        // console.error("Save failed:", error);
       })
       .finally(() => {
         setIsResultLoading(false);

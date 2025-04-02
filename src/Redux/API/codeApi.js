@@ -4,7 +4,7 @@ import store from "../store.js";
 const codeAPIs = {
 
   getCodes: () => {
-    return axiosInstance.get(`/books/book-details`);
+    return axiosInstance.get(`/books/book-details/`);
   },
 
   getCode: (id=1) => {

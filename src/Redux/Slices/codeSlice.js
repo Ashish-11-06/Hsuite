@@ -5,7 +5,7 @@ import codesAPI from "../API/codeApi";
 export const fetchCodes = createAsyncThunk("codes/fetchCodes", async () => {
   try {
     const response = await codesAPI.getCodes();
-    //console.log("📡 API Response for Codes:", response.data); // Debugging
+    // console.log("📡 API Response for Codes:", response.data); // Debugging
     return response.data;
   } catch (error) {
     // console.error("❌ Error fetching codes:", error.response?.data || error.message);

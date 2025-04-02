@@ -19,13 +19,13 @@ export const fetchAssessments = createAsyncThunk(
 export const saveResult = createAsyncThunk(
   "assessments/saveResult",
   async (data, { rejectWithValue }) => {
-    console.log("saveResult action called with data:", data);
+    // console.log("saveResult action called with data:", data);
     try {
       const response = await assessmentApi.saveResult(data);
-      console.log("saveResult response received:", response.data);
+      // console.log("saveResult response received:", response.data);
       return response.data;
     } catch (error) {
-      console.error("saveResult error:", error.response?.data || error.message);
+      // console.error("saveResult error:", error.response?.data || error.message);
       return rejectWithValue(error.response?.data || "Error saving result");
     }
   }
@@ -37,7 +37,7 @@ export const fetchAssessmentHistory = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await assessmentApi.getAssessmentHistory(userId);
-      console.log("Fetched assessment history:", response);
+      // console.log("Fetched assessment history:", response);
 
       // Check if response contains test_history
       if (!response || !response.test_history) {
@@ -46,7 +46,7 @@ export const fetchAssessmentHistory = createAsyncThunk(
 
       return response.test_history; // Make sure this is what Redux stores
     } catch (error) {
-      console.error("Error fetching assessment history:", error);
+      // console.error("Error fetching assessment history:", error);
       return rejectWithValue(error.message);
     }
   }
@@ -57,7 +57,7 @@ export const fetchMultipleChoiceQuestions = createAsyncThunk(
     "assessments/test/fetchMultipleChoiceQuestions",
     async () => {
       const response = await assessmentApi.getAssessments();
-      console.log("Fetched questions:", response.data.questions);
+      // console.log("Fetched questions:", response.data.questions);
       return response.data.questions;
     }
   );
@@ -67,7 +67,7 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
   "assessments/fetchStatementBased",
   async () => {
     const response = await assessmentApi.getStatementBasedAssessments();
-    console.log("Statement-based questions response:", response.data); // Debugging
+    // console.log("Statement-based questions response:", response.data); // Debugging
     return response.data;
   }
 );
@@ -76,13 +76,13 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
   export const fetchUserResults = createAsyncThunk(
     "assessments/fetchUserResults",
     async (userId, { rejectWithValue }) => {
-      console.log("fetchUserResults action called for userId:", userId);
+      // console.log("fetchUserResults action called for userId:", userId);
       try {
         const response = await assessmentApi.getUserResults(userId);
-        console.log("fetchUserResults response received:", response.data);
+        // console.log("fetchUserResults response received:", response.data);
         return response.data;
       } catch (error) {
-        console.error("fetchUserResults error:", error.response?.data || error.message);
+        // console.error("fetchUserResults error:", error.response?.data || error.message);
         return rejectWithValue(error.response?.data || "Error fetching user results");
       }
     }
@@ -135,7 +135,7 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
         .addCase(fetchStatementBasedQuestions.fulfilled, (state, action) => {
           state.loading = false;
           state.statementBasedQuestions = action.payload; // Ensure this is an object with an options array
-          console.log("Statement-based questions updated:", state.statementBasedQuestions); // Debugging
+          // console.log("Statement-based questions updated:", state.statementBasedQuestions); // Debugging
         })
         .addCase(fetchStatementBasedQuestions.rejected, (state) => {
           state.loading = false;
@@ -143,50 +143,50 @@ export const fetchStatementBasedQuestions = createAsyncThunk(
 
     // Save result
     .addCase(saveResult.pending, (state) => {
-      console.log("saveResult pending...");
+      // console.log("saveResult pending...");
       state.loading = true;
     })
     .addCase(saveResult.fulfilled, (state, action) => {
-      console.log("Redux - Result saved:", action.payload);
+      // console.log("Redux - Result saved:", action.payload);
       state.loading = false;
       state.results.push(action.payload);
       state.message = action.payload.message || "Test submitted successfully!";
     })
     .addCase(saveResult.rejected, (state, action) => {
-      console.error("saveResult rejected:", action.payload);
+      // console.error("saveResult rejected:", action.payload);
       state.loading = false;
       state.error = action.payload;
     })
 
     // Fetch user results
     .addCase(fetchUserResults.pending, (state) => {
-      console.log("fetchUserResults pending...");
+      // console.log("fetchUserResults pending...");
       state.loading = true;
     })
     .addCase(fetchUserResults.fulfilled, (state, action) => {
-      console.log("fetchUserResults fulfilled, results fetched:", action.payload);
+      // console.log("fetchUserResults fulfilled, results fetched:", action.payload);
       state.loading = false;
       state.results = action.payload;
     })
     .addCase(fetchUserResults.rejected, (state, action) => {
-      console.log("Redux - User results fetched:", action.payload);
+      // console.log("Redux - User results fetched:", action.payload);
       state.loading = false;
       state.error = action.payload;
     })
 
      // Fetch assessment history
      .addCase(fetchAssessmentHistory.pending, (state) => {
-      console.log("fetchAssessmentHistory pending...");
+      // console.log("fetchAssessmentHistory pending...");
       state.loading = true;
     })
     .addCase(fetchAssessmentHistory.fulfilled, (state, action) => {
-      console.log("fetchAssessmentHistory fulfilled, history fetched:", action.payload);
+      // console.log("fetchAssessmentHistory fulfilled, history fetched:", action.payload);
       state.loading = false;
       state.history = action.payload || []; // Store the test_history data in state
-      console.log("Redux History Updated:", state.history); // Debugging
+      // console.log("Redux History Updated:", state.history); // Debugging
     })
     .addCase(fetchAssessmentHistory.rejected, (state, action) => {
-      console.error("fetchAssessmentHistory rejected:", action.payload);
+      // console.error("fetchAssessmentHistory rejected:", action.payload);
       state.loading = false;
       state.error = action.payload;
     });

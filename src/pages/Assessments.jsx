@@ -31,7 +31,7 @@ const Assessments = () => {
   );
 
   useEffect(() => {
-    console.log("isShowResultsEnabled:", isShowResultsEnabled);
+    // console.log("isShowResultsEnabled:", isShowResultsEnabled);
   }, [isShowResultsEnabled]);  
   useEffect(() => {
     if (currentIndex + 1 === currentQuestions.length) {
@@ -83,12 +83,12 @@ const Assessments = () => {
   };
   
   useEffect(() => {
-    console.log("Current state:", {
-      index: currentIndex,
-      selected: selectedAnswer,
-      timeLeft,
-      responses: [...responses],
-    });
+    // console.log("Current state:", {
+    //   index: currentIndex,
+    //   selected: selectedAnswer,
+    //   timeLeft,
+    //   responses: [...responses],
+    // });
   }, [currentIndex, selectedAnswer, timeLeft, responses]);
 
   const handleOpenModal = (type) => {
@@ -109,7 +109,7 @@ const Assessments = () => {
       }));
     } else {
       if (!statementBasedQuestions || !Array.isArray(statementBasedQuestions.options)) {
-        console.error("statementBasedQuestions is not in the expected format:", statementBasedQuestions);
+        // console.error("statementBasedQuestions is not in the expected format:", statementBasedQuestions);
         return;
       }
 
@@ -131,7 +131,7 @@ const Assessments = () => {
     });
     }
 
-    console.log("All Questions:", allQuestions);
+    // console.log("All Questions:", allQuestions);
     setCurrentQuestions(allQuestions);
     setCurrentIndex(0);
     setIsModalOpen(true);
@@ -213,20 +213,16 @@ const handleAutoSubmit = () => {
       borderRadius: 12,
       padding: 20,
       textAlign: "center",
-      transition: "all 0.3s ease", // Smooth transition for all properties
+      transition: "all 0.3s ease",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       cursor: "pointer",
-      // boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.1)",
-      // Add these new properties:
-      // background: "linear-gradient(135deg, #f5fdff 0%, #e0f7ff 100%)",
       border: "1px solid #ade2f8",
       ":hover": {
         transform: "translateY(-5px)",
         boxShadow: "0 10px 20px rgba(0, 0, 0, 1)",
         borderColor: "#5cb3ff",
-        // background: "linear-gradient(135deg, #e0f7ff 0%, #c7f0ff 100%)"
     }
   };
   
