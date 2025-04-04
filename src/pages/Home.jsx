@@ -1,32 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Layout, Row, Col, Spin, message } from "antd";
 import codeAPIs from "../Redux/API/codeApi";
+import { useSelector } from 'react-redux';
+
 
 const { Title } = Typography;
 const { Content } = Layout;
 
 const Home = () => {
+  const currentUser = useSelector((state) => state.auth.user);
+  const user_id = currentUser?.id;
+
   const [bookCount, setBookCount] = useState(0);
   const [codeCount, setCodeCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const booksResponse = await codeAPIs.getBooks();
-        const codesResponse = await codeAPIs.getCodes();
+ useEffect(() => {
+  const fetchCounts = async () => {
+    try {
+      const booksResponse = await codeAPIs.getBooks();
+      const codesResponse = await codeAPIs.getCodes(user_id); // Pass user_id here
 
-        setBookCount(booksResponse.data.length);
-        setCodeCount(codesResponse.data.length);
-      } catch (error) {
-        message.error("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCounts();
-  }, []);
+      setBookCount(booksResponse.data.length);
+      setCodeCount(codesResponse.data.length);
+    } catch (error) {
+      message.error("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchCounts();
+}, [user_id]); // Add user_id to dependency array
 
   return (
     <Content style={{ padding: "10px" }}>

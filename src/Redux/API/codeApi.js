@@ -3,9 +3,17 @@ import store from "../store.js";
 
 const codeAPIs = {
 
-  getCodes: () => {
-    return axiosInstance.get(`/books/book-details/`);
-  },
+  // getCodes: (user_id) => {
+  //   return axiosInstance.get(`/books/book-details/`);
+  // },
+
+  // In codeAPIs.js
+getCodes: (user_id) => {
+  if (!user_id) {
+    return Promise.reject("User ID is required");
+  }
+  return axiosInstance.get(`/books/book-details/${user_id}/`);
+},
 
   getCode: (id=1) => {
     return axiosInstance.get(`/books/book-details/${id}`); 
@@ -30,7 +38,7 @@ const codeAPIs = {
   },
   
   getBooks: () => {
-    return axiosInstance.get(`/books`); // Adjust the endpoint as necessary
+    return axiosInstance.get(`/books/`); // Adjust the endpoint as necessary
   },
 
   //Fetch code history
@@ -44,7 +52,14 @@ const codeAPIs = {
   },
 
   addReaction: ({ user_id, description_id, action }) => {
-    return axiosInstance.post(`books/code-reaction/`, { user_id, description_id, action });
+    return axiosInstance.post(`books/code-reaction/${user_id}/`, {
+      description_id,
+      action
+    })
+    .then(response => {
+      console.log('RAW RESPONSE:', response); // Check this in browser console
+      return response.data; // This is what you're missing
+    });
   },
   
 };

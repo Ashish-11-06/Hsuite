@@ -32,20 +32,11 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         setSubDescriptions([...subDescriptions, { code: "", sub_description: "" }]);
     };
 
-    // const handleRemoveSubDescription = (index) => {
-    //     setSubDescriptions((prevSubDescriptions) =>
-    //         prevSubDescriptions.filter((_, i) => i !== index)
-    //     );
-    // };
-
     const handleRemoveSubDescription = (index) => {
-        setSubDescriptions((prevSubDescriptions) => {
-            const updatedSubDescriptions = prevSubDescriptions.filter((_, i) => i !== index);
-            return [...updatedSubDescriptions]; // Ensure a new array is created
-        });
+        const updated = subDescriptions.filter((_, i) => i !== index);
+        setSubDescriptions(updated);
     };
-    
-
+      
     const onFinish = () => {
         const updatedData = {
             id: code?.id,
@@ -58,13 +49,9 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         onEdit(updatedData);
         onClose();
     };
-
-   
-    
-
     return ( 
-        <Modal title="Edit Code" open={open} onCancel={onClose} footer={null}>
-            <Form layout="vertical" onFinish={onFinish}>
+        <Modal title="Edit Code" open={open} onCancel={onClose} footer={null} >
+            <Form layout="vertical" onFinish={onFinish}  key={subDescriptions.length}>
                 <Form.Item label="Code">
                     <Input value={codeValue}  onChange={(e) => setCodeValue(e.target.value)}// Allow editing
                          placeholder="Enter code" />
@@ -88,7 +75,12 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                             onChange={(e) => handleSubDescriptionChange(index, "sub_description", e.target.value)}
                         />
                         
-                        <div onClick={() => handleRemoveSubDescription(index)}><MinusCircleOutlined style={{color: "red", fontSize: 20}}/></div>
+                        {subDescriptions.length > 1 && (
+                            <MinusCircleOutlined
+                                onClick={() => handleRemoveSubDescription(index)}
+                                style={{ color: "red", fontSize: 20, cursor: "pointer" }}
+                            />
+                        )}
                     </Space>
                 ))}
                 

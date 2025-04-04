@@ -24,7 +24,7 @@ const Codes = () => {
   const [refresh, setRefresh] = useState(false);
   // const [optimisticReactions, setOptimisticReactions] = useState({});
 
-  console.log(codes);
+  // console.log(codes);
   const userRole = currentUser?.role; // Get user role
 
 const handleViewHistory = async (code) => {
@@ -139,26 +139,43 @@ const handleViewHistory = async (code) => {
       return;
     }
   
-    // Optimistic update - immediately show the reaction
-    dispatch(setUserReaction({ descriptionId: description_id, action }));
+    dispatch(setUserReaction({ 
+      descriptionId: description_id, 
+      action,
+      liked: action === 'like',
+      disliked: action === 'dislike'
+    }));
+  
     const reactionData = { user_id, description_id, action };
-    
+  
     dispatch(addReaction(reactionData))
       .unwrap()
       .then((response) => {
         if (response.message) {
           message.success(response.message);
         }
-        dispatch(fetchCodes()); // Refresh data from server
+  
+        // ✅ Re-fetch all codes to get updated counts
+        dispatch(fetchCodes());
+  
+        // Update specific reaction state
+        dispatch(setUserReaction({
+          descriptionId: description_id,
+          action,
+          liked: response.liked,
+          disliked: response.disliked,
+          likeCount: response.like_count,
+          dislikeCount: response.dislike_count
+        }));
       })
       .catch((error) => {
         console.error("Failed to react:", error);
         message.error("Failed to react to code");
-        // Roll back optimistic update if failed
+  
         dispatch(setUserReaction({ descriptionId: description_id, action: null }));
-        });
+      });
   };
-
+  
   const columns = [
     {
       title: (
@@ -288,69 +305,68 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
     onHeaderCell: () => ({
       style: { backgroundColor: "#5cb3ff7f", fontWeight: "bold", textAlign: "center" }, // Light green header
     }),
+    // In your columns definition where reactions are rendered:
     render: (text, record) => {
-      // Get both server and client-side reactions
-      const finalReaction = userReactions[record.id] ?? 
-      record.reactions?.find(r => r.user_id === currentUser?.id)?.action;
+  // These values will now persist after refresh
+  const isLiked = record.liked;
+  const isDisliked = record.disliked;
 
-      
-      const isLiked = finalReaction === 'like';
-      const isDisliked = finalReaction === 'dislike';
+  return (
+    <Space size="middle">
+      {/* Like Button - will stay colored after refresh */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 8px',
+        border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
+        borderRadius: '4px',
+        backgroundColor: isLiked ? '#f6ffed' : 'transparent'
+      }}>
+        <Button
+          type="text"
+          icon={<LikeFilled style={{
+            color: isLiked ? "#52c41a" : "#d9d9d9",
+            fontSize: "20px"
+          }} />}
+          onClick={() => handleReaction(record.id, "like")}
+        />
+        <span style={{
+          color: isLiked ? "#52c41a" : "#8c8c8c",
+          fontWeight: isLiked ? "600" : "400"
+        }}>
+          {record.like_count || 0}
+        </span>
+      </div>
 
-      return (
-        <Space size="middle">
-          {/* Like Button */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '0 8px',
-            border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
-            borderRadius: '4px'
-          }}>
-            <Button
-              type="text"
-              icon={<LikeFilled style={{
-                color: isLiked ? "#52c41a" : "#d9d9d9",
-                fontSize: "20px"
-              }} />}
-              onClick={() => handleReaction(record.id, "like")}
-            />
-            <span style={{
-              color: isLiked ? "#52c41a" : "#8c8c8c",
-              fontWeight: isLiked ? "600" : "400"
-            }}>
-              {record.like_count || 0}
-            </span>
-          </div>
-
-          {/* Dislike Button */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '0 8px',
-            border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
-            borderRadius: '4px'
-          }}>
-            <Button
-              type="text"
-              icon={<DislikeFilled style={{
-                color: isDisliked ? "#f5222d" : "#d9d9d9",
-                fontSize: "20px"
-              }} />}
-              onClick={() => handleReaction(record.id, "dislike")}
-            />
-            <span style={{
-              color: isDisliked ? "#f5222d" : "#8c8c8c",
-              fontWeight: isDisliked ? "600" : "400"
-            }}>
-              {record.dislike_count || 0}
-            </span>
-          </div>
-        </Space>
-      );
-    }
+      {/* Dislike Button - will stay colored after refresh */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 8px',
+        border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
+        borderRadius: '4px',
+        backgroundColor: isDisliked ? '#fff2f0' : 'transparent'
+      }}>
+        <Button
+          type="text"
+          icon={<DislikeFilled style={{
+            color: isDisliked ? "#f5222d" : "#d9d9d9",
+            fontSize: "20px"
+          }} />}
+          onClick={() => handleReaction(record.id, "dislike")}
+        />
+        <span style={{
+          color: isDisliked ? "#f5222d" : "#8c8c8c",
+          fontWeight: isDisliked ? "600" : "400"
+        }}>
+          {record.dislike_count || 0}
+        </span>
+      </div>
+    </Space>
+  );
+}
   });
 }
     
