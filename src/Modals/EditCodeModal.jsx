@@ -32,56 +32,26 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         setSubDescriptions([...subDescriptions, { code: "", sub_description: "" }]);
     };
 
-    // const handleRemoveSubDescription = (index) => {
-    //     setSubDescriptions((prevSubDescriptions) =>
-    //         prevSubDescriptions.filter((_, i) => i !== index)
-    //     );
-    // };
-
     const handleRemoveSubDescription = (index) => {
-        setSubDescriptions((prevSubDescriptions) => {
-            const updatedSubDescriptions = prevSubDescriptions.filter((_, i) => i !== index);
-            return [...updatedSubDescriptions]; // Ensure a new array is created
-        });
+        const updated = subDescriptions.filter((_, i) => i !== index);
+        setSubDescriptions(updated);
     };
-    
-
-    // const onFinish = () => {
-    //     const updatedData = {
-    //         id: code?.id,
-    //         code: codeValue,
-    //         description,
-    //         user_id: loggedInUserId,
-    //         //sub_descriptions: [...subDescriptions],
-    //         sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
-    //     };
-    //     onEdit(updatedData);
-    //     onClose();
-    // };
-
+      
     const onFinish = () => {
-        const filteredSubDescriptions = subDescriptions.filter(
-            sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""
-        );
-    
         const updatedData = {
             id: code?.id,
             code: codeValue,
             description,
             user_id: loggedInUserId,
-            sub_descriptions: filteredSubDescriptions, // Use the latest filtered data
+            //sub_descriptions: [...subDescriptions],
+            sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
         };
-    
-        console.log("Updated Data Sent:", updatedData); // Debugging to check data before sending
-    
         onEdit(updatedData);
         onClose();
     };
-    
-
     return ( 
-        <Modal title="Edit Code" open={open} onCancel={onClose} footer={null}>
-            <Form layout="vertical" onFinish={onFinish}>
+        <Modal title="Edit Code" open={open} onCancel={onClose} footer={null} >
+            <Form layout="vertical" onFinish={onFinish}  key={subDescriptions.length}>
                 <Form.Item label="Code">
                     <Input value={codeValue}  onChange={(e) => setCodeValue(e.target.value)}// Allow editing
                          placeholder="Enter code" />
@@ -105,7 +75,12 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                             onChange={(e) => handleSubDescriptionChange(index, "sub_description", e.target.value)}
                         />
                         
-                        <div onClick={() => handleRemoveSubDescription(index)}><MinusCircleOutlined style={{color: "red", fontSize: 20}}/></div>
+                        {subDescriptions.length > 1 && (
+                            <MinusCircleOutlined
+                                onClick={() => handleRemoveSubDescription(index)}
+                                style={{ color: "red", fontSize: 20, cursor: "pointer" }}
+                            />
+                        )}
                     </Space>
                 ))}
                 

@@ -6,7 +6,7 @@ import Codes from "../pages/Codes.jsx";
 import Profile from "../pages/Profile.jsx";
 import Users from "../pages/Users.jsx";
 import Assessments from "../pages/Assessments.jsx";
-import Report from "../pages/Report.jsx";
+import { Report } from "../pages/Report.jsx";
 
 const MainContent = () => {
   return (

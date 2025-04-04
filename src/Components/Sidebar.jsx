@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu, Layout, Divider } from "antd";
-import { HomeOutlined, InfoCircleOutlined, UserOutlined, SettingOutlined, LogoutOutlined, BookOutlined } from "@ant-design/icons";
+import { HomeOutlined, InfoCircleOutlined, UserOutlined, SettingOutlined, LogoutOutlined, BookOutlined, AuditOutlined, BarChartOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../Redux/Slices/authSlice";
@@ -13,6 +13,9 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Get current route path
+
+   // Get role from localStorage
+   const userRole = localStorage.getItem("role"); // Expected: "Student", "Reviewer", "Contributor", "Admin"
  
   const handleLogout = () => {
     dispatch(logout());
@@ -26,7 +29,8 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/codes")) return "3";
     if (location.pathname.startsWith("/profile")) return "4";
     if (location.pathname.startsWith("/users")) return "5";
-    if (location.pathname.startsWith("/assessents")) return "6";
+    if (location.pathname.startsWith("/assessents")) return "6-1";
+    if (location.pathname.startsWith("/report")) return "6-2";
     return "1"; // Default to Home
   };
 
@@ -38,7 +42,9 @@ const Sidebar = () => {
           fontWeight: "bold", alignItems: "center",
           justifyContent: "center", }}
       >
-       <span>Medical Coding</span>
+        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+          Medical Coding
+        </Link>
       </div>
 
       <Menu theme="" mode="inline" selectedKeys={[getSelectedKey()]} style={{ color: "#000", flexGrow: 1, fontWeight: 500, paddingTop: 10  }}>
@@ -52,13 +58,17 @@ const Sidebar = () => {
           <Link to="/codes">Codes</Link>
         </Menu.Item>
         {/* SubMenu for Assessments */}
+        <SubMenu key="6" icon={<AuditOutlined />} title="Assessments">
+          <Menu.Item key="6-1" icon={<CheckCircleOutlined />}>
         {/* <SubMenu key="6" icon={<InfoCircleOutlined />} title="Assessments">
           <Menu.Item key="6-1">
             <Link to="/assessents">Test</Link>
           </Menu.Item>
-          <Menu.Item key="6-2">
+          <Menu.Item key="6-2"  icon={<BarChartOutlined />}>
             <Link to="/report">Report</Link>
           </Menu.Item>
+        </SubMenu>
+
         </SubMenu> */}
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>

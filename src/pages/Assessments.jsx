@@ -1,227 +1,279 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  submitResponse,
-  saveResult,
-  fetchQuestions,
-} from "../Redux/Slices/assessmentSlice";
-import { getUserResults } from "../Redux/API/assessmentapi";
+import { saveResult, fetchMultipleChoiceQuestions, fetchStatementBasedQuestions, setResponses, clearResponses } from "../Redux/Slices/assessmentSlice";
 import { Modal, Button, Radio, Card, Row, Col } from "antd";
+import { useResults } from "./Results"; // Import the useResults hook
 
 const Assessments = () => {
   const dispatch = useDispatch();
-  const { questions, loading } = useSelector((state) => state.assessments);
+  const { multipleChoiceQuestions, statementBasedQuestions, loading } = useSelector((state) => state.assessments);
   const loggedInUserId = 1;
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [responses, setResponses] = useState([]);
-  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
-  const [resultData, setResultData] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const responses = useSelector((state) => state.assessments?.responses || []);
   const [timeLeft, setTimeLeft] = useState(10); // Timer for 7 seconds
   const timerRef = useRef(null); // Store timer ID
+  const [testType, setTestType] = useState("");
+  const [isShowResultsEnabled, setIsShowResultsEnabled] = useState(false);
+
+  // Use the useResults hook
+  const { resultData, 
+    isResultModalOpen, setIsResultModalOpen, handleShowResults, ResultsModal } = useResults(
+    loggedInUserId,
+    responses,
+    currentQuestions,
+    testType,
+    multipleChoiceQuestions,
+    statementBasedQuestions,
+    setIsModalOpen 
+  );
 
   useEffect(() => {
-    dispatch(fetchQuestions());
-    fetchUserHistory();
+    // console.log("isShowResultsEnabled:", isShowResultsEnabled);
+  }, [isShowResultsEnabled]);  
+  useEffect(() => {
+    if (currentIndex + 1 === currentQuestions.length) {
+      setIsShowResultsEnabled(true);
+    } else {
+      setIsShowResultsEnabled(false); // Ensure it's disabled while the test is ongoing
+    }
+  }, [currentIndex, currentQuestions.length]);
+  
+  
+
+  useEffect(() => {
+    dispatch(fetchMultipleChoiceQuestions());
+    dispatch(fetchStatementBasedQuestions());
   }, [dispatch]);
 
-  // Fetch user history
-  const fetchUserHistory = async () => {
-    try {
-      const { data } = await getUserResults(loggedInUserId);
-      setHistory(data);
-    } catch (error) {
-      console.error("Error fetching history:", error);
-    }
-  };
-
-  // Start the timer
-  const startTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current); // Clear any existing timer before starting a new one
-    }
-
+  useEffect(() => {
+    if (!isModalOpen || !currentQuestions.length) return;
+  
     setTimeLeft(10);
+    setSelectedAnswer(responses[currentIndex]?.selectedOption || null);
+  
+    startTimer();
+  
+    return () => clearInterval(timerRef.current);
+  }, [currentIndex, isModalOpen]);
+  
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  
+    setTimeLeft(5);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev === 1) {
           clearInterval(timerRef.current);
           timerRef.current = null;
-          handleNextQuestion(); // Move to the next question when the timer hits zero
+          handleAutoSubmit();
+  
+          // if (currentIndex + 1 < currentQuestions.length) {
+          //   handleNextQuestion();
+          // } else {
+          //   handleShowResults();
+          // }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
   };
-
-  // Cleanup on unmount
+  
   useEffect(() => {
-    if (currentIndex < currentQuestions.length) {
-      startTimer();
-      if (timerRef.current) clearInterval(timerRef.current);
+    // console.log("Current state:", {
+    //   index: currentIndex,
+    //   selected: selectedAnswer,
+    //   timeLeft,
+    //   responses: [...responses],
+    // });
+  }, [currentIndex, selectedAnswer, timeLeft, responses]);
 
-      setTimeLeft(10);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev === 1) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-            handleNextQuestion();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+  const handleOpenModal = (type) => {
+    dispatch(clearResponses());
+    const normalizedType = type === "multiple-choice" ? "mcq" : type;
+  setTestType(normalizedType);
+
+    let allQuestions;
+    if (type === "multiple-choice") {
+      allQuestions = multipleChoiceQuestions.map((question) => ({
+        ...question,
+        options: [
+          question.logical,
+          question.analytical,
+          question.strategic,
+          question.thinking,
+        ],
+      }));
+    } else {
+      if (!statementBasedQuestions || !Array.isArray(statementBasedQuestions.options)) {
+        // console.error("statementBasedQuestions is not in the expected format:", statementBasedQuestions);
+        return;
+      }
+
+      allQuestions = statementBasedQuestions.options.map((question) => {
+        const allStatements = [
+          question.logical,
+          question.analytical,
+          question.strategic,
+          question.thinking,
+        ].filter(Boolean); // Filter out any undefined/null values
+        
+        // Shuffle and pick 2 random statements
+        const shuffled = [...allStatements].sort(() => 0.5 - Math.random());
+        const selectedStatements = shuffled.slice(0, 2);
+        return {
+          ...question,
+          statements: selectedStatements,
+      };
+    });
     }
 
-    return () => clearInterval(timerRef.current);
-  }, [currentIndex, currentQuestions.length]);
-
-
-  // Open Modal for Assessment
-  const handleOpenModal = (type) => {
-    const filteredQuestions = questions
-      .filter((q) => q.type === type)
-      .slice(0, 5); // Limit to 5 questions
-
-    setCurrentQuestions(filteredQuestions);
+    // console.log("All Questions:", allQuestions);
+    setCurrentQuestions(allQuestions);
     setCurrentIndex(0);
     setIsModalOpen(true);
     setSelectedAnswer(null);
-    setResultData(null);
-    setResponses([]);
-    startTimer(); // Start the timer when the modal opens
+    startTimer();
   };
 
-  // Handle Answer Selection
-  const handleAnswerSelect = (e) => {
-    setSelectedAnswer(e.target.value);
-  };
-
-  // Move to Next Question or Show Results
-  const handleNextQuestion = () => {
-    // if (!selectedAnswer) return; // Prevent moving forward without an answer
-
-    // const response = {
-    //   userId: loggedInUserId, // Replace with dynamic user ID if needed
-    //   assessmentId: currentQuestions[currentIndex],
-    //   selectedOption: selectedAnswer,
-    // };
-
-    let response = {
-      userId: loggedInUserId,
-      assessmentId: currentQuestions[currentIndex]?.id || null,
-      selectedOption: selectedAnswer || "Not Answered", // Store unanswered attempts
-    };
+const handleAnswerSelect = (e) => {
+  const selectedValue = e.target.value;
+  setSelectedAnswer(selectedValue);
   
+  // Create and dispatch the response immediately
+  const newResponse = {
+    userId: loggedInUserId,
+    assessmentId: currentQuestions[currentIndex]?.id,
+    selectedOption: selectedValue
+  };
 
-    setResponses((prevResponses) => [...prevResponses, response]);
-    dispatch(submitResponse(response));
+  // Update the responses array properly
+  const updatedResponses = [...responses];
+  updatedResponses[currentIndex] = newResponse;
+  
+  dispatch(setResponses(updatedResponses));
+};
 
+const handleAutoSubmit = () => {
+  // Only proceed if no answer was selected
+  if (!selectedAnswer) {
+    const newResponse = {
+      userId: loggedInUserId,
+      assessmentId: currentQuestions[currentIndex]?.id,
+      selectedOption: "Not Answered"
+    };
+
+    const updatedResponses = [...responses];
+    updatedResponses[currentIndex] = newResponse;
+    dispatch(setResponses(updatedResponses));
+  }
+  if (currentIndex + 1 < currentQuestions.length) {
+    setCurrentIndex(currentIndex + 1);
+  } else {
+    setIsShowResultsEnabled(true); // ✅ Enables "Show Results" if auto-submitting the last question
+  }
+  
+};
+  const handleNextQuestion = () => {
+    if (!selectedAnswer) return; // Prevent moving forward without selecting an answer
+
+  const newResponse = {
+    userId: loggedInUserId,
+    assessmentId: currentQuestions[currentIndex]?.id,
+    selectedOption: selectedAnswer || "Not Answered",
+  };
+
+  const updatedResponses = [...responses];
+  updatedResponses[currentIndex] = newResponse;
+  dispatch(setResponses(updatedResponses)); // Save the response
     setSelectedAnswer(null);
-
     if (currentIndex + 1 < currentQuestions.length) {
       setCurrentIndex(currentIndex + 1);
-      startTimer(); // Restart the timer for the next question
+      startTimer();
     } else {
-      handleShowResults();
+      setIsShowResultsEnabled(true); // ✅ Enables "Show Results" after the last question
+    }
+    
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentIndex(0);
+    setCurrentQuestions([]);
+    clearInterval(timerRef.current);
+  };
+
+  const cardStyle = {
+      width: 600,
+      height: 300,
+      color: "black",
+      borderRadius: 12,
+      padding: 20,
+      textAlign: "center",
+      transition: "all 0.3s ease",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      cursor: "pointer",
+      border: "1px solid #ade2f8",
+      ":hover": {
+        transform: "translateY(-5px)",
+        boxShadow: "0 10px 20px rgba(0, 0, 0, 1)",
+        borderColor: "#5cb3ff",
     }
   };
-
-  // Calculate Scores & Show Results
-  const handleShowResults = () => {
-    clearInterval(timerRef.current); // Stop timer when the test ends
-
-    const scores = calculateScores(responses, currentQuestions);
-    const dominantTrait = Object.keys(scores).reduce((a, b) =>
-      scores[a] > scores[b] ? a : b
-    );
-
-    const result = {
-      userId: loggedInUserId, // Replace with dynamic user ID if needed
-      scores: scores,
-      summary: `Your dominant trait is ${dominantTrait}.`,
-      date: new Date().toISOString(), // Stores the current date & time
-    };
-
-    setResultData(result);
-    dispatch(saveResult(result));
-    setIsResultModalOpen(true);
-    setTimeout(fetchUserHistory, 1000);
-    fetchUserHistory();
-  };
-
-  // Score Calculation Logic
-  const calculateScores = (responses) => {
-    let scores = { Logical: 0, Creative: 0, Analytical: 0 };
-
-    responses.forEach((response) => {
-      const question = currentQuestions.find((q) => q.id === response.assessmentId);
-
-      if (!question) return;
-
-      // Check if it's a multiple-choice question
-    if (question.options) {
-        if (response.selectedOption === "Logical analysis") {
-          scores.Logical += 20;
-        }
-        if (response.selectedOption === "Creative thinking") {
-          scores.Creative += 20;
-        }
-        if (response.selectedOption === "Solving complex problems") {
-          scores.Analytical += 20;
-        }
-      }
   
-      // Check if it's a statement-based question
-      if (question.statements) {
-        if (response.selectedOption === "I enjoy solving logical puzzles") {
-          scores.Logical += 15;
-        }
-        if (response.selectedOption === "I love coming up with creative ideas") {
-          scores.Creative += 15;
-        }
-        if (response.selectedOption === "I analyze data deeply before making a decision") {
-          scores.Analytical += 15;
-        }
-      }
-    });
-
-    return scores;
+  const buttonStyle = {
+    backgroundColor: "#ffcc00",
+    color: "#333",
+    fontWeight: "bold",
+    border: "none",
+    borderRadius: 5,
+    padding: "8px 15px",
+    cursor: "pointer",
+    transition: "all 0.3s ease", // Smooth transition
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+    ":hover": {
+      backgroundColor: "#ffd633",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      color: "#000"
+    },
+    ":active": {
+      transform: "translateY(0)",
+      boxShadow: "0 2px 3px rgba(0, 0, 0, 0.1)"
+    }
+  };
+  
+  const listStyle = {
+    textAlign: "left",
+    fontSize: 14,
+    paddingLeft: 15,
+  };
+  const timerStyle = {
+    color: "red",
+    fontWeight: "bold",
   };
 
   return (
     <div>
       <h2>Assessments</h2>
 
-      {loading ? (
+      {loading && (multipleChoiceQuestions.length > 0 || statementBasedQuestions.length > 0) ? (
         <p>Loading assessments...</p>
       ) : (
-        <Row gutter={[10,0]}>
-          <Col >
+        <Row gutter={[10, 0]}>
+          <Col>
             <Card
-              style={{
-                width: "600px",
-                height: "300px",
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: "8px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
+              style={cardStyle}
               title="Multiple-Choice Test"
               hoverable
             >
-             <p><strong>Test your knowledge with multiple-choice questions.</strong></p>
-              <ul style={{ textAlign: "left", fontSize: "12px", paddingLeft: "15px" }}>
+              <p><strong>Test your knowledge with multiple-choice questions.</strong></p>
+              <ul style={listStyle}>
                 <li>The test consists of 40 questions.</li>
                 <li>Each question has a timer of 10 seconds.</li>
                 <li>Each question has 4 options, and only one answer should be chosen.</li>
@@ -231,7 +283,7 @@ const Assessments = () => {
               <Button
                 type="primary"
                 onClick={() => handleOpenModal("multiple-choice")}
-                style={{ marginTop: "10px" }}
+                style={buttonStyle}
               >
                 Take Test
               </Button>
@@ -239,23 +291,12 @@ const Assessments = () => {
           </Col>
           <Col>
             <Card
-              style={{
-                width: "600px",
-                height: "300px",
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: "8px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
+              style={cardStyle}
               title="Statement-Based Test"
               hoverable
             >
               <p><strong>Choose statements that best describe you.</strong></p>
-              <ul style={{ textAlign: "left", fontSize: "12px", paddingLeft: "15px" }}>
+              <ul style={listStyle}>
                 <li>The test consists of 40 questions.</li>
                 <li>Each question has a timer of 10 seconds.</li>
                 <li>Each question has 2 statements, and only one answer should be chosen.</li>
@@ -265,46 +306,61 @@ const Assessments = () => {
               <Button
                 type="primary"
                 onClick={() => handleOpenModal("statement-based")}
-                style={{ marginTop: "10px" }}
+                style={buttonStyle}
               >
                 Take Test
               </Button>
             </Card>
           </Col>
         </Row>
+        
       )}
 
-      {/* Modal for Questions */}
       <Modal
         title="Assessment"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={handleCloseModal}
         footer={null}
         styles={{ body: { minHeight: "300px", padding: 10 } }}
       >
         {currentQuestions.length > 0 && currentIndex < currentQuestions.length && (
           <>
             <p>{currentQuestions[currentIndex].question}</p>
-            <p style={{color: "red"}}>Time Left: {timeLeft}s</p> {/* Display timer */}
-
-            <Radio.Group
-              onChange={handleAnswerSelect}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              {(
-                currentQuestions[currentIndex].options ||
-                currentQuestions[currentIndex].statements
-              ).map((option, index) => (
-                <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
-                  {option}
-                </Radio>
-              ))}
-            </Radio.Group>
-
+            <p style={timerStyle}>Time Left: {timeLeft}s</p>
+            {testType === "mcq" ? (
+  <Radio.Group
+    onChange={handleAnswerSelect}
+    style={{ display: "flex", flexDirection: "column" }}
+  >
+    {currentQuestions[currentIndex]?.options?.map((option, index) => (
+      <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
+        {option}
+      </Radio>
+    ))}
+  </Radio.Group>
+) : (
+  <Row gutter={[16, 16]}>
+    {currentQuestions[currentIndex]?.statements?.map((statement, index) => (
+      <Col key={index} span={12}>
+        <Card
+          hoverable
+          style={{
+            textAlign: "center",
+            padding: "10px",
+            border: selectedAnswer === statement ? "2px solid #1890ff" : "",
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedAnswer(statement)}
+        >
+          {statement}
+        </Card>
+      </Col>
+    ))}
+  </Row>
+)}
             <br />
             <br />
 
-            {/* Progress Indicator */}
             <div style={{ textAlign: "center", marginBottom: "10px" }}>
               {currentQuestions.map((_, index) => (
                 <span
@@ -321,73 +377,22 @@ const Assessments = () => {
               ))}
             </div>
 
-            {/* Navigation Buttons */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-            {responses.length > 0 && (
-                <Button
-                type="default"
-                onClick={() => setIsHistoryModalOpen(true)}
-                style={{ marginRight: "auto" }} // Aligns to the left
-                >
-                View full History
-                </Button>
-            )}
+             <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+        <Button onClick={handleNextQuestion} type="primary" disabled={!selectedAnswer}>
+          Next
+        </Button>
+        <Button onClick={handleShowResults} type="primary" 
+  disabled={!isShowResultsEnabled || currentIndex < currentQuestions.length - 1} 
+>
+  Show Results
+</Button>
 
-            <Button
-                onClick={handleNextQuestion}
-                type="primary"
-                disabled={!selectedAnswer}
-            >
-                {currentIndex === currentQuestions.length - 1 ? "Show Results" : "Next"}
-            </Button>
-            </div>
-
+      </div>
           </>
         )}
       </Modal>
 
-      {/* Results Modal */}
-      <Modal
-        title="Results"
-        open={isResultModalOpen}
-        onCancel={() => setIsResultModalOpen(false)}
-        footer={null}
-      >
-        {resultData ? (
-          <>
-            {Object.entries(resultData.scores).map(([trait, percentage]) => (
-              <p key={trait}>
-                {trait}: {percentage}%
-              </p>
-            ))}
-            <p>{resultData.summary}</p>
-          </>
-        ) : (
-          <p>Loading results...</p>
-        )}
-      </Modal>
-
-       {/* History Modal */}
-       <Modal
-        title="Assessment History"
-        open={isHistoryModalOpen}
-        onCancel={() => setIsHistoryModalOpen(false)}
-        footer={null}
-      >
-        {history.length > 0 ? (
-          history.map((assessment, index) => (
-            <Card key={index} style={{ marginBottom: 10 }}>
-              <p><strong>Date:</strong> {new Date(assessment.date).toLocaleString()}</p>
-              <p><strong>Primary Trait:</strong> {Object.keys(assessment.scores)[0] || "Unknown"}</p>
-              {Object.entries(assessment.scores).map(([trait, percentage]) => (
-                <p key={trait}>{trait}: {percentage}%</p>
-              ))}
-            </Card>
-          ))
-        ) : (
-          <p>No past assessments found.</p>
-        )}
-      </Modal>
+      <ResultsModal />
     </div>
   );
 };

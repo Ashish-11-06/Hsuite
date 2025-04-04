@@ -10,20 +10,20 @@ const AddBookModal = ({ open, onClose, loggedInUserId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch(); // ✅ Use Redux dispatch
   const user = useSelector((state) => state.auth.user);
-  const [codeSets, setCodeSets] = useState([{ code: "" }]); // Initialize as objects
+  const [code_sets, setCodeSets] = useState([{ name: "" }]); // Initialize as objects
 
   // Function to handle form submission
   const handleSubmit = async (values) => {
     try {
       await dispatch(addBook({...values, 
-        codeSets,
+        code_sets,
          user_id: loggedInUserId,  
-         created_by: user?.username, // Username
-        //created_by: { id: user.id, username: user.username },
+         created_by: user?.id, // Username
+        // created_by: { id: user.id, username: user.username },
       })).unwrap(); // ✅ Dispatch addBook action
       message.success("Book added successfully!");
       form.resetFields(); // Reset form fields
-      setCodeSets([""]); // Reset codeSets fields after submission
+      setCodeSets([{name: ""}]); // Reset codeSets fields after submission
       onClose(); // Close the modal
     } catch (error) {
       message.error("Failed to add book");
@@ -33,19 +33,19 @@ const AddBookModal = ({ open, onClose, loggedInUserId }) => {
  
 // Function to add a new code set field
 const addCodeSet = () => {
-  setCodeSets([...codeSets, { code: "" }]); // Maintain object structure
+  setCodeSets([...code_sets, { name: ""}]); // Maintain object structure
 };
 
 // Function to update a code set field
 const updateCodeSet = (index, value) => {
-  const newCodeSets = [...codeSets];
-  newCodeSets[index].code = value;
+  const newCodeSets = [...code_sets];
+  newCodeSets[index].name = value;
   setCodeSets(newCodeSets);
 };
 
 // Function to remove a specific code set field
 const removeCodeSet = (index) => {
-  setCodeSets(codeSets.filter((_, i) => i !== index));
+  setCodeSets(code_sets.filter((_, i) => i !== index));
 };
 
 
@@ -92,11 +92,11 @@ const removeCodeSet = (index) => {
        {/* Code Sets Section - Matching AddCodeModal Styling */}
        <Text strong>Code Sets</Text>
         <Form.Item>
-          {codeSets.map((set, index) => (
+          {code_sets.map((set, index) => (
             <Space key={index} style={{ display: "flex", marginBottom: 8, width: "100%" }} align="baseline">
               <Input
                 placeholder="Enter Code Set"
-                value={codeSets[index].code}
+                value={code_sets[index].name}
                 onChange={(e) => updateCodeSet(index, e.target.value)}
                 // onChange={(e) => {
                 //   const newCodeSets = [...codeSets];
@@ -105,7 +105,7 @@ const removeCodeSet = (index) => {
                 // }}
                 style={{ width: "100%" }} // Ensuring consistent width
               />
-              {codeSets.length > 1 && (
+              {code_sets.length > 1 && (
                 <MinusCircleOutlined onClick={() => removeCodeSet(index)} style={{ color: "red", fontSize: 20 }} />
               )}
             </Space>

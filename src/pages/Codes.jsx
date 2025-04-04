@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Checkbox, Tooltip, Select } from "antd";
-import { fetchCodes, deleteCode, editCode, fetchBooks, reviewCode, fetchCodeHistory } from "../Redux/Slices/codeSlice";
+import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Select } from "antd";
+import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactionMessage, setUserReaction } from "../Redux/Slices/codeSlice";
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
-import ReviewCodeModal from "../Modals/ReviewCodeModal";
 import HistoryModal from "../Modals/HistoryModal";
-import {EditOutlined, DeleteOutlined, CloseOutlined, CheckOutlined  } from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled } from "@ant-design/icons";
 
 const Codes = () => {
   const dispatch = useDispatch();
-  const { codes, status, error, books } = useSelector((state) => state.codes); 
+  const { codes, status, error, books, userReactions } = useSelector((state) => state.codes); 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
-  const [selectedReviewCode, setSelectedReviewCode] = useState(null);
   const currentUser = useSelector((state) => state.auth.user);
   const [selectedCode, setSelectedCode] = useState(null); // Store selected code for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Search term state
@@ -25,46 +22,53 @@ const Codes = () => {
     const [codeSearchTerm, setCodeSearchTerm] = useState(null); // 🔍 Search term for code
     const [globalSearch, setGlobalSearch] = useState("");
   const [refresh, setRefresh] = useState(false);
+  // const [optimisticReactions, setOptimisticReactions] = useState({});
 
-  useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchCodes());
-      dispatch(fetchBooks());
-    }
-  }, [status ,dispatch]);
+  // console.log(codes);
+  const userRole = currentUser?.role; // Get user role
 
-  useEffect(() => {
-   // console.log("Redux codes updated:", codes);
-  }, [codes]);
+const handleViewHistory = async (code) => {
+  //console.log("Fetching history for:", code); // Debugging
 
-  // ✅ View Code History
-//   const handleViewHistory = async (id) => {
-//     dispatch(fetchCodeHistory(id))
-//         .unwrap()
-//         .then((data) => {
-//             setHistoryData(data.history || []); // Ensure history is an array
-//             setIsHistoryModalOpen(true); // Open the modal to show the history
-//         })
-//         .catch(() => message.error("Failed to fetch history"));
-// };
+  if (!code || !code.id) {
+    message.error("Invalid code");
+    return;
+  }
 
-  // console.log("Books: ", books);
-  //console.log("codes: ", codes);
+  try {
+    // Fetch the main code history
+    const mainHistory = code.history || [];
 
-  //console.log("Fetched Codes from Redux:", codes);
-  //console.log("Fetched Books from Redux:", books);
+    // Fetch the sub-description histories
+    const subHistories = await Promise.all(
+      code.sub_descriptions.map(async (sub) => {
+        return {
+          code: sub.code,
+          sub_description: sub.sub_description,
+          history: sub.history || [],
+        };
+      })
+    );
+
+    // Combine main history and sub histories
+    const combinedHistory = {
+      mainHistory,
+      subHistories,
+    };
+
+    setHistoryData(combinedHistory); // Set the combined history data
+    setIsHistoryModalOpen(true); // Open the modal to show the history
+  } catch (error) {
+   // console.error("Error fetching history:", error);
+    message.error("Failed to fetch history");
+  }
+};
 
   const showModal = () => setIsModalOpen(true);
 
   const showEditModal = (code) => {
     setSelectedCode(code); // Set selected code
     setIsEditModalOpen(true);
-  };
-
-  //review code model
-  const showReviewModal = (code) => {
-    setSelectedReviewCode(code);
-    setIsReviewModalOpen(true);
   };
 
   const handleDelete = (id) => {
@@ -82,7 +86,7 @@ const Codes = () => {
   };
 
   const handleEdit = (updatedData) => {
-    console.log("Updated data to be sent:", updatedData);
+   // console.log("Updated data to be sent:", updatedData);
 
     dispatch(editCode(updatedData))
       .unwrap()
@@ -98,78 +102,10 @@ const Codes = () => {
         setSelectedCode(null);
       })
       .catch((error) => {
-        console.error("Failed to update code", error);
+       // console.error("Failed to update code", error);
         message.error("Failed to update code");
       });
   };
-  
-// console.log(codes.details);
-
-
-// const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
-//   const bookName = code.book?.name || "Unknown Book"; // Extract book name directly
-//   return bookName.toLowerCase().includes(searchTerm.toLowerCase());
-// }) : [];
-
-// const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
-//   const bookName = code.book?.name || "Unknown Book"; // Get book name safely
-//   const mainCode = code.code || ""; // Get main code safely
-//   const description = code.description || ""; // Get description safely
-
-//   // Extract sub_descriptions as a string (joining sub codes and sub descriptions)
-//   const subDescriptions = (code.sub_descriptions || [])
-//     .map(sub => `${sub.code} ${sub.sub_description}`)
-//     .join(" ") // Converts array to a searchable string
-
-//   // Convert everything to lowercase and check if search term exists in any field
-//   return [bookName, mainCode, description, subDescriptions]
-//     .join(" ") // Combine all fields into a single searchable string
-//     .toLowerCase()
-//     .includes(searchTerm.toLowerCase());
-// }) : [];
-
-
-
-//const filteredCodes = codes.books;
-
-//for handle review of codes
-const handleReview = (id, status) => {
-  dispatch(reviewCode({ id, status }))
-    .unwrap()
-    .then(() => {
-      message.success(`Review marked as ${status}`);
-      dispatch(fetchCodes()); // Refresh list after review
-    })
-    .catch(() => message.error("Failed to update review"));
-
-  setIsReviewModalOpen(false);
-};
-
-// Function to handle book selection
-const handleBookChange = (value) => {
-  setSelectedBook(value);
-};
-
-// // Filter codes based on book selection
-// const bookFilteredCodes = Array.isArray(codes) ? codes.filter((code) => {
-//   const bookName = code.book?.name || "Unknown Book"; 
-//   const mainCode = code.code || ""; 
-//   const description = code.description || ""; 
-
-//   const subDescriptions = (code.sub_descriptions || [])
-//     .map(sub => `${sub.code} ${sub.sub_description}`)
-//     .join(" ");
-
-//   const matchesSearch = [bookName, mainCode, description, subDescriptions]
-//     .join(" ")
-//     .toLowerCase()
-//     .includes(searchTerm.toLowerCase());
-
-//   const matchesSelectedBook = !selectedBook || bookName === selectedBook; 
-
-//   return matchesSearch && matchesSelectedBook; 
-// }) : [];
-
 
   // Filtering logic with three search bars
   const filteredCodes = Array.isArray(codes) ? codes.filter((code) => {
@@ -194,18 +130,64 @@ const handleBookChange = (value) => {
     return globalMatch && bookMatch && codeMatch;
   }) : [];
 
+  // ✅ Handle Like/Dislike Click
+  const handleReaction = (description_id, action) => {
+    const user_id = currentUser?.id;
+    
+    if (!user_id) {
+      message.error("User not found. Please log in.");
+      return;
+    }
+  
+    dispatch(setUserReaction({ 
+      descriptionId: description_id, 
+      action,
+      liked: action === 'like',
+      disliked: action === 'dislike'
+    }));
+  
+    const reactionData = { user_id, description_id, action };
+  
+    dispatch(addReaction(reactionData))
+      .unwrap()
+      .then((response) => {
+        if (response.message) {
+          message.success(response.message);
+        }
+  
+        // ✅ Re-fetch all codes to get updated counts
+        dispatch(fetchCodes());
+  
+        // Update specific reaction state
+        dispatch(setUserReaction({
+          descriptionId: description_id,
+          action,
+          liked: response.liked,
+          disliked: response.disliked,
+          likeCount: response.like_count,
+          dislikeCount: response.dislike_count
+        }));
+      })
+      .catch((error) => {
+        console.error("Failed to react:", error);
+        message.error("Failed to react to code");
+  
+        dispatch(setUserReaction({ descriptionId: description_id, action: null }));
+      });
+  };
+  
   const columns = [
     {
       title: (
-        <div>
-          Book
+        <div  style={{ display: "flex", alignItems: "center" }}>
+           <span>Book</span>
           <Select
             showSearch
             placeholder="Filter by book"
             value={selectedBook}
             onChange={(value) => setSelectedBook(value)}
             allowClear
-            style={{ width: 150, marginLeft: 10 }}
+            style={{ width: 150, marginLeft: 5 }}
             options={books?.map((book) => ({
               label: book.name,
               value: book.name,
@@ -215,43 +197,35 @@ const handleBookChange = (value) => {
       ),
       dataIndex: "book",
       render: (book) => book?.name || "Unknown Book",
-        //console.log("Record:", record); // Debugging log
-     //getBookNameById(record.bookId || record.book),
-
       key: "book",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
+      width: 150
     }, 
     {
-      // title: (
-      //   <div>
-      //     Code
-      //     <Select
-      //       showSearch
-      //       placeholder="Filter by Code"
-      //       value={codeSearchTerm}
-      //       onChange={(value) => setCodeSearchTerm(value)}
-      //       allowClear
-      //       style={{ width: 150, marginLeft: 10 }}
-      //       options={codes?.map((code) => ({
-      //         label: code.code,
-      //         value: code.code,
-      //       }))}
-      //     />
-      //   </div>
-      // ),
       title: "Code",
       dataIndex: "code",
       key: "code",
-      width: 250
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
+      width: 90
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
+      width: 250
     },
     {
       title: "Sub Descriptions",
       dataIndex: "sub_descriptions",
       key: "sub_descriptions",
+      width: "450px",
       render: (sub_descriptions) =>
         sub_descriptions && sub_descriptions.length > 0 ? (
           <div>
@@ -264,101 +238,160 @@ const handleBookChange = (value) => {
         ) : (
           "N/A"
         ),
+        onHeaderCell: () => ({
+          style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+        }),
     },
-    
-    {
-      title: "Actions",
-      key: "actions",
-      render: (text, record) => (
-        <Space>
-          <Button type="primary" onClick={() => showEditModal(record)}
-           //icon ={<EditOutlined />}
-           style={{ backgroundColor: "#ff9f00", 
-                    borderColor: "#ff9f00", 
-                 }}
-           >Edit</Button>
-          <Popconfirm
-            title="Are you sure you want to delete this code?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="primary" style={{backgroundColor: "#d90027", borderColor: "#d90027"}}
-            //icon = {<DeleteOutlined />}
-            >Delete</Button>
-          </Popconfirm>
-          {/* ✅ View History Button */}
-          {/* <Button type="default" onClick={() => handleViewHistory(record.id)}>
-            View History
-          </Button> */}
-        </Space>
-      ),
-    },
-    // {
-    //   title: "Review",
-    //   key: "review",
-    //   render: (text, record) => (
-    //     <Space>
-    //       {!record.reviewStatus ? ( // Show button only if not reviewed
-    //         <Button type="primary" onClick={() => showReviewModal(record)} style={{backgroundColor: "#007f5f", borderColor: 
-    //           "#007f5f"
-    //         }}>Review</Button>
-    //       ) : record.reviewStatus === "approved" ? (
-    //         <span style={{ fontSize: "18px", cursor: "default", color: "green" }}><CheckOutlined /></span>
-    //       ) : (
-    //         <span style={{ fontSize: "18px", cursor: "default", color: "red" }}><CloseOutlined /></span> // Different color for rejected
-    //       )}
-    //     </Space>
-    //   ),
-    // },
-    
-    // {
-    //   title: "Review Status",
-    //   dataIndex: "reviewStatus",
-    //   key: "reviewStatus",
-    //   render: (status) => {
-    //     if (status === "approved") {
-    //       return <span style={{ color: "green" }}><CheckOutlined /> Approved</span>;
-    //     } else if (status === "rejected") {
-    //       return <span style={{ color: "red" }}><CloseOutlined /> Rejected</span>;
-    //     } else {
-    //       return (
-    //         <span style={{ color: "#505050", fontSize: "18px" }}>
-    //           <CloseOutlined /><CloseOutlined /><CloseOutlined />
-    //         </span>
-    //       ); // Default: Three ❌ in purple
-    //     }
-    //   },
-    // },
-    
-    
   ];
 
-  //console.log(filteredCodes);
+    if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
+      columns.push({
+        title: "Actions",
+        key: "actions",
+        onHeaderCell: () => ({
+          style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
+        }),
+        render: (text, record) => (
+          <Space direction="vertical" style={{ width: "180px"}}>
+            <div>
+            {/* Admin & Contributor can Edit */}
+            {(userRole === "Admin" || userRole === "Contributor") && (
+              <Button
+                type="primary"
+                icon= {<EditOutlined />}
+                onClick={() => showEditModal(record)}
+                style={{ backgroundColor: "#ff9f00", borderColor: "#ff9f00", color: "black" }}
+              >
+                Edit
+              </Button>
+            )}
   
+            {/* Admin can Delete */}
+            {(userRole === "Admin" || userRole === "Contributor") && (
+              <Popconfirm
+                title="Are you sure you want to delete this code?"
+                onConfirm={() => handleDelete(record.id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  type="primary"
+                  style={{ backgroundColor: "#d90027", borderColor: "#d90027", marginLeft: 5 }}
+                  icon={<DeleteOutlined />}
+                >
+                  Delete
+                </Button>
+              </Popconfirm>
+            )}
+            </div>
+
+             {/* ✅ View History Button */}
+             {(userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") && (
+              <Button type="default" onClick={() => handleViewHistory(record)}
+               style={{display: "block", paddingLeft: "2px"}} icon={<HistoryOutlined />}>
+              View History
+              </Button>
+             )}
+          </Space>
+        ),
+      });
+    }
+
+    // ✅ Add Reactions column LAST and make it visible only for Admin, Contributor, and Reviewer
+if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
+  columns.push({
+    title: "Reactions",
+    key: "reactions",
+    onHeaderCell: () => ({
+      style: { backgroundColor: "#5cb3ff7f", fontWeight: "bold", textAlign: "center" }, // Light green header
+    }),
+    // In your columns definition where reactions are rendered:
+    render: (text, record) => {
+  // These values will now persist after refresh
+  const isLiked = record.liked;
+  const isDisliked = record.disliked;
+
+  return (
+    <Space size="middle">
+      {/* Like Button - will stay colored after refresh */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 8px',
+        border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
+        borderRadius: '4px',
+        backgroundColor: isLiked ? '#f6ffed' : 'transparent'
+      }}>
+        <Button
+          type="text"
+          icon={<LikeFilled style={{
+            color: isLiked ? "#52c41a" : "#d9d9d9",
+            fontSize: "20px"
+          }} />}
+          onClick={() => handleReaction(record.id, "like")}
+        />
+        <span style={{
+          color: isLiked ? "#52c41a" : "#8c8c8c",
+          fontWeight: isLiked ? "600" : "400"
+        }}>
+          {record.like_count || 0}
+        </span>
+      </div>
+
+      {/* Dislike Button - will stay colored after refresh */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 8px',
+        border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
+        borderRadius: '4px',
+        backgroundColor: isDisliked ? '#fff2f0' : 'transparent'
+      }}>
+        <Button
+          type="text"
+          icon={<DislikeFilled style={{
+            color: isDisliked ? "#f5222d" : "#d9d9d9",
+            fontSize: "20px"
+          }} />}
+          onClick={() => handleReaction(record.id, "dislike")}
+        />
+        <span style={{
+          color: isDisliked ? "#f5222d" : "#8c8c8c",
+          fontWeight: isDisliked ? "600" : "400"
+        }}>
+          {record.dislike_count || 0}
+        </span>
+      </div>
+    </Space>
+  );
+}
+  });
+}
+    
   return (
     <div style={{ padding: "20px" }}>
       <h1>Code List</h1>
 
        {/* 🔍 Search Bar */}
        <Input
-        placeholder="Search by book name..."
+        placeholder="Search by book name, Code, Description, Sub-description and code..."
         value={globalSearch}
         onChange={(e) => setGlobalSearch(e.target.value)}
         style={{ marginBottom: "16px", width: "500px", marginRight: "40%" }}
       />
 
+       {/* Only Admin & Contributor can add codes */}
+       {(userRole === "Admin" || userRole === "Contributor") && (
       <Button type="primary" onClick={showModal} style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>
         Add Code
-      </Button>
+      </Button>)}
      
       {status === "loading" && <Spin size="large" style={{ display: "block", margin: "20px auto" }} />}
       {status === "failed" && <Alert message="Error" description={error} type="error" showIcon />}
 
       {status === "succeeded" && Array.isArray(filteredCodes) && filteredCodes.length > 0 ? (
-        // <Table key={codes.length} dataSource={filteredCodes.map((code, index) => ({ ...code,  id: Number(code.id),  // Convert ID to a number
-        //   book: Number(code.book), // Convert book ID if needed
-        //   key: index, }))} columns={columns} />
         <Table
         key={filteredCodes.length}
         dataSource={filteredCodes.map((code, index) => ({
@@ -368,7 +401,7 @@ const handleBookChange = (value) => {
         }))}
         columns={columns}
         bordered
-       
+        style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
       />
       ) : (
         <Alert message="No codes available" type="info" showIcon />
@@ -384,8 +417,7 @@ const handleBookChange = (value) => {
         onEdit={handleEdit} // ✅ Pass correct function
         loggedInUserId={currentUser?.id}
       />
-       <ReviewCodeModal open={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} onReview={handleReview} code={selectedReviewCode} />
-
+       
         {/* ✅ History Modal */}
       <HistoryModal
         open={isHistoryModalOpen}

@@ -7,6 +7,10 @@ body {
   .ant-layout-sider {
     background: #ade2f8 !important;
 }
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: #e5f2e0 !important;
+}
   
   .layout {
     min-height: 100vh;
@@ -53,8 +57,6 @@ body {
     padding: 10px;
   }
   
- 
-  
   .ant-btn-primary:hover {
     /* background-color: #5cb3ff !important; */
     border-color: #62bbca !important;
@@ -66,6 +68,38 @@ body {
   
   .ant-menu-item-selected{
     background-color: #5cb3ff !important;
+  }
+
+  /* Add these styles to your existing CSS */
+
+/* Table header styles */
+.ant-table-thead > tr > th {
+  background-color: #ade2f8 !important; /* Light blue header background */
+  color: #000 !important; /* Black text for better contrast */
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Hover effect for table rows */
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: #daf4ff !important; /* Light green hover */
+}
+
+/* Reactions column header specific style */
+.ant-table-thead > tr > th[data-col-key="reactions"] {
+  background-color: #5cb3ff7f !important; /* Semi-transparent blue */
+}
+
+/* Ensure consistent styling for all headers */
+.ant-table-thead > tr > th {
+  border-bottom: 1px solid #00B4D8 !important; /* Slightly darker blue border */
+}
+
+/* Optional: Add transition for smooth hover effects */
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  transition: background-color 0.3s ease;
+}
   }
 
   :where(.css-1v613y0) a {

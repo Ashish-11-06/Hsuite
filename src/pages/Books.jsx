@@ -17,6 +17,8 @@ const Books = () => {
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Add search term state
 
+  const userRole = currentUser?.role; // Get current user role
+
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchBooks()); // Fetch books on mount
@@ -42,8 +44,6 @@ const Books = () => {
       .catch(() => message.error("Failed to delete book"));
   };
 
-  
-
     // 🔍 Filter books based on search term
     const filteredBooks = books.filter((book) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,76 +56,93 @@ const Books = () => {
       title: "Sr. No.",
       key: "srNo",
       render: (text, record, index) => index + 1,
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Author",
       dataIndex: "author",
       key: "author",
       render: (author) => author || "N/A",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Code Sets", // 📌 Add Code Sets Column
-      dataIndex: "codeSets",
-      key: "codeSets",
-      render: (codeSets) => (codeSets?.length > 0 ? codeSets.join(", ") : "No Code Sets"), // Show comma-separated codes
+      dataIndex: "code_sets",
+      key: "code_sets",
+      render: (code_sets) => 
+       // code_sets?.length > 0 ? code_sets.map((set) => set.name).join(", ") : "No Code Sets",
+      code_sets?.length > 0 ? (
+        <ul style={{ paddingLeft: 20, margin: 0 }}>
+          {code_sets.map((set, index) => (
+            <li key={index}>{set.name}</li>
+          ))}
+        </ul>
+      ) : (
+        "No Code Sets"
+      ),
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
     {
       title: "Version",
       dataIndex: "version",
       key: "version",
-    },
-    // {
-    //   title: "Updated By",
-    //   dataIndex: "updated_by",
-    //   key: "updated_by",
-    //   render: (updated_by) => updated_by?.username, // Handle missing username
-    // },
-    // {
-    //   title: "Created By",
-    //   dataIndex: "created_by",
-    //   key: "created_by",
-    //   render: (created_by) => created_by?.username,
-    // },
-    
-    
-   
-    // {
-    //   title: "Published Year",
-    //   dataIndex: "first_publish_year",
-    //   key: "first_publish_year",
-    // },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (text, record) => (
-        <Space>
-          <Button type="primary" onClick={() => showEditModal(record)}
-            //icon ={<EditOutlined />}
-            style={{ backgroundColor: "#ff9f00", 
-              borderColor: "#ff9f00", 
-              color: "black" }}
-            >Edit
-          </Button>
-          <Popconfirm
-            title="Are you sure you want to delete this book?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="primary" style={{backgroundColor: "#d90027", borderColor: "#d90027"}}
-            //icon = {<DeleteOutlined />}
-            >Delete</Button>
-          </Popconfirm>
-        </Space>
-      ),
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
     },
   ];
 
+  if (userRole === "Admin" || userRole === "Contributor") {
+    columns.push({
+      title: "Actions",
+      key: "actions",
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
+      }),
+      render: (text, record) => (
+        <Space>
+          {/* Contributor & Admin can edit */}
+          <Button 
+            type="primary" 
+            onClick={() => showEditModal(record)}
+            style={{ backgroundColor: "#ff9f00", borderColor: "#ff9f00", color: "black" }}
+          >
+            Edit
+          </Button>
+
+          {/* Only Admin can delete */}
+          {(userRole === "Admin" || userRole === "Contributor") && (
+            <Popconfirm
+              title="Are you sure you want to delete this book?"
+              onConfirm={() => handleDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary" style={{ backgroundColor: "#d90027", borderColor: "#d90027" }}>
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
+      ),
+    });
+    
+  }
+  
   return (
     <div style={{ padding: 20 }}>
       <Title level={2}>Books List</Title>
@@ -139,9 +156,11 @@ const Books = () => {
       />
 
       {/* Button to open the modal */}
+      {(userRole === "Admin" || userRole === "Contributor") && (
       <Button type="primary" onClick={showModal} style={{ marginBottom: 20 }}>
         Add Book
       </Button>
+      )}
 
       {/* Show loading spinner */}
       {status === "loading" && <Spin size="large" style={{ display: "block", margin: "20px auto" }} />}
@@ -151,7 +170,9 @@ const Books = () => {
 
       {/* Show table when data is available */}
       {status === "succeeded" && (
-        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered />
+        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered 
+        style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
+        />
       )}
 
       {/* Add Book Modal */}
