@@ -1,6 +1,16 @@
 import React from "react";
 import { Menu, Layout, Divider } from "antd";
-import { HomeOutlined, InfoCircleOutlined, UserOutlined, SettingOutlined, LogoutOutlined, BookOutlined, AuditOutlined, BarChartOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  InfoCircleOutlined,
+  UserOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  BookOutlined,
+  AuditOutlined,
+  BarChartOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../Redux/Slices/authSlice";
@@ -14,9 +24,9 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Get current route path
 
-   // Get role from localStorage
-   const userRole = localStorage.getItem("role"); // Expected: "Student", "Reviewer", "Contributor", "Admin"
- 
+  // Get role from localStorage
+  const userRole = localStorage.getItem("role"); // Expected: "Student", "Reviewer", "Contributor", "Admin"
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
@@ -38,16 +48,28 @@ const Sidebar = () => {
     <Sider>
       <div
         className="logo"
-        style={{ textAlign: "center", padding: "20px", color: "black", height: "66px",  fontSize: "18px",
-          fontWeight: "bold", alignItems: "center",
-          justifyContent: "center", }}
+        style={{
+          textAlign: "center",
+          padding: "20px",
+          color: "black",
+          height: "66px",
+          fontSize: "18px",
+          fontWeight: "bold",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         <Link to="/" style={{ textDecoration: "none", color: "black" }}>
           Medical Coding
         </Link>
       </div>
 
-      <Menu theme="" mode="inline" selectedKeys={[getSelectedKey()]} style={{ color: "#000", flexGrow: 1, fontWeight: 500, paddingTop: 10  }}>
+      <Menu
+        theme=""
+        mode="inline"
+        selectedKeys={[getSelectedKey()]}
+        style={{ color: "#000", flexGrow: 1, fontWeight: 500, paddingTop: 10 }}
+      >
         <Menu.Item key="1" icon={<HomeOutlined />}>
           <Link to="/">Home</Link>
         </Menu.Item>
@@ -57,19 +79,17 @@ const Sidebar = () => {
         <Menu.Item key="3" icon={<InfoCircleOutlined />}>
           <Link to="/codes">Codes</Link>
         </Menu.Item>
+
         {/* SubMenu for Assessments */}
         <SubMenu key="6" icon={<AuditOutlined />} title="Assessments">
           <Menu.Item key="6-1" icon={<CheckCircleOutlined />}>
-        {/* <SubMenu key="6" icon={<InfoCircleOutlined />} title="Assessments">
-          <Menu.Item key="6-1">
             <Link to="/assessents">Test</Link>
           </Menu.Item>
-          <Menu.Item key="6-2"  icon={<BarChartOutlined />}>
+          <Menu.Item key="6-2" icon={<BarChartOutlined />}>
             <Link to="/report">Report</Link>
           </Menu.Item>
         </SubMenu>
 
-        </SubMenu> */}
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>
         </Menu.Item>
@@ -81,15 +101,16 @@ const Sidebar = () => {
         {/* <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
           <Link to="/users">Users</Link>
         </Menu.Item> */}
-        
       </Menu>
 
       {/* Show Logout only if the user is logged in */}
       {isAuthenticated && (
-        <Menu theme="" mode="inline" 
-        style={{ position: "absolute", bottom: "0", fontWeight: 500}}
+        <Menu
+          theme=""
+          mode="inline"
+          style={{ position: "absolute", bottom: "0", fontWeight: 500 }}
         >
-          <Menu.Item key="6" icon={<LogoutOutlined />} onClick={handleLogout}>
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
         </Menu>
