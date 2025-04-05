@@ -156,7 +156,7 @@ const handleViewHistory = async (code) => {
         }
   
         // ✅ Re-fetch all codes to get updated counts
-        dispatch(fetchCodes());
+        // dispatch(fetchCodes());
   
         // Update specific reaction state
         dispatch(setUserReaction({
