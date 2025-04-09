@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector} from "react-redux";
 import { Modal, Table, Spin,  Typography, Card } from "antd";
 import { saveResult } from "../Redux/Slices/assessmentSlice";
@@ -84,20 +84,28 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
     };
   };
 
-  const handleShowResults = () => {
-    // console.log("Responses:", responses);
-    // console.log("Current Questions:", currentQuestions);
-    // if (responses.length !== currentQuestions.length) {
-      if (!responses || responses.length !== currentQuestions.length) {
-        // console.error("Missing responses! Expected:", currentQuestions.length, "Received:", responses.length);
-        
-        return;
-      }
+  // const handleShowResults = () => {
+  //   console.log('ShowResults called', { isResultModalOpen, isResultLoading });
+  //     // if (!responses || responses.length !== currentQuestions.length) {
+  //     //   return;
+  //     // }
     
-      // Prevent multiple calls
-      if (isResultModalOpen) {
-        return;
-      }
+  //     // // Prevent multiple calls
+  //     // if (isResultModalOpen) {
+  //     //   return;
+  //     // }
+  //     if (isResultModalOpen || isResultLoading) {
+  //       return;
+  //     }
+
+  const handleShowResults = useCallback(() => {
+    if (isResultModalOpen || isResultLoading || !responses) {
+      console.log('Prevented duplicate call', { isResultModalOpen, isResultLoading });
+      return;
+    }
+    // ... rest of your function
+ 
+
     const scores = calculateScores();
     const result = {
       user_id: loggedInUserId,
@@ -163,13 +171,23 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
       .finally(() => {
         setIsResultLoading(false);
       });
-  };
+  },  [isResultModalOpen, isResultLoading, responses]);
+
+  // const handleCloseResultModal = () => {
+  //   setIsResultModalOpen(false);
+  //   if (setIsModalOpen) {
+  //     setIsModalOpen(false); // Close Assessment Modal (Fix)
+  //   }
+  // };
 
   const handleCloseResultModal = () => {
     setIsResultModalOpen(false);
+    setIsResultLoading(false); // Add this line
     if (setIsModalOpen) {
-      setIsModalOpen(false); // Close Assessment Modal (Fix)
+      setIsModalOpen(false);
     }
+    // Reset result data if needed
+    setResultData(null); 
   };
 
   const columns = [
@@ -194,15 +212,17 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
       footer={null}
       centered
       width={600}
+      maskClosable={false} // Add this
+    keyboard={false} 
       // bodyStyle={{ padding: "20px" }}
     >
       {isResultLoading ? (
        <Spin tip="Loading results..." style={{ display: "flex", justifyContent: "center", padding: "20px" }} />
       ) : resultData ? (
         <Card style={{ borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}>
-          <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
+          {/* <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
             <Text strong>User ID:</Text> {resultData.user_id}
-          </p>
+          </p> */}
           <p style={{ textAlign: "center", fontSize: "16px", marginBottom: "15px" }}>
             <Text strong>Total Questions:</Text> {resultData.total}
           </p>

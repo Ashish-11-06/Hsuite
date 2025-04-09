@@ -298,7 +298,7 @@ const handleViewHistory = async (code) => {
     }
 
     // ✅ Add Reactions column LAST and make it visible only for Admin, Contributor, and Reviewer
-if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
+if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer"|| userRole === "View") {
   columns.push({
     title: "Reactions",
     key: "reactions",

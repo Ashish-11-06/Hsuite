@@ -226,10 +226,10 @@ export const Report = ({ userId }) => {
               </Tag>
             </div>
 
-            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+            {/* <div style={{ textAlign: "center", marginBottom: "15px" }}>
               <Text strong style={{ fontSize: "16px" }}>User ID:</Text>{" "}
               <Text>{selectedRow.id}</Text>
-            </div>
+            </div> */}
 
             <div style={{ textAlign: "center", marginBottom: "15px" }}>
               <Text strong style={{ fontSize: "16px" }}>Date:</Text>{" "}

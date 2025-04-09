@@ -381,12 +381,22 @@ const handleAutoSubmit = () => {
         <Button onClick={handleNextQuestion} type="primary" disabled={!selectedAnswer}>
           Next
         </Button>
-        <Button onClick={handleShowResults} type="primary" 
-  disabled={!isShowResultsEnabled || currentIndex < currentQuestions.length - 1} 
->
-  Show Results
-</Button>
-
+        {/* <Button onClick={handleShowResults} type="primary" 
+         disabled={!isShowResultsEnabled || currentIndex < currentQuestions.length - 1} >
+          Show Results
+        </Button> */}
+        <Button 
+          onClick={() => {
+            console.log('Button clicked', { isShowResultsEnabled, isResultModalOpen });
+            if (isShowResultsEnabled && !isResultModalOpen) {
+              handleShowResults();
+            }
+          }}
+          type="primary"
+          disabled={!isShowResultsEnabled || isResultModalOpen}
+        >
+          Show Results
+        </Button>
       </div>
           </>
         )}
