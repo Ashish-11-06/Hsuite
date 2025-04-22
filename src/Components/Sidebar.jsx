@@ -29,8 +29,9 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/codes")) return "3";
     if (location.pathname.startsWith("/profile")) return "4";
     if (location.pathname.startsWith("/users")) return "5";
-    if (location.pathname.startsWith("/assessents")) return "6-1";
-    if (location.pathname.startsWith("/report")) return "6-2";
+    if (location.pathname.startsWith("/createset")) return "6-1";
+    if (location.pathname.startsWith("/assessents")) return "6-2";
+    if (location.pathname.startsWith("/report")) return "6-3";
     return "1"; // Default to Home
   };
 
@@ -60,12 +61,19 @@ const Sidebar = () => {
         {/* SubMenu for Assessments */}
         <SubMenu key="6" icon={<AuditOutlined />} title="Assessments">
           <Menu.Item key="6-1" icon={<CheckCircleOutlined />}>
+            <Link to="/createset">Create Set</Link>
+          </Menu.Item>
+          <Menu.Item key="6-2" icon={<CheckCircleOutlined />}>
             <Link to="/assessents">Test</Link>
           </Menu.Item>
-          <Menu.Item key="6-2"  icon={<BarChartOutlined />}>
+          <Menu.Item key="6-3"  icon={<BarChartOutlined />}>
             <Link to="/report">Report</Link>
           </Menu.Item>
         </SubMenu>
+
+        <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
+          <Link to="/users">Users</Link>
+        </Menu.Item>
 
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>
@@ -75,9 +83,7 @@ const Sidebar = () => {
           <Link to="/settings">Settings</Link>
         </Menu.Item> */}
 
-        {/* <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
-          <Link to="/users">Users</Link>
-        </Menu.Item> */}
+      
         
       </Menu>
 

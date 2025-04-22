@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveResult, fetchMultipleChoiceQuestions, fetchStatementBasedQuestions, setResponses, clearResponses } from "../Redux/Slices/assessmentSlice";
 import { Modal, Button, Radio, Card, Row, Col } from "antd";
+import QuizList from "./QuizList";
 import { useResults } from "./Results"; // Import the useResults hook
 
 const Assessments = () => {
@@ -16,7 +17,11 @@ const Assessments = () => {
   const [timeLeft, setTimeLeft] = useState(10); // Timer for 7 seconds
   const timerRef = useRef(null); // Store timer ID
   const [testType, setTestType] = useState("");
+  const [activeTab, setActiveTab] = useState("quiz");
   const [isShowResultsEnabled, setIsShowResultsEnabled] = useState(false);
+  // const { quizCategories, loading: quizLoading } = useSelector((state) => state.quiz);
+  // const quizState = useSelector((state) => state.quiz);
+  
 
   // Use the useResults hook
   const { resultData, 
@@ -40,11 +45,9 @@ const Assessments = () => {
       setIsShowResultsEnabled(false); // Ensure it's disabled while the test is ongoing
     }
   }, [currentIndex, currentQuestions.length]);
-  
-  
 
   useEffect(() => {
-    dispatch(fetchMultipleChoiceQuestions());
+     dispatch(fetchMultipleChoiceQuestions());
     dispatch(fetchStatementBasedQuestions());
   }, [dispatch]);
 
@@ -69,12 +72,6 @@ const Assessments = () => {
           clearInterval(timerRef.current);
           timerRef.current = null;
           handleAutoSubmit();
-  
-          // if (currentIndex + 1 < currentQuestions.length) {
-          //   handleNextQuestion();
-          // } else {
-          //   handleShowResults();
-          // }
           return 0;
         }
         return prev - 1;
@@ -83,12 +80,6 @@ const Assessments = () => {
   };
   
   useEffect(() => {
-    // console.log("Current state:", {
-    //   index: currentIndex,
-    //   selected: selectedAnswer,
-    //   timeLeft,
-    //   responses: [...responses],
-    // });
   }, [currentIndex, selectedAnswer, timeLeft, responses]);
 
   const handleOpenModal = (type) => {
@@ -262,7 +253,7 @@ const handleAutoSubmit = () => {
     <div>
       <h2>Assessments</h2>
 
-      {loading && (multipleChoiceQuestions.length > 0 || statementBasedQuestions.length > 0) ? (
+      {/* {loading && (multipleChoiceQuestions.length > 0 || statementBasedQuestions.length > 0) ? (
         <p>Loading assessments...</p>
       ) : (
         <Row gutter={[10, 0]}>
@@ -313,8 +304,7 @@ const handleAutoSubmit = () => {
             </Card>
           </Col>
         </Row>
-        
-      )}
+      )} */}
 
       <Modal
         title="Assessment"
@@ -328,36 +318,36 @@ const handleAutoSubmit = () => {
             <p>{currentQuestions[currentIndex].question}</p>
             <p style={timerStyle}>Time Left: {timeLeft}s</p>
             {testType === "mcq" ? (
-  <Radio.Group
-    onChange={handleAnswerSelect}
-    style={{ display: "flex", flexDirection: "column" }}
-  >
-    {currentQuestions[currentIndex]?.options?.map((option, index) => (
-      <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
-        {option}
-      </Radio>
-    ))}
-  </Radio.Group>
-) : (
-  <Row gutter={[16, 16]}>
-    {currentQuestions[currentIndex]?.statements?.map((statement, index) => (
-      <Col key={index} span={12}>
-        <Card
-          hoverable
-          style={{
-            textAlign: "center",
-            padding: "10px",
-            border: selectedAnswer === statement ? "2px solid #1890ff" : "",
-            cursor: "pointer",
-          }}
-          onClick={() => setSelectedAnswer(statement)}
-        >
-          {statement}
-        </Card>
-      </Col>
-    ))}
-  </Row>
-)}
+            <Radio.Group
+              onChange={handleAnswerSelect}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
+              {currentQuestions[currentIndex]?.options?.map((option, index) => (
+                <Radio key={index} value={option} style={{ marginBottom: "10px" }}>
+                  {option}
+                </Radio>
+              ))}
+            </Radio.Group>
+          ) : (
+            <Row gutter={[16, 16]}>
+              {currentQuestions[currentIndex]?.statements?.map((statement, index) => (
+                <Col key={index} span={12}>
+                  <Card
+                    hoverable
+                    style={{
+                      textAlign: "center",
+                      padding: "10px",
+                      border: selectedAnswer === statement ? "2px solid #1890ff" : "",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setSelectedAnswer(statement)}
+                  >
+                    {statement}
+                  </Card>
+                </Col>
+              ))}
+              </Row>
+            )}
             <br />
             <br />
 
@@ -381,10 +371,6 @@ const handleAutoSubmit = () => {
         <Button onClick={handleNextQuestion} type="primary" disabled={!selectedAnswer}>
           Next
         </Button>
-        {/* <Button onClick={handleShowResults} type="primary" 
-         disabled={!isShowResultsEnabled || currentIndex < currentQuestions.length - 1} >
-          Show Results
-        </Button> */}
         <Button 
           onClick={() => {
             console.log('Button clicked', { isShowResultsEnabled, isResultModalOpen });
@@ -403,7 +389,11 @@ const handleAutoSubmit = () => {
       </Modal>
 
       <ResultsModal />
+
+      {/* Conditional rendering based on the activeTab state */}
+      {activeTab === "quiz" && <QuizList />} {/* Shows QuizList component */}
     </div>
+    
   );
 };
 

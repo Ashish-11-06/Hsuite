@@ -10,7 +10,6 @@ import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutl
 const Codes = () => {
   const dispatch = useDispatch();
   const { codes, status, error, books, userReactions } = useSelector((state) => state.codes); 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -22,24 +21,15 @@ const Codes = () => {
     const [codeSearchTerm, setCodeSearchTerm] = useState(null); // 🔍 Search term for code
     const [globalSearch, setGlobalSearch] = useState("");
   const [refresh, setRefresh] = useState(false);
-  // const [optimisticReactions, setOptimisticReactions] = useState({});
-
-  // console.log(codes);
   const userRole = currentUser?.role; // Get user role
 
 const handleViewHistory = async (code) => {
-  //console.log("Fetching history for:", code); // Debugging
-
   if (!code || !code.id) {
     message.error("Invalid code");
     return;
   }
-
   try {
-    // Fetch the main code history
     const mainHistory = code.history || [];
-
-    // Fetch the sub-description histories
     const subHistories = await Promise.all(
       code.sub_descriptions.map(async (sub) => {
         return {
@@ -49,8 +39,6 @@ const handleViewHistory = async (code) => {
         };
       })
     );
-
-    // Combine main history and sub histories
     const combinedHistory = {
       mainHistory,
       subHistories,
@@ -178,6 +166,20 @@ const handleViewHistory = async (code) => {
   
   const columns = [
     {
+      title: "Sr. No",
+      dataIndex: "srNo",  // This will represent the serial number
+      key: "srNo",
+      render: (_, record, index) => index + 1,  // Serial number starts from 1
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#00EAFF",
+          fontWeight: "bold",
+          textAlign: "center",
+        },
+      }),
+      width: 80,
+    },
+    {
       title: (
         <div  style={{ display: "flex", alignItems: "center" }}>
            <span>Book</span>
@@ -231,8 +233,21 @@ const handleViewHistory = async (code) => {
           <div>
             {sub_descriptions.map((sub, index) => (
               <div key={index}>
+                <div>
                 <strong style={{ color: "#0F4C75" }}>{sub.code}</strong>: {sub.sub_description}
               </div>
+              {sub.sub_data && (
+                <div style={{ 
+                  marginLeft: 16,
+                  padding: 4,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 4,
+                  borderLeft: '3px solid #1890ff'
+                }}>
+                  <strong>Notes:</strong> {sub.sub_data}
+                </div>
+              )}
+            </div>
             ))}
           </div>
         ) : (
@@ -319,15 +334,15 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
         flexDirection: 'column',
         alignItems: 'center',
         padding: '0 8px',
-        border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
+        // border: isLiked ? '2px solid #52c41a' : '2px solid transparent',
         borderRadius: '4px',
-        backgroundColor: isLiked ? '#f6ffed' : 'transparent'
+        // backgroundColor: isLiked ? '#f6ffed' : 'transparent'
       }}>
         <Button
           type="text"
           icon={<LikeFilled style={{
             color: isLiked ? "#52c41a" : "#d9d9d9",
-            fontSize: "20px"
+            fontSize: "25px"
           }} />}
           onClick={() => handleReaction(record.id, "like")}
         />
@@ -345,15 +360,15 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
         flexDirection: 'column',
         alignItems: 'center',
         padding: '0 8px',
-        border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
+        // border: isDisliked ? '2px solid #f5222d' : '2px solid transparent',
         borderRadius: '4px',
-        backgroundColor: isDisliked ? '#fff2f0' : 'transparent'
+        // backgroundColor: isDisliked ? '#fff2f0' : 'transparent'
       }}>
         <Button
           type="text"
           icon={<DislikeFilled style={{
             color: isDisliked ? "#f5222d" : "#d9d9d9",
-            fontSize: "20px"
+            fontSize: "25px"
           }} />}
           onClick={() => handleReaction(record.id, "dislike")}
         />
@@ -397,6 +412,7 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
         dataSource={filteredCodes.map((code, index) => ({
           ...code, 
           key: code.id || index,
+          srNo: index + 1,
          // dataSource={filteredCodes},
         }))}
         columns={columns}

@@ -84,27 +84,11 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
     };
   };
 
-  // const handleShowResults = () => {
-  //   console.log('ShowResults called', { isResultModalOpen, isResultLoading });
-  //     // if (!responses || responses.length !== currentQuestions.length) {
-  //     //   return;
-  //     // }
-    
-  //     // // Prevent multiple calls
-  //     // if (isResultModalOpen) {
-  //     //   return;
-  //     // }
-  //     if (isResultModalOpen || isResultLoading) {
-  //       return;
-  //     }
-
   const handleShowResults = useCallback(() => {
     if (isResultModalOpen || isResultLoading || !responses) {
       console.log('Prevented duplicate call', { isResultModalOpen, isResultLoading });
       return;
     }
-    // ... rest of your function
- 
 
     const scores = calculateScores();
     const result = {
@@ -172,13 +156,6 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
         setIsResultLoading(false);
       });
   },  [isResultModalOpen, isResultLoading, responses]);
-
-  // const handleCloseResultModal = () => {
-  //   setIsResultModalOpen(false);
-  //   if (setIsModalOpen) {
-  //     setIsModalOpen(false); // Close Assessment Modal (Fix)
-  //   }
-  // };
 
   const handleCloseResultModal = () => {
     setIsResultModalOpen(false);

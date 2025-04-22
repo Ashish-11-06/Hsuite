@@ -54,21 +54,6 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 🔹 Update Profile
-export const updateProfile = createAsyncThunk(
-  "auth/updateProfile",
-  async (profileData, { rejectWithValue }) => {
-    try {
-      const response = await authAPI.updateProfile(profileData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Update failed");
-    }
-  }
-);
-
-
-
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -138,10 +123,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(updateProfile.fulfilled, (state, action) => {
-        state.user = { ...state.user, ...action.payload };
-        localStorage.setItem("user", JSON.stringify(state.user));
-      });
   },
 });
 
