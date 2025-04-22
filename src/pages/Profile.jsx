@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Card, Typography, Button, Descriptions, Input, message, Avatar } from "antd";
 import { EditOutlined, SaveOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import { logout, updateProfile } from "../Redux/Slices/authSlice";
+import { logout, loginSuccess } from "../Redux/Slices/authSlice";
+import { updateProfile } from "../Redux/Slices/profileSlice";
 import { useNavigate } from "react-router-dom";
 import  User_img  from '../assets/user.jpg';
 
@@ -14,6 +15,8 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.auth.user);
+// OR if you want to fall back to profile data:
+// const user = useSelector((state) => state.auth.user || state.profile.userData);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -22,18 +25,38 @@ const Profile = () => {
     username: user?.username || "",
   });
 
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        email: user.email,
+        username: user.username,
+      });
+    }
+  }, [user]);
+  
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
     dispatch(updateProfile(profileData))
-      .then(() => {
-        message.success("Profile updated successfully!");
-        setIsEditing(false);
-      })
-      .catch(() => message.error("Failed to update profile."));
+      .then((res) => {
+        if (res.type.includes("fulfilled")) {
+          const updatedUser = res.payload.user; // Get user from response
+          
+          // Update all states consistently
+          setProfileData(updatedUser);
+          dispatch(loginSuccess(updatedUser));
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          
+          setIsEditing(false);
+          message.success(res.payload.message); // "Profile updated successfully"
+        } else {
+          message.error("Failed to update profile.");
+        }
+      });
   };
+  
 
   const handleLogout = () => {
     dispatch(logout());
@@ -106,7 +129,7 @@ const Profile = () => {
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Verified at">
-                  {new Date(user.verified_at).toLocaleDateString("en-GB", {
+                  {new Date(profileData.verified_at || user.verified_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "long",
                     year: "numeric",
@@ -116,7 +139,7 @@ const Profile = () => {
 
               {/* Buttons */}
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: 30 }}>
-                {/* <Button
+                <Button
                   type="default"
                   onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
                   icon={isEditing ? <SaveOutlined /> : <EditOutlined />}
@@ -128,7 +151,7 @@ const Profile = () => {
                   }}
                 >
                   {isEditing ? "Save" : "Edit"}
-                </Button> */}
+                </Button>
 
                 <Button
                   type="primary"

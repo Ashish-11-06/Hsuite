@@ -64,10 +64,6 @@ const Login = () => {
       }
     };
 
-    const handleLoginSuccess = (user) => {
-      dispatch(setUserData({ name: user.username, email: user.email }));
-    };
-
      // 🔹 Handle OTP Button Click
      const handleSendOtp = () => {
       if (!email) return;
@@ -153,10 +149,7 @@ const Login = () => {
               // }
             />
           </Form.Item>
-
-         
-    
-
+          
           <Form.Item>
             <Button type="primary" block loading={loading} onClick={handleVerifyAndRegister}>
               Verify & Register

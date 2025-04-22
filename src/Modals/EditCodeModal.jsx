@@ -12,7 +12,10 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         if (code) {
             setCodeValue(code.code || "");
             setDescription(code.description || "");
-            setSubDescriptions(code.sub_descriptions ? [...code.sub_descriptions] : []);
+            setSubDescriptions(code.sub_descriptions ? code.sub_descriptions.map(sub => ({ 
+                ...sub, 
+                sub_data: sub.sub_data || "" 
+              })) : []);
         }
     }, [code]);
 
@@ -29,7 +32,7 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
     };
 
     const handleAddSubDescription = () => {
-        setSubDescriptions([...subDescriptions, { code: "", sub_description: "" }]);
+        setSubDescriptions([...subDescriptions, { code: "", sub_description: "", sub_data: "" }]);
     };
 
     const handleRemoveSubDescription = (index) => {
@@ -44,7 +47,11 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
             description,
             user_id: loggedInUserId,
             //sub_descriptions: [...subDescriptions],
-            sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== ""), // Ensure removed items are excluded
+            sub_descriptions: subDescriptions.filter(sub => sub.code.trim() !== "" && sub.sub_description.trim() !== "")
+            .map(sub => ({
+                ...sub,
+                sub_data: sub.sub_data?.trim() || ""
+            })), // Ensure removed items are excluded
         };
         onEdit(updatedData);
         onClose();
@@ -63,6 +70,7 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                  
                 <label><strong>Sub-Descriptions</strong></label>
                 {subDescriptions.map((sub, index) => (
+                    <div>
                     <Space key={index} style={{ display: "flex", marginBottom: 8 }} align="baseline">
                         <Input
                             placeholder="Enter code"
@@ -82,6 +90,13 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                             />
                         )}
                     </Space>
+                    <Input
+                            placeholder="Notes (optional)"
+                            value={sub.sub_data}
+                            onChange={(e) => handleSubDescriptionChange(index, "sub_data", e.target.value)}
+                            style={{ marginLeft: 8, width: 'calc(100% - 16px)' }}
+                        />
+                    </div>
                 ))}
                 
                 <Button type="dashed" onClick={handleAddSubDescription} style={{ marginTop: 10 }}>+ Add Sub-Description</Button>

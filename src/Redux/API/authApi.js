@@ -11,10 +11,10 @@ const authAPI = {
   loginUser: (credentials) => axiosInstance.post(`/accounts/login`, credentials),
 
    // 🔹 Update Profile
-   updateProfile: (profileData) => axiosInstance.put(`/accounts/update-profile`, profileData),
+   updateProfile: (profileData) => axiosInstance.put(`/accounts/update-profile/`, profileData),
 
    // 🔹 Fetch Users from JSON Server
-  fetchAllUsers: () => axiosInstance.get(`/users`).then((res) => res.data),
+  // fetchAllUsers: () => axiosInstance.get(`/users`).then((res) => res.data),
 };
 
 export default authAPI;

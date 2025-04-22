@@ -34,6 +34,7 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
       sub_descriptions: values.sub_descriptions.map((item, index) => ({
         code: item.code || `sub_${index + 1}`,
         sub_description: item.sub_description.trim(),
+        sub_data: item.sub_data?.trim() || ""
       })),
     };
 
@@ -64,7 +65,7 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
 
   return (
     <Modal title="Add New Code" open={open} onCancel={onClose} footer={null}>
-      <Form form={form} onFinish={onFinish} layout="vertical" initialValues={{ sub_descriptions: [{ code: "", sub_description: "" }] }}>
+      <Form form={form} onFinish={onFinish} layout="vertical" initialValues={{ sub_descriptions: [{ code: "", sub_description: "", sub_data: "" }] }}>
         <Form.Item label="Book" name="book" rules={[{ required: true, message: "Please select a book!" }]}>
           <Select placeholder="Select a book" optionLabelProp="label">
             {Array.isArray(books) && books.length > 0 ? (
@@ -91,6 +92,7 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }, index) => (
+                <div key={key} style={{ marginBottom: 16, border: '1px solid #d9d9d9', padding: 16, borderRadius: 4 }}>
                 <Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
                   <Form.Item
                     {...restField}
@@ -108,9 +110,17 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
                   </Form.Item>
                   {index > 0 && <MinusCircleOutlined onClick={() => remove(name)} style={{color: "red", fontSize: 20}}/>}
                 </Space>
+                <Form.Item
+                    {...restField}
+                    name={[name, "sub_data"]}
+                    label="Notes"
+                  >
+                    <Input placeholder="Additional notes about this sub-description" />
+                  </Form.Item>
+                </div>
               ))}
               <Form.Item>
-                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                <Button type="dashed" onClick={() => add({ code: '', sub_description: '', sub_data: '' })} block icon={<PlusOutlined />}>
                   Add Sub-Description
                 </Button>
               </Form.Item>

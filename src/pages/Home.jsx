@@ -40,14 +40,14 @@ const Home = () => {
             style={{
               width: "200px",
               height: "150px",
-              backgroundColor: "#fff", // White background
+              backgroundColor: "rgb(223, 246, 255)", // White background
               color: "#000", // Black text
               borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
               
-              border: "2px solid #d9d9d9", // Styled border
+              border: "2px solid rgb(172, 212, 255)", // Styled border
               boxShadow: "2px 2px 10px rgba(0,0,0,0.1)", // Soft shadow
             }}
           >
@@ -67,13 +67,13 @@ const Home = () => {
             style={{
               width: "200px",
               height: "150px",
-              backgroundColor: "#fff", // White background
+              background: "rgb(223, 246, 255)", // White background
               color: "#000", // Black text
               borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              border: "2px solid #d9d9d9", // Styled border
+              border: "2px solid rgb(172, 212, 255)", // Styled border
               boxShadow: "2px 2px 10px rgba(0,0,0,0.1)", // Soft shadow
             }}
           >

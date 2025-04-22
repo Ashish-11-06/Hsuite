@@ -1,88 +1,107 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, message, Modal, Form, Input, Select, Popconfirm } from "antd";
-import axios from "axios";
+import { Table, Button, message, Modal, Form, Input, Select, Switch} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers, updateUser, toggleUserActive } from "../Redux/Slices/userSlice";
 
 const { Option } = Select;
 
 const Users = () => {
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
+  const { list: users, loading } = useSelector((state) => state.users);
+
   const [editingUser, setEditingUser] = useState(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [form] = Form.useForm(); // Form reference
+  const [form] = Form.useForm();
 
-  // Fetch users from JSON Server
+  const roles = ["Admin", "Contributor", "Reviewer", "Student"];
+
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/users");
-      setUsers(response.data);
-    } catch (error) {
-      message.error("Failed to fetch users.");
-    }
-  };
-
-  // Edit user function
   const editUser = (user) => {
     setEditingUser(user);
-    form.setFieldsValue(user); // Populate form with existing data
+    form.setFieldsValue(user);
     setIsEditModalVisible(true);
   };
 
-  // Handle save after editing
   const handleEditSave = async (values) => {
     try {
-      const updatedUser = { ...editingUser, ...values };
-      await axios.put(`http://localhost:3000/users/${editingUser.id}`, updatedUser);
+      const resultAction = await dispatch(
+        updateUser({ id: editingUser.id, data: values })
+      );
       
-      setUsers(users.map((user) => (user.id === editingUser.id ? updatedUser : user)));
-      setIsEditModalVisible(false);
-      message.success("User updated successfully!");
+      if (updateUser.fulfilled.match(resultAction)) {
+        setIsEditModalVisible(false);
+        message.success("User updated successfully!");
+        dispatch(fetchUsers()); // Refresh the list to ensure UI updates
+      } else {
+        throw new Error("Update failed");
+      }
     } catch (error) {
       message.error("Failed to update user.");
     }
   };
 
-  // Delete user function
-  const deleteUser = async (id) => {
+  const toggleUserStatus = async (user) => {
+    console.log("Toggling user status for:", user); // Is this showing?
     try {
-      await axios.delete(`http://localhost:3000/users/${id}`);
-      setUsers(users.filter((user) => user.id !== id));
-      message.success("User deleted successfully!");
+      const resultAction = await dispatch(toggleUserActive(user.id));
+      console.log("Toggle User Result:", resultAction); // 🔍 log the response
+  
+      if (toggleUserActive.fulfilled.match(resultAction)) {
+        const { is_active } = resultAction.payload;
+        message.success(`User ${is_active ? "enabled" : "disabled"} successfully!`);
+      } else {
+        throw new Error("Toggle failed");
+      }
     } catch (error) {
-      message.error("Failed to delete user.");
+      console.error("Error toggling user:", error); // 🔍
+      message.error("Failed to update user status.");
     }
   };
+  
+  
 
-  // Define table columns
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", width: 60 },
     { title: "Username", dataIndex: "username", key: "username" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { 
-      title: "Role", 
-      dataIndex: "role", 
+    {
+      title: "Role",
+      dataIndex: "role",
       key: "role",
-      render: (role) => (role ? role : "N/A"), // Show "N/A" if role is missing
+      render: (role) => (role ? role : "N/A"),
     },
+    {
+      title: "Status",
+      dataIndex: "disabled",
+      key: "disabled",
+      render: (disabled, record) => (
+        <Switch
+          checked={!disabled}
+          checkedChildren="Enabled"
+          unCheckedChildren="Disabled"
+          onChange={() => toggleUserStatus(record)}
+          style={{
+            backgroundColor: disabled ? "#ff4d4f" : "#52c41a",
+          }}
+        />
+      ),
+    },
+    
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <span>
-          <Button type="primary" style={{ marginRight: 8 }} onClick={() => editUser(record)}>
+          <Button
+            type="primary"
+            style={{ marginRight: 8 }}
+            onClick={() => editUser(record)}
+          >
             Edit
           </Button>
-          <Popconfirm
-            title="Are you sure you want to delete this user?"
-            onConfirm={() => deleteUser(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="danger">Delete</Button>
-          </Popconfirm>
         </span>
       ),
     },
@@ -91,7 +110,23 @@ const Users = () => {
   return (
     <div>
       <h2>Users List</h2>
-      <Table columns={columns} dataSource={users} rowKey="id" pagination={{ pageSize: 5 }} />
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 5 }}
+        rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
+      />
+
+      <style>
+      {`
+        .disabled-row {
+          background-color: #fff1f0 !important;
+          color: #cf1322;
+        }
+      `}
+      </style>
 
       {/* Edit User Modal */}
       <Modal
@@ -100,22 +135,32 @@ const Users = () => {
         onCancel={() => setIsEditModalVisible(false)}
         footer={null}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleEditSave}
-        >
-          <Form.Item name="username" label="Username" rules={[{ required: true, message: "Username is required!" }]}>
+        <Form form={form} layout="vertical" onFinish={handleEditSave}>
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Username is required!" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: "Email is required!" }]}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Email is required!" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="Role">
-            <Select>
-              <Option value="Admin">Admin</Option>
-              <Option value="Editor">Editor</Option>
-              <Option value="Viewer">Viewer</Option>
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={[{ required: true, message: "Role is required!" }]}
+          >
+            <Select placeholder="Select a role">
+              {roles.map((role) => (
+                <Option key={role} value={role}>
+                  {role}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
           <Form.Item>

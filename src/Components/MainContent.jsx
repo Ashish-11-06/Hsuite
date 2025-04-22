@@ -6,7 +6,8 @@ import Codes from "../pages/Codes.jsx";
 import Profile from "../pages/Profile.jsx";
 import Users from "../pages/Users.jsx";
 import Assessments from "../pages/Assessments.jsx";
-import { Report } from "../pages/Report.jsx";
+import Createset from "../pages/Createset.jsx";
+import Report from "../pages/Report.jsx";
 
 const MainContent = () => {
   return (
@@ -19,6 +20,7 @@ const MainContent = () => {
       <Route path="/users" element={<Users />}></Route>
       <Route path="/assessents" element={<Assessments />}></Route>
       <Route path="/report" element={<Report />}></Route>
+      <Route path="/createset" element={<Createset />}></Route>
     </Routes>
   );
 };

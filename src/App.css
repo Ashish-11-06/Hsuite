@@ -5,7 +5,8 @@ body {
   }
 
   .ant-layout-sider {
-    background: #ade2f8 !important;
+    /* background: #ade2f8 !important; */
+    background: linear-gradient(180deg, #58C3F0FF 0%, #FFFFFFFF 100%) !important;
 }
 
 .ant-table-tbody > tr.ant-table-row:hover > td {
@@ -33,7 +34,7 @@ body {
   color: #000 !important;
 }
 .ant-menu-item:hover {
-  background-color: #5cb3ff7f !important;
+  background-color: #1476cc7f !important;
 }
 
 /* Ensure text color is black in the Menu when hovered or selected */
@@ -42,12 +43,13 @@ body {
   color: #000 !important;
 }
   .header {
-    background-color: #ade2f8 !important; /* Override AntD default header col   or */
+    /* background-color: #ade2f8 !important; Override AntD default header col   or */
+    background-color: #58C3F0FF !important;
   }
 
   .ant-layout-header {
     padding: 0 0px !important;
-    background-color: #ade2f8 !important;
+    background-color: #58C3F0FF !important;
 }
 
   .footer {
@@ -63,11 +65,11 @@ body {
   }
   
   .ant-menu-dark {
-    background-color: #ade2f8 !important;
+    background-color: #47c8ff !important;
   }
   
   .ant-menu-item-selected{
-    background-color: #5cb3ff !important;
+    background-color: #008dce !important;
   }
 
   /* Add these styles to your existing CSS */
