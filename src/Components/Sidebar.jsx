@@ -89,11 +89,10 @@ const Sidebar = () => {
           <Menu.Item key="6-2" icon={<CheckCircleOutlined />}>
             <Link to="/assessents">Test</Link>
           </Menu.Item>
-<<<<<<< HEAD
-          <Menu.Item key="6-2" icon={<BarChartOutlined />}>
-=======
+          {/* <Menu.Item key="6-2" icon={<BarChartOutlined />} /> */}
+
           <Menu.Item key="6-3"  icon={<BarChartOutlined />}>
->>>>>>> sejal
+
             <Link to="/report">Report</Link>
           </Menu.Item>
         </SubMenu>
@@ -109,15 +108,6 @@ const Sidebar = () => {
         {/*<Menu.Item key="4" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
         </Menu.Item> */}
-
-<<<<<<< HEAD
-        {/* <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
-          <Link to="/users">Users</Link>
-        </Menu.Item> */}
-=======
-      
-        
->>>>>>> sejal
       </Menu>
 
       {/* Show Logout only if the user is logged in */}
