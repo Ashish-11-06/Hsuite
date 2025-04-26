@@ -140,7 +140,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ marginBottom: "16px" }}>
+      {/* <div style={{ marginBottom: "16px" }}>
         <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz Type:</label>
         <Radio.Group 
           onChange={(e) => setQuizType(e.target.value)} 
@@ -150,7 +150,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
           <Radio value="question-based">Question-Based</Radio>
           <Radio value="statement-based">Statement-Based</Radio>
         </Radio.Group>
-      </div>
+      </div> */}
 
       <div style={{ marginBottom: "16px" }}>
         <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz:</label>

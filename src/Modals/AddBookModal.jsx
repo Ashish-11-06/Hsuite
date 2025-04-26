@@ -56,6 +56,11 @@ const removeCodeSet = (index) => {
       onCancel={onClose}
       footer={null} // Remove default footer buttons
     >
+      <div style={{
+        maxHeight: "400px",
+        overflowY: "auto",
+        paddingRight: "8px"
+      }}>
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Book Name */}
         <Form.Item
@@ -124,6 +129,7 @@ const removeCodeSet = (index) => {
           </Button>
         </Form.Item>
       </Form>
+      </div>
     </Modal>
   );
 };

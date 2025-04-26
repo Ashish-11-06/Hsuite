@@ -64,6 +64,11 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
 
   return (
     <Modal title="Edit Book" open={open} onCancel={onClose} footer={null}>
+      <div style={{
+        maxHeight: "400px",
+        overflowY: "auto",
+        paddingRight: "8px"
+      }}>
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item name="name" label="Book Name" rules={[{ required: true }]}>
           <Input />
@@ -107,6 +112,7 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
           </Button>
         </Form.Item>
       </Form>
+      </div>
     </Modal>
   );
 };

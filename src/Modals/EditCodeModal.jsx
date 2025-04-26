@@ -63,6 +63,11 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         footer={null} 
         width={800}
         styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}>
+            <div style={{
+                maxHeight: "400px",
+                overflowY: "auto",
+                paddingRight: "8px"
+            }}>
             <Form layout="vertical" onFinish={onFinish}  key={subDescriptions.length}>
                 <Form.Item label="Code">
                     <Input value={codeValue}  onChange={(e) => setCodeValue(e.target.value)}// Allow editing
@@ -110,6 +115,7 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                     <Button type="primary" htmlType="submit">Update Code</Button>
                 </Form.Item>
             </Form>
+            </div>
         </Modal>
     );
 };
