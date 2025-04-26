@@ -13,12 +13,13 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
     resultsError 
   } = useSelector((state) => state.quiz);
   
-  // Get user from Redux store at the component level
   const { user } = useSelector((state) => state.auth);
 
-  // Update the useEffect
   useEffect(() => {
-    if (visible && questions?.length > 0 && !quizResults) {
+    if (visible && questions?.length > 0) {
+      // Reset results state when starting a new test
+      dispatch(resetResultsState());
+      
       if (!user?.id) {
         console.error("User not authenticated");
         return;
@@ -32,12 +33,12 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
       }));
       
       dispatch(submitQuizResults({
-        quiz_id: questions[0].quiz,  // Just the ID, not the entire quiz object
+        quiz_id: questions[0].quiz,
         answers,
-        user_id: user.id  // Include user_id
+        user_id: user.id
       }));
     }
-  }, [visible, questions, selectedAnswers, quizResults, dispatch, user]);
+  }, [visible, questions, selectedAnswers, dispatch, user]);
 
   useEffect(() => {
     return () => {
@@ -173,6 +174,7 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
       onCancel={onClose}
       footer={null}
       width={800}
+      destroyOnClose
     >
       {resultsLoading ? (
         <div style={{ textAlign: "center", padding: "40px 0" }}>

@@ -113,9 +113,9 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
                 <Form.Item
                     {...restField}
                     name={[name, "sub_data"]}
-                    label="Notes"
+                    label="Data"
                   >
-                    <Input placeholder="Additional notes about this sub-description" />
+                    <Input placeholder="Additional data about this sub-description" />
                   </Form.Item>
                 </div>
               ))}

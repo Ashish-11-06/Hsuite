@@ -42,6 +42,9 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/createset")) return "6-1";
     if (location.pathname.startsWith("/assessents")) return "6-2";
     if (location.pathname.startsWith("/report")) return "6-3";
+    if (location.pathname.startsWith("/createmcq")) return "7-1";
+    if (location.pathname.startsWith("/mcqtest")) return "7-2";
+    if (location.pathname.startsWith("/mcqreport")) return "7-3";
     return "1"; // Default to Home
   };
 
@@ -81,21 +84,32 @@ const Sidebar = () => {
           <Link to="/codes">Codes</Link>
         </Menu.Item>
 
-        {/* SubMenu for Assessments */}
-        <SubMenu key="6" icon={<AuditOutlined />} title="Assessments">
+        {/* SubMenu for personality test */}
+        <SubMenu key="6" icon={<AuditOutlined />} title="Personality Test">
           <Menu.Item key="6-1" icon={<CheckCircleOutlined />}>
             <Link to="/createset">Create Set</Link>
           </Menu.Item>
           <Menu.Item key="6-2" icon={<CheckCircleOutlined />}>
             <Link to="/assessents">Test</Link>
           </Menu.Item>
-          {/* <Menu.Item key="6-2" icon={<BarChartOutlined />} /> */}
-
-          <Menu.Item key="6-3"  icon={<BarChartOutlined />}>
-
+          <Menu.Item key="6-3" icon={<BarChartOutlined />}>
             <Link to="/report">Report</Link>
           </Menu.Item>
         </SubMenu>
+
+        {/* subMenu for assessments */}
+        <SubMenu key="7" icon={<AuditOutlined />} title="Assessments">
+          <Menu.Item key="7-1" icon={<CheckCircleOutlined />}>
+            <Link to="/createmcq">Create MCQ</Link>
+          </Menu.Item>
+          <Menu.Item key="7-2" icon={<CheckCircleOutlined />}>
+            <Link to="/mcqtest">MCQ Test</Link>
+          </Menu.Item>
+          <Menu.Item key="7-3" icon={<BarChartOutlined />}>
+            <Link to="/mcqreport">MCQ Report</Link>
+          </Menu.Item>
+        </SubMenu>
+
 
         <Menu.Item key="5" icon={<InfoCircleOutlined/>}>
           <Link to="/users">Users</Link>
@@ -104,10 +118,6 @@ const Sidebar = () => {
         <Menu.Item key="4" icon={<UserOutlined />}>
           <Link to="/profile">Profile</Link>
         </Menu.Item>
-
-        {/*<Menu.Item key="4" icon={<SettingOutlined />}>
-          <Link to="/settings">Settings</Link>
-        </Menu.Item> */}
       </Menu>
 
       {/* Show Logout only if the user is logged in */}

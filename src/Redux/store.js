@@ -6,6 +6,7 @@ import profileReducer from "./Slices/profileSlice";
 import assessmentReducer from "./Slices/assessmentSlice";
 import userReducer from "./Slices/userSlice";
 import quizReducer from "./Slices/quizSlice";
+import mcqReducer from "./Slices/mcqSlice"
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     assessments: assessmentReducer,
     users: userReducer,
     quiz: quizReducer,
+    mcq: mcqReducer,
   },
 });
 

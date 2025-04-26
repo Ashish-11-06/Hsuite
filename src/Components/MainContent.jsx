@@ -8,6 +8,9 @@ import Users from "../pages/Users.jsx";
 import Assessments from "../pages/Assessments.jsx";
 import Createset from "../pages/Createset.jsx";
 import Report from "../pages/Report.jsx";
+import CreateMCQ from "../pages/CreateMCQ.jsx";
+import MCQTest from "../pages/MCQTest.jsx";
+import MCQReport from "../pages/MCQReport.jsx";
 
 const MainContent = () => {
   return (
@@ -21,6 +24,9 @@ const MainContent = () => {
       <Route path="/assessents" element={<Assessments />}></Route>
       <Route path="/report" element={<Report />}></Route>
       <Route path="/createset" element={<Createset />}></Route>
+      <Route path="/createmcq" element={<CreateMCQ />}></Route>
+      <Route path="/mcqtest" element={<MCQTest />}></Route>
+      <Route path="/mcqreport" element={<MCQReport />}></Route>
     </Routes>
   );
 };

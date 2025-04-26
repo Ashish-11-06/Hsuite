@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getTestQuestions,
+  getAllNewQuestions,
   deleteTestQuestion,
   updateTestQuestion,
 } from "../Redux/Slices/quizSlice";
@@ -15,10 +15,12 @@ import {
   Form,
   Input,
   message,
-  Popconfirm,
+  Alert,
+  Row,
+  Col
 } from "antd";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const AllTestQuestions = ({ quizId, searchTerm }) => {
   const dispatch = useDispatch();
@@ -27,6 +29,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [form] = Form.useForm();
+  
   const filteredQuestions = testQuestions.filter(question => {
     if (!searchTerm) return true;
     
@@ -42,7 +45,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
 
   useEffect(() => {
     if (quizId) {
-      dispatch(getTestQuestions(quizId));
+      dispatch(getAllNewQuestions(quizId));
     }
   }, [dispatch, quizId]);
 
@@ -81,8 +84,8 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
       dispatch(getTestQuestions(quizId));
   
     } catch (error) {
-      message.error("Update failed. Please try again.");
-      console.log("Update error:", error);
+      // message.error("Update failed. Please try again.");
+      // console.log("Update error:", error);
     }
   };
   
@@ -94,7 +97,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
         dispatch(getTestQuestions(quizId));
       })
       .catch(() => {
-        message.error("Failed to delete question");
+        // message.error("Failed to delete question");
       });
   };
 
@@ -112,8 +115,21 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
 
   return (
     <div style={{ width: "100%", padding: "20px" }}>
-      {/* <Title level={3}>All Questions</Title> */}
-      {/* {testQuestions.length === 0 ? ( */}
+      {/* Simplified Question Count and Alert Section */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div>
+          <Text strong style={{ fontSize: 16 }}>
+            Total Questions: {filteredQuestions.length}
+          </Text>
+        </div>
+        <div>
+          <Text type="secondary" style={{ fontSize: 14 }}>
+            Note: A minimum of 20 questions is mandatory for the quiz.
+          </Text>
+        </div>
+      </div>
+
+      {/* Questions Table */}
       {filteredQuestions.length === 0 ? (
         <Empty description={searchTerm ? "No matching questions found" : "No questions found for this quiz."} />
       ) : (
@@ -160,8 +176,24 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
             title="Actions"
             render={(text, record) => (
               <div style={{ display: "flex", gap: "10px" }}>
-                <Button onClick={() => showEditModal(record)}>Edit</Button>
-                <Button danger onClick={() => handleDelete(record.id)}>
+                <Button 
+                  onClick={() => showEditModal(record)} 
+                  style={{ 
+                    backgroundColor: "#ff9f00", 
+                    borderColor: "#ff9f00", 
+                    color: "black" 
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button 
+                  onClick={() => handleDelete(record.id)}
+                  style={{ 
+                    backgroundColor: "#d90027", 
+                    borderColor: "#d90027", 
+                    color: "white" 
+                  }}
+                >
                   Delete
                 </Button>
               </div>
@@ -181,7 +213,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
       >
         <Form form={form} layout="vertical">
           <Form.Item name="question" label="Question" required>
-            <Input.TextArea />
+            <Input />
           </Form.Item>
           <Form.Item name="option_1" label="Option 1" required>
             <Input />

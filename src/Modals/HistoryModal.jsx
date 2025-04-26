@@ -65,15 +65,6 @@ const HistoryModal = ({ open, onClose, history }) => {
                     <Text type="secondary">Updated at: {new Date(item.updated_at).toLocaleString()}</Text>
                   </div>
                 </Card>
-
-              //     <Table
-              //   dataSource={mainHistory}
-              //   columns={mainColumns}
-              //   rowKey={(record, index) => index}
-              //   pagination={false}
-              //   bordered
-              //   size="small"
-              // />
                 ))}
               </>
             )}
@@ -96,14 +87,6 @@ const HistoryModal = ({ open, onClose, history }) => {
                           <Text type="secondary">Updated at: {new Date(item.updated_at).toLocaleString()}</Text>
                         </div>
                       </Card>
-                      //   <Table
-                      //   dataSource={sub.history}
-                      //   columns={subColumns}
-                      //   rowKey={(record, subIndex) => subIndex}
-                      //   pagination={false}
-                      //   bordered
-                      //   size="small"
-                      // />
                       ))
                     ) : (
                       <p>No history available for this sub-description.</p>
