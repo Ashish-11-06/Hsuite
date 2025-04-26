@@ -18,9 +18,22 @@ export const postQuizName = createAsyncThunk(
 // Inside Redux/Slices/quizSlice.js
 export const getQuizCategories = createAsyncThunk(
   "quiz/getQuizCategories",
+  async (type, { rejectWithValue }) => {
+    try {
+      const response = await quizAPI.getQuizCategories(type);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Add this to your existing async thunks in quizSlice.js
+export const getQuizName = createAsyncThunk(
+  "quiz/getQuizName",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await quizAPI.getQuizCategories();
+      const response = await quizAPI.getQuizName();
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -46,6 +59,18 @@ export const getTestQuestions = createAsyncThunk(
     try {
       const response = await quizAPI.getTestQuestions(quizId);
       return response.data;  // Assuming response contains the test questions data
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getAllNewQuestions = createAsyncThunk(
+  'quiz/getAllNewQuestions',
+  async (quizId, { rejectWithValue }) => {
+    try {
+      const response = await quizAPI.getAllNewQuestions(quizId);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -241,6 +266,18 @@ const quizSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(getAllNewQuestions.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllNewQuestions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.testQuestions = action.payload;  // Update state with fetched questions
+      })
+      .addCase(getAllNewQuestions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase(updateTestQuestion.pending, (state) => {
         state.loading = true;
       })
@@ -301,6 +338,18 @@ const quizSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.data = { quiz_history: [] }; // Reset to empty array on error
+      })
+
+      .addCase(getQuizName.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getQuizName.fulfilled, (state, action) => {
+        state.loading = false;
+        state.quizList = action.payload; // Store the quiz names in quizList
+      })
+      .addCase(getQuizName.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

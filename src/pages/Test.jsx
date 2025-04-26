@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { message as antdMessage, Select, Input, Button, List } from "antd";
+import { message as antdMessage, Select, Input, Button, List, Radio } from "antd";
 import { getQuizCategories, createTestQuestion, resetQuestionState, getTestQuestions } from "../Redux/Slices/quizSlice";
 
 const { Option } = Select;
@@ -16,6 +16,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
     testQuestions, 
   } = useSelector((state) => state.quiz);
 
+  const [quizType, setQuizType] = useState("question-based");
   const [formData, setFormData] = useState([{
     quiz_id: null,
     question: "",
@@ -24,6 +25,11 @@ const Test = ({ onSuccess, selectedQuizId }) => {
     option_3: "",
     option_4: ""
   }]);
+
+  // Filter quiz list based on selected type
+  const filteredQuizList = quizList?.filter(quiz => 
+    quiz.type === quizType || quiz.quiz_type === quizType
+  );
 
   useEffect(() => {
     if (selectedQuizId) {
@@ -35,29 +41,26 @@ const Test = ({ onSuccess, selectedQuizId }) => {
       dispatch(getTestQuestions(selectedQuizId));
     }
   }, [selectedQuizId, dispatch]);
-  
 
-  // Fetch quizzes and questions when component mounts
   useEffect(() => {
-    dispatch(getQuizCategories());
-  }, [dispatch]);
+    dispatch(getQuizCategories(quizType));
+  }, [dispatch, quizType]);
 
   useEffect(() => {
     if (formData[0]?.quiz_id) {
-      dispatch(getTestQuestions(formData[0]?.quiz_id)); // Fetch test questions when a quiz is selected
+      dispatch(getTestQuestions(formData[0]?.quiz_id));
     }
   }, [formData, dispatch]);
 
-  // Handle API success/error messages
   useEffect(() => {
     if (questionSuccess) {
-      antdMessage.success("Questions added successfully!");
+      antdMessage.success("Saved successfully!");
       resetForm();
       dispatch(resetQuestionState());
       onSuccess();
     }
     if (questionError) {
-      antdMessage.error(questionError.message || "Failed to add questions");
+      antdMessage.error(questionError.message || "Failed to save");
       dispatch(resetQuestionState());
     }
   }, [questionSuccess, questionError, dispatch, onSuccess]);
@@ -70,16 +73,16 @@ const Test = ({ onSuccess, selectedQuizId }) => {
   };
 
   const handleQuizSelect = (quizId) => {
-    const updatedFormData = [...formData];
-    updatedFormData.forEach(item => {
-      item.quiz_id = quizId;
-    });
+    const updatedFormData = formData.map(item => ({
+      ...item,
+      quiz_id: quizId
+    }));
     setFormData(updatedFormData);
   };
 
   const resetForm = () => {
     setFormData([{
-      quiz_id: formData[0]?.quiz_id || null, // Keep the same quiz selected
+      quiz_id: formData[0]?.quiz_id || null,
       question: "",
       option_1: "",
       option_2: "",
@@ -91,27 +94,38 @@ const Test = ({ onSuccess, selectedQuizId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData[0].quiz_id) {
+    if (!formData[0]?.quiz_id) {
       antdMessage.error("Please select a quiz");
       return;
     }
 
-    const validQuestions = formData.filter(
-      item => item.question && item.option_1 && item.option_2
+    const payload = formData.map(item => ({
+      quiz_id: item.quiz_id,
+      question: quizType === "question-based" ? item.question : null,
+      option_1: item.option_1,
+      option_2: item.option_2,
+      option_3: item.option_3,
+      option_4: item.option_4
+    }));
+
+    // Validate all fields are filled
+    const isValid = formData.every(item =>
+      item.option_1 && item.option_2 && item.option_3 && item.option_4
     );
-    if (validQuestions.length === 0) {
-      antdMessage.error("Please fill in at least one valid question with 2 options");
+
+    if (!isValid) {
+      antdMessage.error("All four options are required.");
       return;
     }
 
     try {
-      await dispatch(createTestQuestion(validQuestions)).unwrap(); // Send all questions at once
+      await dispatch(createTestQuestion(payload)).unwrap();
     } catch (err) {
-      // Error handled by useEffect
+      console.error("Submission error:", err);
     }
   };
 
-  const selectedQuizName = quizList?.find(q => q.id === formData[0]?.quiz_id)?.quiz_name || "";
+  const selectedQuizName = filteredQuizList?.find(q => q.id === formData[0]?.quiz_id)?.quiz_name || "";
 
   const addQuestion = () => {
     setFormData([...formData, {
@@ -127,10 +141,22 @@ const Test = ({ onSuccess, selectedQuizId }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: "16px" }}>
-        <label>Select Quiz:</label>
+        <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz Type:</label>
+        <Radio.Group 
+          onChange={(e) => setQuizType(e.target.value)} 
+          value={quizType}
+          style={{ marginBottom: "16px" }}
+        >
+          <Radio value="question-based">Question-Based</Radio>
+          <Radio value="statement-based">Statement-Based</Radio>
+        </Radio.Group>
+      </div>
+
+      <div style={{ marginBottom: "16px" }}>
+        <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz:</label>
         <Select
           showSearch
-          style={{ width: "100%", marginTop: "8px" }}
+          style={{ width: "100%", marginBottom: "16px" }}
           placeholder={quizLoading ? "Loading quizzes..." : "Select a quiz"}
           loading={quizLoading}
           value={formData[0]?.quiz_id}
@@ -140,7 +166,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
             option.children.toLowerCase().includes(input.toLowerCase())
           }
         >
-          {quizList?.map((quiz) => (
+          {filteredQuizList?.map((quiz) => (
             <Option key={quiz.id} value={quiz.id}>
               {quiz.quiz_name}
             </Option>
@@ -155,32 +181,56 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
       {formData.map((item, index) => (
         <div key={index}>
-          <div style={{ marginBottom: "16px" }}>
-            <label>Question: {index + 1}</label>
-            <Input
-              name="question"
-              value={item.question}
-              onChange={(e) => handleChange(index, e)}
-              placeholder="Enter your question"
-              style={{ width: "100%", marginTop: "8px" }}
-              required
-            />
-          </div>
+          {quizType === "question-based" && (
+            <div style={{ marginBottom: "16px" }}>
+              <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>
+                Question {index + 1}:
+              </label>
+              <Input
+                name="question"
+                value={item.question}
+                onChange={(e) => handleChange(index, e)}
+                placeholder="Enter your question"
+                required
+              />
+            </div>
+          )}
 
           <div style={{ marginBottom: "16px" }}>
-            <label>Options:</label>
-            {[1, 2, 3, 4].map((num) => (
-              <div key={num} style={{ marginTop: "8px" }}>
-                <Input
-                  name={`option_${num}`}
-                  value={item[`option_${num}`]}
-                  onChange={(e) => handleChange(index, e)}
-                  placeholder={`Option ${num}${num > 2 ? '' : ''}`}
-                  style={{ width: "100%" }}
-                  required={num <= 2}
-                />
-              </div>
-            ))}
+            <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>
+              Options:
+            </label>
+            <Input
+              name="option_1"
+              value={item.option_1}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="Option 1 (Required)"
+              required
+            />
+            <Input
+              name="option_2"
+              value={item.option_2}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="Option 2 (Required)"
+              required
+              style={{ marginTop: 8 }}
+            />
+            <Input
+              name="option_3"
+              value={item.option_3}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="Option 3 (Required)"
+              // required
+              style={{ marginTop: 8 }}
+            />
+            <Input
+              name="option_4"
+              value={item.option_4}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="Option 4 (Required)"
+              // required
+              style={{ marginTop: 8 }}
+            />
           </div>
         </div>
       ))}
@@ -197,26 +247,34 @@ const Test = ({ onSuccess, selectedQuizId }) => {
         type="primary"
         htmlType="submit"
         loading={questionLoading}
-        disabled={!formData[0]?.quiz_id || formData.some(item => !item.question || !item.option_1 || !item.option_2)}
+        disabled={
+          !formData[0]?.quiz_id || 
+          formData.some(item => !item.option_1 || !item.option_2 || !item.option_3 || !item.option_4)
+        }
         style={{ width: "100%" }}
       >
-        {questionLoading ? "Submitting..." : "Add Questions"}
+        {questionLoading ? "Submitting..." : "Submit"}
       </Button>
 
-      {/* Display Test Questions for the selected Quiz */}
       {testQuestions?.length > 0 && (
         <div style={{ marginTop: "32px" }}>
-          <h3>Existing Questions for "{selectedQuizName}":</h3>
+          <h3>Existing Questions:</h3>
           <List
-            itemLayout="vertical"
+            itemLayout="horizontal"
             dataSource={testQuestions}
-            renderItem={(question, index) => (
-              <List.Item key={question.id}>
-                <h4>{index+1}.{question.question}</h4>
-                <p>{question.option_1}</p>
-                <p>{question.option_2}</p>
-                <p>{question.option_3}</p>
-                <p>{question.option_4}</p>
+            renderItem={(item, index) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={`${index + 1}. ${item.question}`}
+                  description={
+                    <>
+                      <div>1. {item.option_1}</div>
+                      <div>2. {item.option_2}</div>
+                      {item.option_3 && <div>3. {item.option_3}</div>}
+                      {item.option_4 && <div>4. {item.option_4}</div>}
+                    </>
+                  }
+                />
               </List.Item>
             )}
           />

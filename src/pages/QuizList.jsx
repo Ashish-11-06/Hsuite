@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Spin, Row, Col, Button, Modal, Radio } from "antd";
-import { getQuizCategories, getTestQuestions } from "../Redux/Slices/quizSlice";
+import { getQuizName, getTestQuestions } from "../Redux/Slices/quizSlice";
 import QuizResultModal from "../Modals/QuizResultModal";
 
 const QuizList = () => {
@@ -17,7 +17,7 @@ const QuizList = () => {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    dispatch(getQuizCategories());
+    dispatch(getQuizName());
   }, [dispatch]);
 
   const handleTakeTest = (quizId) => {
@@ -38,7 +38,7 @@ const QuizList = () => {
   const goToNextQuestion = () => {
     if (Array.isArray(testQuestions) && currentQuestionIndex < testQuestions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
-      setSecondsLeft(5);
+      setSecondsLeft(10);
     } else {
       clearInterval(timerRef.current);
       setViewModalVisible(false);
@@ -49,7 +49,7 @@ const QuizList = () => {
   // Timer logic
   useEffect(() => {
     if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
-      setSecondsLeft(5); // reset timer on new question
+      setSecondsLeft(10); // reset timer on new question
       clearInterval(timerRef.current);
 
       timerRef.current = setInterval(() => {
@@ -81,11 +81,12 @@ const QuizList = () => {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     cursor: "pointer",
     border: "1px solid #ade2f8",
     ":hover": {
       transform: "translateY(-5px)",
-      boxShadow: "0 10px 20px rgba(0, 0, 0, 1)",
+      // boxShadow: "0 10px 20px rgba(0, 85, 255, 0.52)",
       borderColor: "#5cb3ff",
     }
   };

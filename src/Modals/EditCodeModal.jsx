@@ -57,7 +57,12 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         onClose();
     };
     return ( 
-        <Modal title="Edit Code" open={open} onCancel={onClose} footer={null} >
+        <Modal title="Edit Code" 
+        open={open} 
+        onCancel={onClose} 
+        footer={null} 
+        width={800}
+        styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}>
             <Form layout="vertical" onFinish={onFinish}  key={subDescriptions.length}>
                 <Form.Item label="Code">
                     <Input value={codeValue}  onChange={(e) => setCodeValue(e.target.value)}// Allow editing
@@ -91,10 +96,10 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
                         )}
                     </Space>
                     <Input
-                            placeholder="Notes (optional)"
+                            placeholder="Data (optional)"
                             value={sub.sub_data}
                             onChange={(e) => handleSubDescriptionChange(index, "sub_data", e.target.value)}
-                            style={{ marginLeft: 8, width: 'calc(100% - 16px)' }}
+                            style={{ marginLeft: 8, width: 'calc(100% - 16px)', marginBottom: "10px" }}
                         />
                     </div>
                 ))}

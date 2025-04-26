@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Select } from "antd";
+import { Table, Button, Spin, Alert, Space, Popconfirm, message, Input, Select, Popover } from "antd";
 import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactionMessage, setUserReaction } from "../Redux/Slices/codeSlice";
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
@@ -45,9 +45,8 @@ const handleViewHistory = async (code) => {
     };
 
     setHistoryData(combinedHistory); // Set the combined history data
-    setIsHistoryModalOpen(true); // Open the modal to show the history
+    setIsHistoryModalOpen(true); 
   } catch (error) {
-   // console.error("Error fetching history:", error);
     message.error("Failed to fetch history");
   }
 };
@@ -79,7 +78,6 @@ const handleViewHistory = async (code) => {
     dispatch(editCode(updatedData))
       .unwrap()
       .then(() => {
-        //console.log("✅ Server Response:", response);  // Debug server response
         message.success("Code updated successfully!");
         //console.log("Updated successfully");
 
@@ -142,11 +140,6 @@ const handleViewHistory = async (code) => {
         if (response.message) {
           message.success(response.message);
         }
-  
-        // ✅ Re-fetch all codes to get updated counts
-        // dispatch(fetchCodes());
-  
-        // Update specific reaction state
         dispatch(setUserReaction({
           descriptionId: description_id,
           action,
@@ -228,35 +221,83 @@ const handleViewHistory = async (code) => {
       dataIndex: "sub_descriptions",
       key: "sub_descriptions",
       width: "450px",
-      render: (sub_descriptions) =>
+      render: (sub_descriptions, record) =>
         sub_descriptions && sub_descriptions.length > 0 ? (
           <div>
-            {sub_descriptions.map((sub, index) => (
-              <div key={index}>
-                <div>
-                <strong style={{ color: "#0F4C75" }}>{sub.code}</strong>: {sub.sub_description}
-              </div>
-              {sub.sub_data && (
-                <div style={{ 
-                  marginLeft: 16,
-                  padding: 4,
-                  backgroundColor: '#f5f5f5',
-                  borderRadius: 4,
-                  borderLeft: '3px solid #1890ff'
-                }}>
-                  <strong>Notes:</strong> {sub.sub_data}
+            {sub_descriptions.map((sub, index) => {
+              const hasNotes = sub.sub_data && sub.sub_data.trim().length > 0;
+              return (
+                <div key={index} style={{ marginBottom: 8 }}>
+                  <div>
+                    <strong style={{ color: "#0F4C75" }}>{sub.code}</strong>: {sub.sub_description}
+                  </div>
+                  {hasNotes && (
+                    <Popover
+                      content={
+                        <div style={{
+                          maxHeight: '150px',  // Fixed height for scroll
+                          overflowY: 'auto',   // Vertical scroll
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word',
+                          padding: '8px',
+                          width: '400px',     // Fixed width
+                        }}>
+                          {sub.sub_data}
+                        </div>
+                      }
+                      title={`Data of ${sub.code}`}
+                      trigger="click"
+                      placement="bottomLeft"
+                      overlayStyle={{
+                        maxWidth: '500px',     // Maximum width of popover
+                      }}
+                    >
+                      <div 
+                        style={{ 
+                          marginLeft: 16,
+                          padding: 4,
+                          backgroundColor: '#f5f5f5',
+                          borderRadius: 4,
+                          borderLeft: '3px solid #1890ff',
+                          cursor: 'pointer',
+                          display: 'inline-block',
+                          maxWidth: '100%'
+                        }}
+                      >
+                        <div style={{ marginTop: 4 }}>
+                          {sub.sub_data.length <= 50 
+                            ? sub.sub_data 
+                            : (
+                              <>
+                                {`${sub.sub_data.substring(0, 50)}...`}
+                                <span 
+                                  style={{ 
+                                    color: '#1890ff', 
+                                    marginLeft: 4,
+                                    fontWeight: '500',
+                                    textDecoration: 'underline',
+                                  }}
+                                >
+                                  (View full notes)
+                                </span>
+                              </>
+                            )}
+                        </div>
+                      </div>
+                    </Popover>
+                  )}
                 </div>
-              )}
-            </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           "N/A"
         ),
-        onHeaderCell: () => ({
-          style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" }, // Light green header
-        }),
-    },
+      onHeaderCell: () => ({
+        style: { backgroundColor: "#00EAFF", fontWeight: "bold", textAlign: "center" },
+      }),
+    }
+    
   ];
 
     if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
@@ -303,7 +344,8 @@ const handleViewHistory = async (code) => {
              {/* ✅ View History Button */}
              {(userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") && (
               <Button type="default" onClick={() => handleViewHistory(record)}
-               style={{display: "block", paddingLeft: "2px"}} icon={<HistoryOutlined />}>
+               style={{display: "block", marginLeft: 5}} 
+               icon={<HistoryOutlined />}>
               View History
               </Button>
              )}

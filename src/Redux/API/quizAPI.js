@@ -4,21 +4,33 @@ import axiosInstance from "./axiosInstance.js";
 
 const quizAPI = {
   // 🔹 Create a new quiz category
-  createQuizCategory: (data) => axiosInstance.post(`assessments/quiz-name/`, data),
+  createQuizCategory: (data) => axiosInstance.post(`assessments/quiz-name/`, {
+    ...data,
+    type: data.quiz_type === "statement" ? "statement-based" : "question-based"
+  }),
 
   // Optionally: Get all quiz categories (if such an endpoint exists)
   getQuizCategories: () => axiosInstance.get(`assessments/quiz-name-get/`),
+
+  // getQuizCategories: (type) => axiosInstance.get(`assessments/quiz/type/${type}/`),
 
   createTestQuestion: (questionData) => 
     axiosInstance.post(`assessments/new-quiz/`, questionData),
 
   getTestQuestions: (quizId) => axiosInstance.get(`assessments/new-quiz/${quizId}/`),
 
+  getAllNewQuestions: (quizId) => {
+    return axiosInstance.get(`assessments/quiz/${quizId}/questions/`)
+  },
+
+  getQuizName: ()=>{
+    return axiosInstance.get(`assessments/test-quiz-name/`)
+  },
+
     updateTestQuestion: (quizId, questionId, updatedData) => {
       // console.log(updatedData);
       return axiosInstance.put(`assessments/quiz/${quizId}/question/${questionId}/`, updatedData);
     },
-
   // 🔹 Delete a specific test question
   deleteTestQuestion: (quizId, questionId) =>
     axiosInstance.delete(`assessments/quiz/question/${questionId}/delete/`),
