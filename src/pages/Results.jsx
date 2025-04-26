@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector} from "react-redux";
 import { Modal, Table, Spin,  Typography, Card } from "antd";
-import { saveResult } from "../redux/slices/assessmentSlice";
+import { saveResult } from "../Redux/Slices/assessmentSlice";
 
 const { Title, Text } = Typography;
 export const useResults = (loggedInUserId, responses, currentQuestions, testType, multipleChoiceQuestions, statementBasedQuestions, setIsModalOpen) => {

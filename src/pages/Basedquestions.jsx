@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   fetchMultipleChoiceQuestions, 
   fetchStatementBasedQuestions 
-} from '../redux/slices/assessmentSlice';
+} from '../Redux/Slices/assessmentSlice';
 import { Card, Button, Spin, message } from 'antd';
 import BasedQuestionModal from '../Modals/BasedQuestionModal';
 

@@ -42,7 +42,7 @@ const Assessments = () => {
           <li>At the end of the test, results will be shown.</li>
           <li>You can retake the test if you want.</li>
         </ul>
-        <BasedQuestions />
+        {/* <BasedQuestions /> */}
       </div>
       {/* Show QuizList component */}
       {activeTab === "quiz" && <QuizList />}
