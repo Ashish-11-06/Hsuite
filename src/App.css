@@ -102,7 +102,7 @@ body {
 .ant-table-tbody > tr > td {
   transition: background-color 0.3s ease;
 }
-  }
+  
 
   :where(.css-1v613y0) a {
     color: black;
