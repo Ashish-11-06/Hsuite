@@ -15,9 +15,6 @@ import {
   Form,
   Input,
   message,
-  Alert,
-  Row,
-  Col
 } from "antd";
 
 const { Text } = Typography;
@@ -29,19 +26,21 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [form] = Form.useForm();
-  
+
   const filteredQuestions = testQuestions.filter(question => {
     if (!searchTerm) return true;
-    
+
     const searchLower = searchTerm.toLowerCase();
     return (
-      question.question.toLowerCase().includes(searchLower) ||
+      question.question?.toLowerCase().includes(searchLower) ||
       question.option_1?.toLowerCase().includes(searchLower) ||
       question.option_2?.toLowerCase().includes(searchLower) ||
       question.option_3?.toLowerCase().includes(searchLower) ||
       question.option_4?.toLowerCase().includes(searchLower)
     );
   });
+
+  const hasQuestions = filteredQuestions.some(q => q.question && q.question.trim() !== "");
 
   useEffect(() => {
     if (quizId) {
@@ -72,29 +71,27 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
         option_4: values.option_4,
         quiz_id: quizId,
       };
-  
-      await dispatch(updateTestQuestion({ 
-        quizId, 
-        questionId: editingQuestion.id, 
-        updatedData: updateData 
+
+      await dispatch(updateTestQuestion({
+        quizId,
+        questionId: editingQuestion.id,
+        updatedData: updateData
       }));
-  
+
       message.success("Question updated successfully!");
       setIsEditModalVisible(false);
-      dispatch(getTestQuestions(quizId));
-  
+      dispatch(getAllNewQuestions(quizId)); // Fixed wrong dispatch
     } catch (error) {
       // message.error("Update failed. Please try again.");
-      // console.log("Update error:", error);
     }
   };
-  
+
   const handleDelete = (questionId) => {
     dispatch(deleteTestQuestion({ quizId, questionId }))
       .unwrap()
       .then(() => {
         message.success("Question deleted successfully");
-        dispatch(getTestQuestions(quizId));
+        dispatch(getAllNewQuestions(quizId)); // Fixed wrong dispatch
       })
       .catch(() => {
         // message.error("Failed to delete question");
@@ -115,7 +112,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
 
   return (
     <div style={{ width: "100%", padding: "20px" }}>
-      {/* Simplified Question Count and Alert Section */}
+      {/* Top Section */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <Text strong style={{ fontSize: 16 }}>
@@ -133,9 +130,9 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
       {filteredQuestions.length === 0 ? (
         <Empty description={searchTerm ? "No matching questions found" : "No questions found for this quiz."} />
       ) : (
-        <Table 
-          dataSource={filteredQuestions} 
-          rowKey="id" 
+        <Table
+          dataSource={filteredQuestions}
+          rowKey="id"
           pagination={false}
           style={{ width: "100%" }}
           scroll={{ x: true }}
@@ -145,12 +142,17 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
             render={(text, record, index) => index + 1}
             width="80px"
           />
-          <Table.Column 
-            title="Question" 
-            dataIndex="question" 
-            key="question"
-            width="30%"
-          />
+
+          {/* Conditionally render Question column */}
+          {hasQuestions && (
+            <Table.Column
+              title="Question"
+              dataIndex="question"
+              key="question"
+              width="30%"
+            />
+          )}
+
           <Table.Column
             title="Options"
             render={(text, record) => {
@@ -160,7 +162,8 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
                 record.option_3,
                 record.option_4,
               ].filter(Boolean);
-              return (
+
+              return options.length === 0 ? null : (
                 <div>
                   {options.map((opt, idx) => (
                     <p key={idx}>
@@ -172,26 +175,27 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
             }}
             width="40%"
           />
+
           <Table.Column
             title="Actions"
             render={(text, record) => (
               <div style={{ display: "flex", gap: "10px" }}>
-                <Button 
-                  onClick={() => showEditModal(record)} 
-                  style={{ 
-                    backgroundColor: "#ff9f00", 
-                    borderColor: "#ff9f00", 
-                    color: "black" 
+                <Button
+                  onClick={() => showEditModal(record)}
+                  style={{
+                    backgroundColor: "#ff9f00",
+                    borderColor: "#ff9f00",
+                    color: "black"
                   }}
                 >
                   Edit
                 </Button>
-                <Button 
+                <Button
                   onClick={() => handleDelete(record.id)}
-                  style={{ 
-                    backgroundColor: "#d90027", 
-                    borderColor: "#d90027", 
-                    color: "white" 
+                  style={{
+                    backgroundColor: "#d90027",
+                    borderColor: "#d90027",
+                    color: "white"
                   }}
                 >
                   Delete

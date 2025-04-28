@@ -16,11 +16,10 @@ const { Option } = Select;
 
 const CreateMCQ = () => {
   const dispatch = useDispatch();
-  const { quizzes, questions, loading } = useSelector((state) => state.mcq);
+  const { quizzes, questions, loading, quizQuestions } = useSelector((state) => state.mcq);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [quizQuestions, setQuizQuestions] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
 
@@ -43,6 +42,7 @@ const CreateMCQ = () => {
   const handleQuestionSubmit = (data) => {
     console.log("Received MCQ data:", data);
     handleCloseModal();
+    dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
   };
 
   const handleQuizSubmit = async (quizData) => {
@@ -51,7 +51,7 @@ const CreateMCQ = () => {
       if (addMcqQuiz.fulfilled.match(result)) {
         message.success("Quiz added successfully!");
         handleCloseQuizModal();
-        dispatch(getAllQuizzes());
+        dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
       }
     } catch (err) {
       message.error("Failed to add quiz.");
@@ -70,7 +70,7 @@ const CreateMCQ = () => {
   const handleUpdateQuestion = async (questionId, questionData) => {
     try {
       await dispatch(updateQuestion({ questionId, questionData })).unwrap();
-      dispatch(fetchAllQuestionsByQuiz()); // Refresh questions after update
+      dispatch(fetchAllQuestionsByQuiz(selectedQuiz)); // Refresh questions after update
     } catch (error) {
       throw new Error(error);
     }
@@ -80,7 +80,7 @@ const CreateMCQ = () => {
     try {
       await dispatch(deleteQuestion(questionId)).unwrap();
       message.success('Question deleted successfully');
-      dispatch(fetchAllQuestionsByQuiz()); // Refresh questions after delete
+      dispatch(fetchAllQuestionsByQuiz(selectedQuiz)); // Refresh questions after delete
     } catch (error) {
       message.error('Failed to delete question');
     }

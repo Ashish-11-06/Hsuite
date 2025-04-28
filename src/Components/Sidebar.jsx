@@ -98,7 +98,7 @@ const Sidebar = () => {
         </SubMenu>
 
         {/* subMenu for assessments */}
-        <SubMenu key="7" icon={<AuditOutlined />} title="Assessments">
+        {/* <SubMenu key="7" icon={<AuditOutlined />} title="Assessments">
           <Menu.Item key="7-1" icon={<CheckCircleOutlined />}>
             <Link to="/createmcq">Create MCQ</Link>
           </Menu.Item>
@@ -108,7 +108,7 @@ const Sidebar = () => {
           <Menu.Item key="7-3" icon={<BarChartOutlined />}>
             <Link to="/mcqreport">MCQ Report</Link>
           </Menu.Item>
-        </SubMenu>
+        </SubMenu> */}
 
 
         <Menu.Item key="5" icon={<InfoCircleOutlined/>}>

@@ -28,12 +28,15 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
 
   const handleFinish = (values) => {
     const payload = {
-      ...values,
-      type,
+       type,
+      name: values.name,
+      description: values.description,
+      questions: values.questions,
     };
+    console.log(payload);
     onSubmit(payload);
     form.resetFields();
-  };
+  };  
 
   const handleQuizTypeChange = (e) => {
     const newType = e.target.value;
@@ -78,10 +81,10 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
             <Input.TextArea rows={4} placeholder="e.g. A basic quiz to test programming fundamentals." />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="questions"
             label="Select Questions"
-            rules={[{ required: true, message: "Please select at least one question" }]}
+            // rules={[{ required: true, message: "Please select at least one question" }]}
           >
             <Space.Compact style={{ width: '100%' }}>
               <Select
@@ -90,9 +93,12 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
                 loading={loading}
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  option?.children?.toLowerCase()?.includes(input.toLowerCase())
                 }
-                style={{ width: 'calc(100% - 120px)' }}
+                style={{
+                  width: 'calc(100% - 130px)', // Slightly adjusted for better gap
+                  minHeight: '40px'
+                }}
               >
                 {Array.isArray(questions) && questions.map((q) => (
                   <Option key={q.id} value={q.id}>
@@ -100,15 +106,19 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
                   </Option>
                 ))}
               </Select>
+
               <Button 
-                type="primary" 
+                type="dashed" 
                 onClick={handleAddQuestion}
-                style={{ width: '120px' }}
+                style={{
+                  width: '120px',
+                  minHeight: '40px'
+                }}
               >
-                Add Question
+                + Add
               </Button>
             </Space.Compact>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>

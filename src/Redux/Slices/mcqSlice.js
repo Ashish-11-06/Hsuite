@@ -107,6 +107,30 @@ export const getAllQuizzes = createAsyncThunk(
     }
   );
 
+  export const getQuestionsInQuiz = createAsyncThunk(
+    'mcq/getQuestionsInQuiz',
+    async (quizId, { rejectWithValue }) => {
+      try {
+        const response = await mcqAPIs.getQuestionInQuizID(quizId);
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data?.message || 'Failed to get questions');
+      }
+    }
+  );
+
+  export const submitMcqQuizResult = createAsyncThunk(
+    'mcq/submitQuizResult',
+    async (payload, { rejectWithValue }) => {
+      try {
+        const response = await mcqAPIs.AddMcqQuizResult(payload); // Pass payload here
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data?.message || 'Failed to submit quiz result');
+      }
+    }
+  );  
+
 export const mcqSlice = createSlice({
   name: 'mcq',
   initialState: {
@@ -115,6 +139,10 @@ export const mcqSlice = createSlice({
     error: null,
     success: false,
     quizzes:[],
+    submitResultLoading: false,
+    submitResultSuccess: false,
+    submitResultError: null,
+    submitResultData: null,
   },
   reducers: {
     resetQuizState: (state) => {
@@ -126,6 +154,15 @@ export const mcqSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.success = false;
+      },
+      clearQuestions: (state) => {
+        state.questions = [];
+      },
+      clearSubmitResultState: (state) => {
+        state.submitResultLoading = false;
+        state.submitResultSuccess = false;
+        state.submitResultError = null;
+        state.submitResultData = null;
       },
   },
 extraReducers: (builder) => {
@@ -257,9 +294,42 @@ extraReducers: (builder) => {
           .addCase(fetchAllQuestionsByQuiz.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
-          });
+          })
+
+          // 🆕 Get Questions cases
+      .addCase(getQuestionsInQuiz.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getQuestionsInQuiz.fulfilled, (state, action) => {
+        state.loading = false;
+        state.questions = action.payload;
+      })
+      .addCase(getQuestionsInQuiz.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+       // submitMcqQuizResult
+       .addCase(submitMcqQuizResult.pending, (state) => {
+        state.submitResultLoading = true;
+        state.submitResultSuccess = false;
+        state.submitResultError = null;
+        state.submitResultData = null;
+      })
+      .addCase(submitMcqQuizResult.fulfilled, (state, action) => {
+        state.submitResultLoading = false;
+        state.submitResultSuccess = true;
+        state.submitResultData = action.payload; // << important
+      })
+      .addCase(submitMcqQuizResult.rejected, (state, action) => {
+        state.submitResultLoading = false;
+        state.submitResultSuccess = false;
+        state.submitResultError = action.payload;
+        state.submitResultData = null;
+      });
   }
 });
 
-export const { resetQuizState, resetQuizStatus } = mcqSlice.actions;
+export const { resetQuizState, resetQuizStatus, clearQuestions, clearSubmitResultState } = mcqSlice.actions;
 export default mcqSlice.reducer;

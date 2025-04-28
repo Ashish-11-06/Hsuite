@@ -17,7 +17,7 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
       options_4: "",
       correct_ans: [],
       type: "single-choice", // 'single-choice' or 'multiple-choice'
-      quizId: null
+      quiz: null
     }]);
   
     // Fetch quizzes when modal opens
@@ -67,7 +67,7 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
                 options_4: questionData.options_4,
                 correct_ans: questionData.correct_ans, // Ensure the correct answer is passed as expected
                 type: questionData.type, // The type of the question (single-choice or multiple-choice)
-                quiz_id: questionData.quizId, // Ensure quizId is included and correctly mapped
+                quiz: questionData.quizId, // Ensure quizId is included and correctly mapped
               };
             });
           

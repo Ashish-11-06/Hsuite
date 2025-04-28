@@ -35,6 +35,10 @@ const mcqAPIs = {
         return axiosInstance.get(`assessments/mcq-quizzes/`)
     },
 
+    getQuestionInQuizID: (quizId)=>{
+      return axiosInstance.get(`assessments/mcq-quiz/${quizId}/questions/`)
+  },
+
     updateQuestion: async (questionId, questionData) => {
         try {
           const response = await axiosInstance.put(`assessments/mcq-questions/${questionId}/edit/`, questionData);
@@ -77,6 +81,10 @@ const mcqAPIs = {
       
     fetchAllQuestionsByQuiz: (quizId) => {
         return axiosInstance.get(`assessments/mcq-quiz/${quizId}/questions-all/`)
+    },
+
+    AddMcqQuizResult: (data) => {
+      return axiosInstance.post(`assessments/submit-mcq-quiz/`, data);
     }
     
 };
