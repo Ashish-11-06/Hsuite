@@ -63,7 +63,9 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
   };
 
   return (
-    <Modal title="Edit Book" open={open} onCancel={onClose} footer={null}>
+    <Modal title="Edit Book" open={open} onCancel={onClose} 
+    footer={null}
+    styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}>
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item name="name" label="Book Name" rules={[{ required: true }]}>
           <Input />

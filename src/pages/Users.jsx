@@ -13,7 +13,7 @@ const Users = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  const roles = ["Admin", "Contributor", "Reviewer", "Student"];
+  const roles = ["Admin", "Contributor", "Student"];
 
   useEffect(() => {
     dispatch(fetchUsers());

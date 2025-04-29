@@ -64,7 +64,8 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
   };
 
   return (
-    <Modal title="Add New Code" open={open} onCancel={onClose} footer={null}>
+    <Modal title="Add New Code" open={open} onCancel={onClose} footer={null}
+    styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}>
       <Form form={form} onFinish={onFinish} layout="vertical" initialValues={{ sub_descriptions: [{ code: "", sub_description: "", sub_data: "" }] }}>
         <Form.Item label="Book" name="book" rules={[{ required: true, message: "Please select a book!" }]}>
           <Select placeholder="Select a book" optionLabelProp="label">

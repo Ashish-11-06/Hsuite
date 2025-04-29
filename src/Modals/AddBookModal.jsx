@@ -55,6 +55,7 @@ const removeCodeSet = (index) => {
       open={open}
       onCancel={onClose}
       footer={null} // Remove default footer buttons
+      styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
     >
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Book Name */}
