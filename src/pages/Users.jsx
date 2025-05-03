@@ -13,7 +13,11 @@ const Users = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  const roles = ["Admin", "Contributor", "Student"];
+  const roleDisplayMap = {
+    Admin: "Admin",
+    Edit: "Contributor",
+    View: "Student",
+  };  
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -71,8 +75,9 @@ const Users = () => {
       title: "Role",
       dataIndex: "role",
       key: "role",
-      render: (role) => (role ? role : "N/A"),
+      render: (role) => roleDisplayMap[role] || role || "N/A",
     },
+    
     {
       title: "Status",
       dataIndex: "disabled",
@@ -156,13 +161,14 @@ const Users = () => {
             rules={[{ required: true, message: "Role is required!" }]}
           >
             <Select placeholder="Select a role">
-              {roles.map((role) => (
-                <Option key={role} value={role}>
-                  {role}
+              {Object.entries(roleDisplayMap).map(([backendRole, displayName]) => (
+                <Option key={backendRole} value={backendRole}>
+                  {displayName}
                 </Option>
               ))}
             </Select>
           </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save Changes

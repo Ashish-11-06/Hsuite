@@ -11,6 +11,51 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [timer, setTimer] = useState(10);
+  
+  const currentQuestion = questions[currentIndex];
+
+  // Add renderDots function
+  const renderDots = () => {
+    if (!Array.isArray(questions)) return null;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+        {questions.map((_, index) => (
+          <div
+            key={index}
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              margin: '0 4px',
+              backgroundColor: index === currentIndex ? '#1890ff' : '#ccc',
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    if (!currentQuestion) return;
+  
+    setTimer(10); // reset timer for new question
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(interval);
+          if (currentIndex === questions.length - 1) {
+            handleSubmit(); // auto-submit on last question
+          } else {
+            setCurrentIndex((prevIndex) => prevIndex + 1);
+          }
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [currentIndex, currentQuestion]);
 
   useEffect(() => {
     if (open && quizData?.id) {
@@ -22,8 +67,6 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
       dispatch(clearQuestions());
     }
   }, [open, quizData, dispatch]);
-
-  const currentQuestion = questions[currentIndex];
 
   const handleRadioChange = (e) => {
     setAnswers({
@@ -52,13 +95,13 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
   };
 
   const handleSubmit = () => {
-  setResultModalOpen(true);
-};
+    setResultModalOpen(true);
+  };
 
-const handleCloseResultModal = () => {
-  setResultModalOpen(false);
-  onClose(); // Close test modal also
-};
+  const handleCloseResultModal = () => {
+    setResultModalOpen(false);
+    onClose(); // Close test modal also
+  };
 
   return (
     <Modal
@@ -78,6 +121,10 @@ const handleCloseResultModal = () => {
           {questions.length > 0 ? (
             <Card style={{ marginBottom: '16px' }}>
               <h3>Q{currentIndex + 1}: {currentQuestion?.question}</h3>
+
+              <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'red', marginBottom: '12px' }}>
+                Time Left: {timer}s
+              </div>
 
               {currentQuestion?.type === "single-choice" ? (
                 <Radio.Group
@@ -103,22 +150,25 @@ const handleCloseResultModal = () => {
                 </Checkbox.Group>
               )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <Button
-                        disabled={currentIndex === 0}
-                        onClick={handlePrev}
-                    >
-                        Previous
-                    </Button>
+              {/* Render dots before the navigation buttons */}
+              {renderDots()}
 
-                    {currentIndex === questions.length - 1 ? (
-                        <Button type="primary" onClick={handleSubmit}>
-                        Submit Test
-                        </Button>
-                    ) : (
-                        <Button type="primary" onClick={handleNext}>
-                        Next
-                        </Button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+                <Button
+                  disabled={currentIndex === 0}
+                  onClick={handlePrev}
+                >
+                  Previous
+                </Button>
+
+                {currentIndex === questions.length - 1 ? (
+                  <Button type="primary" onClick={handleSubmit}>
+                    Submit Test
+                  </Button>
+                ) : (
+                  <Button type="primary" onClick={handleNext}>
+                    Next
+                  </Button>
                 )}
               </div>
             </Card>
@@ -126,15 +176,15 @@ const handleCloseResultModal = () => {
             <p>No questions available.</p>
           )}
           <MCQTestResultModal
-      open={resultModalOpen}
-      onClose={handleCloseResultModal}
-      answers={answers}
-      quizData={quizData}
-      userId={1} // hardcoded user_id for now, ideally pass dynamically
-    />
+            open={resultModalOpen}
+            onClose={handleCloseResultModal}
+            answers={answers}
+            quizData={quizData}
+            userId={1} // hardcoded user_id for now, ideally pass dynamically
+            questions={questions}
+          />
         </>
       )}
-      
     </Modal>
   );
 };

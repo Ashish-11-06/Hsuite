@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import mcqAPIs from '../API/mcqApi'; // We'll create this next
 
+//Async thunk for adding mcq question
 export const addMCQQuestion = createAsyncThunk(
     'mcq/addMCQQuestion',
     async (questionData, { rejectWithValue }) => {
@@ -13,15 +14,17 @@ export const addMCQQuestion = createAsyncThunk(
     }
   );
 
-  export const addMcqQuiz = createAsyncThunk("mcq/addmcqQuiz", async (quizData, { rejectWithValue }) => {
-    try {
-      const response = await mcqAPIs.addMcqQuiz(quizData);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to add quiz");
-    }
-  });
+//Async thunk for adding MCQ quiz
+export const addMcqQuiz = createAsyncThunk("mcq/addmcqQuiz", async (quizData, { rejectWithValue }) => {
+  try {
+    const response = await mcqAPIs.addMcqQuiz(quizData);
+    return response;
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || "Failed to add quiz");
+  }
+});
 
+//Async thunk for fetching all questions
   export const getAllQuestions = createAsyncThunk(
     "mcq/getallquestions",
     async (_, { rejectWithValue }) => {
@@ -34,6 +37,7 @@ export const addMCQQuestion = createAsyncThunk(
     }
   );
 
+//Async thunk for fetching all questions by quiz
   export const fetchAllQuestionsByQuiz = createAsyncThunk(
     "mcq/fetchAllQuestionsByQuiz",
     async (quizId, { rejectWithValue }) => {
@@ -46,7 +50,7 @@ export const addMCQQuestion = createAsyncThunk(
     }
   );
 
-  // In your mcqSlice.js, add this new async thunk
+//Async thunk for fetching all quizs
 export const getAllQuizzes = createAsyncThunk(
     "mcq/getAllQuizzes",
     async (_, { rejectWithValue }) => {
@@ -59,6 +63,7 @@ export const getAllQuizzes = createAsyncThunk(
     }
   );
   
+  //Async thunk for editing the question
   export const updateQuestion = createAsyncThunk(
     'mcq/updateQuestion',
     async ({ questionId, questionData }, { rejectWithValue }) => {
@@ -71,6 +76,7 @@ export const getAllQuizzes = createAsyncThunk(
     }
   );
   
+  //Async thunk for deleting the question
   export const deleteQuestion = createAsyncThunk(
     'mcq/deleteQuestion',
     async (questionId, { rejectWithValue }) => {
@@ -83,6 +89,7 @@ export const getAllQuizzes = createAsyncThunk(
     }
   );
 
+  //Async thunk for fetching questions by type
   export const getQuestionsByType = createAsyncThunk(
     "mcq/getQuestionsByType",
     async (type, { rejectWithValue }) => {
@@ -131,6 +138,30 @@ export const getAllQuizzes = createAsyncThunk(
     }
   );  
 
+  export const fetchMcqResultsByUser = createAsyncThunk(
+    "mcqResults/fetchByUser",
+    async (user_id, { rejectWithValue }) => {
+      try {
+        const response = await mcqAPIs.getMcqQuizResult(user_id);
+        return response.data; // Ensure this matches your API response structure
+      } catch (error) {
+        return rejectWithValue(error.response?.data || error.message);
+      }
+    }
+  );
+
+  export const getTestMcqQuiz = createAsyncThunk(
+    'mcq/getTestMcqQuiz',
+    async (_, { rejectWithValue }) => {
+      try {
+        const response = await mcqAPIs.getTestGetMcqQuiz();
+        return response.data; // <-- ensure API returns .data
+      } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message);
+      }
+    }
+  );  
+
 export const mcqSlice = createSlice({
   name: 'mcq',
   initialState: {
@@ -138,7 +169,10 @@ export const mcqSlice = createSlice({
     loading: false,
     error: null,
     success: false,
+    results: [],
     quizzes:[],
+    quiz: [],
+    quizQuestions: [],
     submitResultLoading: false,
     submitResultSuccess: false,
     submitResultError: null,
@@ -327,7 +361,36 @@ extraReducers: (builder) => {
         state.submitResultSuccess = false;
         state.submitResultError = action.payload;
         state.submitResultData = null;
+      })
+
+      .addCase(fetchMcqResultsByUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMcqResultsByUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.results = action.payload; // Verify payload structure here
+        console.log("Results stored:", action.payload); // Debug log
+      })
+      .addCase(fetchMcqResultsByUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getTestMcqQuiz.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTestMcqQuiz.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.quiz = action.payload; // or action.payload.data if needed
+      })
+      .addCase(getTestMcqQuiz.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+      
   }
 });
 
