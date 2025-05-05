@@ -69,7 +69,7 @@ const CreateMCQ = () => {
       if (addMcqQuiz.fulfilled.match(result)) {
         message.success("Quiz added successfully!");
         handleCloseQuizModal();
-        dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
+        // dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
       }
     } catch (err) {
       message.error("Failed to add quiz.");

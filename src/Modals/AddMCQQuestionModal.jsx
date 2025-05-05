@@ -27,9 +27,14 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
     // Fetch quizzes when modal opens or quizType changes
     useEffect(() => {
       if (open) {
-        dispatch(getQuizByType(quizType));
+        dispatch(getQuizByType(quizType)).then(response => {
+          // Ensure that quizzes are always set as an array
+          if (!Array.isArray(response.quizzes)) {
+            // console.error("API response is not an array:", response.quizzes);
+          }
+        });
       }
-    }, [open, quizType, dispatch]);
+    }, [open, quizType, dispatch]);    
 
     const handleInputChange = (index, field, value) => {
       const updatedQuestions = [...questions];
@@ -91,9 +96,9 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
     
     
     const getFilteredQuizzes = () => {
-      return Array.isArray(quizzes)
+      return Array.isArray(quizzes) && quizzes.length
         ? quizzes.filter(quiz => quiz.type === quizType)
-        : [];
+        : []; // Return empty array if quizzes is not an array or empty
     };    
 
     const validateCorrectAnswers = (_, value, questionIndex) => {
