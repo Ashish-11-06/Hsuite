@@ -70,12 +70,12 @@ const mcqAPIs = {
       },
 
       fetchQuestionsByType: async (type) => {
-        const response = await axiosInstance.get(`/assessments/mcq-questions/type/${type}`);
+        const response = await axiosInstance.get(`/assessments/mcq-questions/type/${type}/`);
         return response.data;
       },
 
       fetchQuizByType: async (quiztype) => {
-        const response = await axiosInstance.get(`assessments/mcq-quiz/type/${quiztype}`);
+        const response = await axiosInstance.get(`assessments/mcq-quiz/type/${quiztype}/`);
         return response.data;
       },
       
