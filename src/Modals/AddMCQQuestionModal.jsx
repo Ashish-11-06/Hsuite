@@ -91,8 +91,10 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
     
     
     const getFilteredQuizzes = () => {
-      return quizzes.filter(quiz => quiz.type === quizType);
-    };
+      return Array.isArray(quizzes)
+        ? quizzes.filter(quiz => quiz.type === quizType)
+        : [];
+    };    
 
     const validateCorrectAnswers = (_, value, questionIndex) => {
       const question = questions[questionIndex];
@@ -184,7 +186,7 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
               onChange={setSelectedQuiz}
               loading={loading}
             >
-              {getFilteredQuizzes().map(quiz => (
+              {Array.isArray(quizzes) && getFilteredQuizzes().map(quiz => (
                 <Option key={quiz.id} value={quiz.id}>
                   {quiz.name}
                 </Option>

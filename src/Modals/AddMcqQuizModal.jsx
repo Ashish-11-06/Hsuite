@@ -31,30 +31,58 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
     console.log(questions)
   }, [questions]);
 
-  const handleFinish = (values) => {
-    // Get the full question objects for selected IDs
-    const selectedQuestions = Array.isArray(questions)
-  ? questions.filter(q => values.questions?.includes(q.id))
-  : [].map(q => ({
-      question: q.question,
-      options_1: q.options_1,
-      options_2: q.options_2,
-      options_3: q.options_3,
-      options_4: q.options_4,
-      correct_ans: q.correct_ans
-    }));
+  // const handleFinish = (values) => {
+  //   // Get the full question objects for selected IDs
+  //   const selectedQuestions = Array.isArray(questions)
+  // ? questions.filter(q => values.questions?.includes(q.id))
+  // : [].map(q => ({
+  //     question: q.question,
+  //     options_1: q.options_1,
+  //     options_2: q.options_2,
+  //     options_3: q.options_3,
+  //     options_4: q.options_4,
+  //     correct_ans: q.correct_ans
+  //   }));
 
+  //   const payload = {
+  //     type,
+  //     name: values.name,
+  //     description: values.description,
+  //     questions: selectedQuestions,
+  //   };
+
+  //   // console.log("Submitting payload:", payload);
+  //   onSubmit(payload);
+  //   form.resetFields();
+  // };
+
+  const handleFinish = (values) => {
+    let selectedQuestions = [];
+  
+    if (Array.isArray(questions) && Array.isArray(values.questions) && values.questions.length > 0) {
+      selectedQuestions = questions
+        .filter(q => values.questions.includes(q.id))
+        .map(q => ({
+          question: q.question,
+          options_1: q.options_1,
+          options_2: q.options_2,
+          options_3: q.options_3,
+          options_4: q.options_4,
+          correct_ans: q.correct_ans
+        }));
+    }
+  
     const payload = {
       type,
       name: values.name,
       description: values.description,
-      questions: selectedQuestions,
+      ...(selectedQuestions.length > 0 && { questions: selectedQuestions })
     };
-
-    // console.log("Submitting payload:", payload);
+  
     onSubmit(payload);
     form.resetFields();
   };
+  
 
   const handleQuizTypeChange = (e) => {
     const newType = e.target.value;
