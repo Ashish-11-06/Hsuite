@@ -15,6 +15,7 @@ const MCQTestResultModal = ({ open, onClose, answers, quizData, userId, question
   const score = submitResultData?.score ?? 0;
   const performance = submitResultData?.performance ?? 'No Attempt';
   const attemptedQuestions = totalQuestions - skippedQuestions;
+  const { user } = useSelector((state) => state.auth);
 
   // Optional: color map for tag
   const performanceColorMap = {
@@ -54,7 +55,7 @@ const MCQTestResultModal = ({ open, onClose, answers, quizData, userId, question
   useEffect(() => {
     if (open && answers && quizData && userId) {
       const payload = {
-        user_id: userId,
+        user_id: user.id,
         quiz_id: quizData.id,
         response: questions.map((question) => {
           const questionId = question.id;

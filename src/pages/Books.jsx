@@ -106,7 +106,7 @@ const Books = () => {
     },
   ];
 
-  if (userRole === "Admin" || userRole === "Contributor") {
+  if (userRole === "Admin" || userRole === "Edit") {
     columns.push({
       title: "Actions",
       key: "actions",
@@ -125,7 +125,7 @@ const Books = () => {
           </Button>
 
           {/* Only Admin can delete */}
-          {(userRole === "Admin" || userRole === "Contributor") && (
+          {(userRole === "Admin" || userRole === "Edit") && (
             <Popconfirm
               title="Are you sure you want to delete this book?"
               onConfirm={() => handleDelete(record.id)}
@@ -156,7 +156,7 @@ const Books = () => {
       />
 
       {/* Button to open the modal */}
-      {(userRole === "Admin" || userRole === "Contributor") && (
+      {(userRole === "Admin" || userRole === "Edit") && (
       <Button type="primary" onClick={showModal} style={{ marginBottom: 20 }}>
         Add Book
       </Button>

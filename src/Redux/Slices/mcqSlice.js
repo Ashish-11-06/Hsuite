@@ -140,9 +140,9 @@ export const getAllQuizzes = createAsyncThunk(
 
   export const fetchMcqResultsByUser = createAsyncThunk(
     "mcqResults/fetchByUser",
-    async (user_id, { rejectWithValue }) => {
+    async (userId, { rejectWithValue }) => {
       try {
-        const response = await mcqAPIs.getMcqQuizResult(user_id);
+        const response = await mcqAPIs.getMcqQuizResult(userId);
         return response.data; // Ensure this matches your API response structure
       } catch (error) {
         return rejectWithValue(error.response?.data || error.message);

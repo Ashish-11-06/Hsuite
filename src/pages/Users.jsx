@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Modal, Form, Input, Select, Switch} from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers, updateUser, toggleUserActive } from "../Redux/Slices/userSlice";
+import { fetchUsers, updateUser, toggleUserActive, createUser } from "../Redux/Slices/userSlice";
 
 const { Option } = Select;
 
@@ -10,13 +10,16 @@ const Users = () => {
   const { list: users, loading } = useSelector((state) => state.users);
 
   const [editingUser, setEditingUser] = useState(null);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); 
   const [form] = Form.useForm();
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [addForm] = Form.useForm();
+
 
   const roleDisplayMap = {
     Admin: "Admin",
     Edit: "Contributor",
-    View: "Student",
+    View: "Student/User",
   };  
 
   useEffect(() => {
@@ -64,8 +67,22 @@ const Users = () => {
       message.error("Failed to update user status.");
     }
   };
-  
-  
+
+  const handleAddUser = async (values) => {
+    try {
+      const resultAction = await dispatch(createUser(values));
+      if (createUser.fulfilled.match(resultAction)) {
+        message.success("User created successfully!");
+        setIsAddModalVisible(false);
+        addForm.resetFields();
+        dispatch(fetchUsers()); // Refresh user list
+      } else {
+        throw new Error("Failed");
+      }
+    } catch (error) {
+      message.error("Failed to create user.");
+    }
+  };
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", width: 60 },
@@ -113,8 +130,14 @@ const Users = () => {
   ];
 
   return (
-    <div>
-      <h2>Users List</h2>
+    <div >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Users List</h2>
+        <Button type="primary" onClick={() => setIsAddModalVisible(true)}>
+          Add User
+        </Button>
+      </div>
+      
       <Table
         columns={columns}
         dataSource={users}
@@ -132,6 +155,58 @@ const Users = () => {
         }
       `}
       </style>
+
+      <Modal
+        title="Add User"
+        open={isAddModalVisible}
+        onCancel={() => setIsAddModalVisible(false)}
+        footer={null}
+      >
+        <Form form={addForm} layout="vertical" onFinish={handleAddUser}>
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Username is required!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Email is required!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Password is required!" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={[{ required: true, message: "Role is required!" }]}
+          >
+            <Select placeholder="Select a role">
+              <Option value="Admin">Admin</Option>
+              <Option value="Edit">Contributor</Option>
+              <Option value="View">Student/User</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Create User
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
 
       {/* Edit User Modal */}
       <Modal
