@@ -27,11 +27,15 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
     }
   }, [error]);
 
+  useEffect (()=> {
+    console.log(questions)
+  }, [questions]);
+
   const handleFinish = (values) => {
     // Get the full question objects for selected IDs
-    const selectedQuestions = questions.filter(q => 
-      values.questions?.includes(q.id)
-    ).map(q => ({
+    const selectedQuestions = Array.isArray(questions)
+  ? questions.filter(q => values.questions?.includes(q.id))
+  : [].map(q => ({
       question: q.question,
       options_1: q.options_1,
       options_2: q.options_2,
@@ -47,7 +51,7 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
       questions: selectedQuestions,
     };
 
-    console.log("Submitting payload:", payload);
+    // console.log("Submitting payload:", payload);
     onSubmit(payload);
     form.resetFields();
   };
