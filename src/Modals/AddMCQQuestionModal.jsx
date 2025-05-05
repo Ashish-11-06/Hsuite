@@ -26,15 +26,21 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
 
     // Fetch quizzes when modal opens or quizType changes
     useEffect(() => {
-      if (open) {
-        dispatch(getQuizByType(quizType)).then(response => {
-          // Ensure that quizzes are always set as an array
-          if (!Array.isArray(response.quizzes)) {
-            // console.error("API response is not an array:", response.quizzes);
+      const fetchQuizzes = async () => {
+        try {
+          if (open) {
+            const response = await dispatch(getQuizByType(quizType));
+            if (!Array.isArray(response.quizzes)) {
+              console.warn("API response is not an array:", response.quizzes);
+            }
           }
-        });
-      }
-    }, [open, quizType, dispatch]);    
+        } catch (err) {
+          console.error("Error fetching quizzes:", err);
+          message.error("Failed to fetch quizzes");
+        }
+      };
+      fetchQuizzes();
+    }, [open, quizType, dispatch]);
 
     const handleInputChange = (index, field, value) => {
       const updatedQuestions = [...questions];
@@ -53,10 +59,17 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
     
 
     useEffect(() => {
-      if (error) {
-        message.error(error);
-        dispatch(resetQuizState());
-      }
+      const handleError = () => {
+        try {
+          if (error) {
+            message.error(error);
+            dispatch(resetQuizState());
+          }
+        } catch (err) {
+          console.error("Error handling quiz state reset:", err);
+        }
+      };
+      handleError();
     }, [error, dispatch]);
 
     const handleSubmit = async () => {
