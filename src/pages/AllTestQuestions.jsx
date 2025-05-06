@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllNewQuestions,
@@ -15,48 +15,76 @@ import {
   Form,
   Input,
   message,
+  Popconfirm
 } from "antd";
 
 const { Text } = Typography;
 
 const AllTestQuestions = ({ quizId, searchTerm }) => {
   const dispatch = useDispatch();
-  const { loading, testQuestions = [], error } = useSelector((state) => state.quiz);
+  const { 
+    loading, 
+    testQuestions = [], 
+    error,
+    quizList,
+  } = useSelector((state) => state.quiz);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [form] = Form.useForm();
+  const [categoryNames, setCategoryNames] = useState([]);
 
-  const filteredQuestions = testQuestions.filter(question => {
-    if (!searchTerm) return true;
-
+  // Memoize filtered questions to prevent unnecessary recalculations
+  const filteredQuestions = React.useMemo(() => {
+    if (!searchTerm) return testQuestions;
+    
     const searchLower = searchTerm.toLowerCase();
-    return (
-      question.question?.toLowerCase().includes(searchLower) ||
-      question.option_1?.toLowerCase().includes(searchLower) ||
-      question.option_2?.toLowerCase().includes(searchLower) ||
-      question.option_3?.toLowerCase().includes(searchLower) ||
-      question.option_4?.toLowerCase().includes(searchLower)
-    );
-  });
-
+    return testQuestions.filter(question => (
+      (question.question?.toLowerCase().includes(searchLower)) ||
+      (question.option_1?.toLowerCase().includes(searchLower)) ||
+      (question.option_2?.toLowerCase().includes(searchLower)) ||
+      (question.option_3?.toLowerCase().includes(searchLower)) ||
+      (question.option_4?.toLowerCase().includes(searchLower))
+    ));
+  }, [testQuestions, searchTerm]);
+  
   const hasQuestions = filteredQuestions.some(q => q.question && q.question.trim() !== "");
-
-  useEffect(() => {
+  // Fetch questions and set categories
+  const fetchData = useCallback(() => {
     if (quizId) {
       dispatch(getAllNewQuestions(quizId));
+      
+      // Find the selected quiz and set categories
+      const selectedQuiz = quizList?.find(quiz => quiz.id === quizId);
+      if (selectedQuiz) {
+        setCategoryNames([
+          selectedQuiz.category_1,
+          selectedQuiz.category_2,
+          selectedQuiz.category_3,
+          selectedQuiz.category_4
+        ].filter(Boolean));
+      }
     }
-  }, [dispatch, quizId]);
+  }, [quizId, quizList, dispatch]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const showEditModal = (question) => {
     setEditingQuestion(question);
-    form.setFieldsValue({
-      question: question.question,
+    const initialValues = {
       option_1: question.option_1,
       option_2: question.option_2,
       option_3: question.option_3,
       option_4: question.option_4
-    });
+    };
+    
+    if (hasQuestions) {
+      initialValues.question = question.question;
+    }
+    
+    form.setFieldsValue(initialValues);
     setIsEditModalVisible(true);
   };
 
@@ -64,13 +92,16 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
     try {
       const values = await form.validateFields();
       const updateData = {
-        question: values.question,
         option_1: values.option_1,
         option_2: values.option_2,
         option_3: values.option_3,
         option_4: values.option_4,
         quiz_id: quizId,
       };
+      
+      if (hasQuestions) {
+        updateData.question = values.question;
+      }
 
       await dispatch(updateTestQuestion({
         quizId,
@@ -80,22 +111,20 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
 
       message.success("Question updated successfully!");
       setIsEditModalVisible(false);
-      dispatch(getAllNewQuestions(quizId)); // Fixed wrong dispatch
+      fetchData(); // Use the memoized fetch function
     } catch (error) {
-      // message.error("Update failed. Please try again.");
+      console.error("Update error:", error);
     }
   };
 
-  const handleDelete = (questionId) => {
-    dispatch(deleteTestQuestion({ quizId, questionId }))
-      .unwrap()
-      .then(() => {
-        message.success("Question deleted successfully");
-        dispatch(getAllNewQuestions(quizId)); // Fixed wrong dispatch
-      })
-      .catch(() => {
-        // message.error("Failed to delete question");
-      });
+  const handleDelete = async (questionId) => {
+    try {
+      await dispatch(deleteTestQuestion({ quizId, questionId })).unwrap();
+      message.success("Question deleted successfully");
+      fetchData(); // Use the memoized fetch function
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
   };
 
   if (!quizId) {
@@ -109,6 +138,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
   if (!Array.isArray(testQuestions)) {
     return <Text type="danger">Invalid data received for test questions.</Text>;
   }
+
 
   return (
     <div style={{ width: "100%", padding: "20px" }}>
@@ -190,16 +220,22 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
                 >
                   Edit
                 </Button>
-                <Button
-                  onClick={() => handleDelete(record.id)}
-                  style={{
-                    backgroundColor: "#d90027",
-                    borderColor: "#d90027",
-                    color: "white"
-                  }}
-                >
-                  Delete
-                </Button>
+                <Popconfirm
+                  title="Are you sure you want to delete this book?"
+                  onConfirm={() => handleDelete(record.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >   
+                  <Button
+                    style={{
+                      backgroundColor: "#d90027",
+                      borderColor: "#d90027",
+                      color: "white"
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Popconfirm>
               </div>
             )}
             width="150px"
@@ -216,21 +252,23 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
         okText="Update"
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="question" label="Question" required>
-            <Input />
-          </Form.Item>
-          <Form.Item name="option_1" label="Option 1" required>
-            <Input />
-          </Form.Item>
-          <Form.Item name="option_2" label="Option 2" required>
-            <Input />
-          </Form.Item>
-          <Form.Item name="option_3" label="Option 3" required>
-            <Input />
-          </Form.Item>
-          <Form.Item name="option_4" label="Option 4" required>
-            <Input />
-          </Form.Item>
+          {hasQuestions && (
+            <Form.Item name="question" label="Question">
+              <Input />
+            </Form.Item>
+          )}
+          <Form.Item name="option_1" label={categoryNames[0] || "Option 1"} required>
+      <Input placeholder={categoryNames[0] ? `${categoryNames[0]}` : "Enter Option 1"} />
+    </Form.Item>
+    <Form.Item name="option_2" label={categoryNames[1] || "Option 2"} required>
+      <Input placeholder={categoryNames[1] ? `${categoryNames[1]}` : "Enter Option 2"} />
+    </Form.Item>
+    <Form.Item name="option_3" label={categoryNames[2] || "Option 3"} required>
+      <Input placeholder={categoryNames[2] ? `${categoryNames[2]}` : "Enter Option 3"} />
+    </Form.Item>
+    <Form.Item name="option_4" label={categoryNames[3] || "Option 4"} required>
+      <Input placeholder={categoryNames[3] ? `${categoryNames[3]}` : "Enter Option 4"} />
+    </Form.Item>
         </Form>
       </Modal>
     </div>
