@@ -142,6 +142,7 @@ const Createset = () => {
         <Quizz onSuccess={handleCancel} />
       </Modal> */}
 
+      {/* to add quiz name and categories */}
       <CreateQuizModal
         visible={isQuizModalOpen}
         onCancel={handleCancel}  // This will actually close the modal programmatically

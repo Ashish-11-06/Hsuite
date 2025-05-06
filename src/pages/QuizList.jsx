@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, Spin, Row, Col, Button, Modal, Radio } from "antd";
+import { Card, Spin, Row, Col, Button, Modal, Radio, Tag } from "antd";
 import { getQuizName, getTestQuestions } from "../Redux/Slices/quizSlice";
 import QuizResultModal from "../Modals/QuizResultModal";
 
@@ -16,8 +16,7 @@ const QuizList = () => {
   const [secondsLeft, setSecondsLeft] = useState(5);
   const timerRef = useRef(null);
   const [selectedQuizType, setSelectedQuizType] = useState(""); // <-- NEW
-const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
-
+  const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
 
   useEffect(() => {
     dispatch(getQuizName());
@@ -55,7 +54,6 @@ const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
       setResultModalVisible(true);
     }
   };
-  
 
   const getRandomTwoOptions = (question) => {
     const options = [];
@@ -67,7 +65,6 @@ const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
     const shuffled = options.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 2);
   };
-  
 
   // Timer logic
   useEffect(() => {
@@ -95,63 +92,14 @@ const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
 
   const currentQuestion = Array.isArray(testQuestions) ? testQuestions[currentQuestionIndex] : null;
 
-  // Styling from Assessments component
-  const cardStyle = {
-    width: 600,
-    height: 300,
-    marginTop: "5px",
-    color: "black",
-    borderRadius: 12,
-    padding: 20,
-    textAlign: "center",
-    transition: "all 0.3s ease",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    cursor: "pointer",
-    border: "1px solid #ade2f8",
-    ":hover": {
-      transform: "translateY(-5px)",
-      // boxShadow: "0 10px 20px rgba(0, 85, 255, 0.52)",
-      borderColor: "#5cb3ff",
-    }
+  // Helper function for quiz type
+  const getTypeTag = (type) => {
+    const lowerType = type?.toLowerCase();
+    if (lowerType === 'question-based') return <Tag color="blue">QUESTION BASED</Tag>;
+    if (lowerType === 'statement-based') return <Tag color="volcano">STATEMENT BASED</Tag>;
+    return <Tag>UNKNOWN</Tag>;
   };
 
-  const buttonStyle = {
-    backgroundColor: "#ffcc00",
-    color: "#333",
-    fontWeight: "bold",
-    border: "none",
-    borderRadius: 5,
-    padding: "8px 15px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-    ":hover": {
-      backgroundColor: "#ffd633",
-      transform: "translateY(-2px)",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-      color: "#000"
-    },
-    ":active": {
-      transform: "translateY(0)",
-      boxShadow: "0 2px 3px rgba(0, 0, 0, 0.1)"
-    }
-  };
-
-  const listStyle = {
-    textAlign: "left",
-    fontSize: 14,
-    paddingLeft: 15,
-  };
-
-  const timerStyle = {
-    color: "red",
-    fontWeight: "bold",
-  };
-
-  // Circle dot indicator
   const renderDots = () => {
     if (!Array.isArray(testQuestions)) return null;
     return (
@@ -173,37 +121,58 @@ const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
   };
 
   return (
-    <div style={{ width: "100%", marginBottom: "16px" }}>
+    <div style={{ padding: "24px" }}>
       {quizLoading ? (
-        <Spin size="large" />
+        <div style={{ textAlign: 'center', marginTop: '100px' }}>
+          <Spin size="large" />
+        </div>
       ) : (
-        <Row gutter={[16, 16]} justify="start">
+        <Row gutter={[16, 16]}>
           {quizList?.map((quiz) => (
-            <Col key={quiz.id} 
-            xs={24} sm={12} md={8} lg={6}
-            >
+            <Col key={quiz.id} xs={24} sm={12} md={8} lg={6}>
               <Card
-                bordered={false}
+                title={
+                  <div style={{ textAlign: 'center', paddingTop: '8px' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                      {quiz.quiz_name}
+                    </div>
+                    <div style={{ marginTop: '4px' }}>
+                      {getTypeTag(quiz.type)}
+                    </div>
+                  </div>
+                }
+                bordered={true}
                 style={{
-                  ...cardStyle,
-                  width: 300,
-                  height: 200,
+                  height: '100%',
+                  border: '1px solid #1890ff',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 }}
-                hoverable
               >
-                <div style={{ textAlign: "left" }}>
-                  <div style={{ fontWeight: "bold", fontSize: "16px" }}>{quiz.quiz_name}</div>
-                  <div style={{ fontSize: "12px", color: "#888" }}>{quiz.type}</div>
-                </div>
-                <div style={{ marginTop: "20px", textAlign: "center" }}>
-                  <Button
-                    type="primary"
-                    onClick={() => handleTakeTest(quiz.id)}
-                    style={buttonStyle}
-                  >
-                    Take Test
-                  </Button>
-                </div>
+                <p
+                  style={{
+                    minHeight: '60px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3, // Limit to 3 lines
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {quiz.quiz_description}
+                </p>
+                <Button
+                  style={{
+                    backgroundColor: "#ffcc00",
+                    color: "#333",
+                    border: 'none',
+                    width: '100%',
+                    fontWeight: 'bold',
+                  }}
+                  onClick={() => handleTakeTest(quiz.id)}
+                >
+                  Take Test
+                </Button>
               </Card>
 
             </Col>
@@ -213,91 +182,115 @@ const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
 
       {/* Quiz Modal */}
       <Modal
-        title={`Question ${currentQuestionIndex + 1}`}
-        open={viewModalVisible}
-        onCancel={() => {
-          clearInterval(timerRef.current);
-          setViewModalVisible(false);
-        }}
-        footer={[
-          <div style={{ width: "100%", display: "flex", justifyContent: "center", flexDirection: "column" }} key="footer">
-            {renderDots()}
-            <Button 
-              type="primary" 
-              onClick={goToNextQuestion} 
-              style={{ 
-                ...buttonStyle,
-                marginTop: "16px", 
-                alignSelf: "flex-end",
-                backgroundColor: "#1890ff",
-                ":hover": {
-                  backgroundColor: "#40a9ff",
-                }
+  title={`Question ${currentQuestionIndex + 1}`}
+  open={viewModalVisible}
+  onCancel={() => {
+    clearInterval(timerRef.current);
+    setViewModalVisible(false);
+  }}
+  footer={[
+    <div
+      key="footer"
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        padding: "12px 24px",
+      }}
+    >
+      <div style={{ marginBottom: "12px", textAlign: "center" }}>
+        {renderDots()}
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          type="primary"
+          onClick={goToNextQuestion}
+          style={{ backgroundColor: "#1890ff", padding: "10px" }}
+          size="medium"
+        >
+          {Array.isArray(testQuestions) &&
+          currentQuestionIndex === testQuestions.length - 1
+            ? "Finish"
+            : "Next"}
+        </Button>
+      </div>
+    </div>,
+  ]}
+  width={600}
+>
+  {currentQuestion ? (
+    <div>
+      <h3>{currentQuestion.question}</h3>
+      <p style={{ color: "red", fontWeight: "bold" }}>
+        Time left: {secondsLeft} sec
+      </p>
+      {selectedQuizType === "statement-based" ? (
+        <div
+          style={{
+            display: "flex",
+            gap: "16px",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          {randomOptions.map((option) => (
+            <Card
+              key={option.key}
+              onClick={() =>
+                handleOptionChange(currentQuestion.id, option.key)
+              }
+              style={{
+                border:
+                  selectedAnswers[currentQuestion.id] === option.key
+                    ? "2px solid #1890ff"
+                    : "1px solid #ccc",
+                cursor: "pointer",
+                padding: "10px",
+                textAlign: "center",
+                backgroundColor:
+                  selectedAnswers[currentQuestion.id] === option.key
+                    ? "#e6f7ff"
+                    : "#fff",
+                borderRadius: 8,
+                width: "45%",
               }}
+              hoverable
             >
-              {Array.isArray(testQuestions) && currentQuestionIndex === testQuestions.length - 1
-                ? "Finish"
-                : "Next"}
-            </Button>
-          </div>,
-        ]}
-        width={600}
-        styles={{
-          body: {
-            maxHeight: "70vh",
-            overflowY: "auto",
-          },
-        }}
-      >
-        {currentQuestion ? (
-          <div>
-            <h3>{currentQuestion.question}</h3>
-            <p style={timerStyle}>
-              Time left: {secondsLeft} sec
-            </p>
-            {selectedQuizType === "statement-based" ? (
-              <div style={{ display: "flex", gap: "16px", justifyContent: "center", marginTop: "20px" }}>
-              {randomOptions.map((option) => (
-                <Card
-                  key={option.key}
-                  onClick={() => handleOptionChange(currentQuestion.id, option.key)}
-                  style={{
-                    border: selectedAnswers[currentQuestion.id] === option.key ? "2px solid #1890ff" : "1px solid #ccc",
-                    cursor: "pointer",
-                    padding: "10px",
-                    textAlign: "center",
-                    backgroundColor: selectedAnswers[currentQuestion.id] === option.key ? "#e6f7ff" : "#fff",
-                    borderRadius: 8,
-                    width: "45%",   // Add width to ensure side-by-side nicely
-                    transition: "all 0.3s ease",
-                  }}
-                  hoverable
-                >
-                  {option.value}
-                </Card>
-              ))}
-            </div>
-            ) : (
-              <Radio.Group
-                onChange={(e) => handleOptionChange(currentQuestion.id, e.target.value)}
-                value={selectedAnswers[currentQuestion.id]}
-                style={{ display: "flex", flexDirection: "column" }}
-              >
-                <Radio value="option_1" style={{ marginBottom: "10px" }}>A. {currentQuestion.option_1}</Radio>
-                <Radio value="option_2" style={{ marginBottom: "10px" }}>B. {currentQuestion.option_2}</Radio>
-                {currentQuestion.option_3 && (
-                  <Radio value="option_3" style={{ marginBottom: "10px" }}>C. {currentQuestion.option_3}</Radio>
-                )}
-                {currentQuestion.option_4 && (
-                  <Radio value="option_4" style={{ marginBottom: "10px" }}>D. {currentQuestion.option_4}</Radio>
-                )}
-              </Radio.Group>
-            )}
-          </div>
-        ) : (
-          <p>No questions available.</p>
-        )}
-      </Modal>
+              {option.value}
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Radio.Group
+          onChange={(e) =>
+            handleOptionChange(currentQuestion.id, e.target.value)
+          }
+          value={selectedAnswers[currentQuestion.id]}
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <Radio value="option_1" style={{ marginBottom: "10px" }}>
+            A. {currentQuestion.option_1}
+          </Radio>
+          <Radio value="option_2" style={{ marginBottom: "10px" }}>
+            B. {currentQuestion.option_2}
+          </Radio>
+          {currentQuestion.option_3 && (
+            <Radio value="option_3" style={{ marginBottom: "10px" }}>
+              C. {currentQuestion.option_3}
+            </Radio>
+          )}
+          {currentQuestion.option_4 && (
+            <Radio value="option_4" style={{ marginBottom: "10px" }}>
+              D. {currentQuestion.option_4}
+            </Radio>
+          )}
+        </Radio.Group>
+      )}
+    </div>
+  ) : (
+    <p>No questions available.</p>
+  )}
+</Modal>
 
       {/* Result Modal */}
       <QuizResultModal
