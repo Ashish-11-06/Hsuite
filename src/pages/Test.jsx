@@ -63,7 +63,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
   useEffect(() => {
     if (questionSuccess) {
-      antdMessage.success("Saved successfully!");
+      antdMessage.success("Quiz questions created successfully");
       resetForm();
       dispatch(resetQuestionState());
       onSuccess();

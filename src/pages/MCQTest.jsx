@@ -45,6 +45,23 @@ const MCQTest = () => {
         <div style={{ textAlign: 'center', marginTop: '100px' }}>
           <Spin size="large" />
         </div>
+      ) : quizzes.length === 0 ? (
+        <div
+          style={{
+            border: '2px dashed #d9d9d9',
+            padding: '60px',
+            textAlign: 'center',
+            borderRadius: '12px',
+            backgroundColor: '#fafafa',
+          }}
+        >
+          <p style={{ fontSize: '18px', color: '#888' }}>
+            No tests are available .
+          </p>
+          <p style={{ fontSize: '14px', color: '#aaa', marginTop: '10px' }}>
+            Please check back later for new tests.
+          </p>
+        </div>
       ) : (
         <Row gutter={[16, 16]}>
           {quizzes.map((quiz) => (
@@ -84,9 +101,9 @@ const MCQTest = () => {
               </Card>
             </Col>
           ))}
-        </Row>      
+        </Row>
       )}
-
+  
       <MCQTestQuestionModal
         open={isModalOpen}
         onClose={handleCloseModal}
@@ -94,6 +111,6 @@ const MCQTest = () => {
       />
     </div>
   );
-};
+}
 
 export default MCQTest;

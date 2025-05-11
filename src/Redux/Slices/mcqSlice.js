@@ -253,7 +253,8 @@ extraReducers: (builder) => {
         .addCase(getAllQuizzes.fulfilled, (state, action) => {
             state.loading = false;
             state.success = true;
-            state.quizzes = Array.isArray(action.payload.data) ? action.payload.data : [];
+            // state.quizzes = Array.isArray(action.payload.data) ? action.payload.data : [];
+            state.quizzes = Array.isArray(action.payload) ? action.payload : [];
         })
         .addCase(getAllQuizzes.rejected, (state, action) => {
             state.loading = false;

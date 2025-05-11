@@ -11,6 +11,10 @@ import Report from "../pages/Report.jsx";
 import CreateMCQ from "../pages/CreateMCQ.jsx";
 import MCQTest from "../pages/MCQTest.jsx";
 import MCQReport from "../pages/MCQReport.jsx";
+import Assessment from "../pages/Assessment.jsx";
+import CreateEgogram from "../pages/CreateEgogram.jsx";
+import EgogramTest from "../pages/EgogramTest.jsx";
+import EgogramReport from "../pages/EgogramReport.jsx";
 
 const MainContent = () => {
   return (
@@ -27,6 +31,10 @@ const MainContent = () => {
       <Route path="/createmcq" element={<CreateMCQ />}></Route>
       <Route path="/mcqtest" element={<MCQTest />}></Route>
       <Route path="/mcqreport" element={<MCQReport />}></Route>
+      <Route path="/assessment" element={<Assessment />}/>
+      <Route path="/createegogram" element={<CreateEgogram />}/>
+      <Route path="/testegogram" element={<EgogramTest />}/>
+      <Route path="/egogramreport" element={<EgogramReport />}/>
     </Routes>
   );
 };

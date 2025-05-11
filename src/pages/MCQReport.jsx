@@ -180,7 +180,7 @@ const MCQReport = () => {
     <Card style={{ margin: 20 }}>
       <Title level={3}>MCQ Performance Report</Title>
 
-      <div style={{ marginBottom: 20 }}>
+      {/* <div style={{ marginBottom: 20 }}>
         <Button
           type={!filteredQuiz ? 'primary' : 'default'}
           onClick={() => setFilteredQuiz(null)}
@@ -198,17 +198,17 @@ const MCQReport = () => {
             {name}
           </Button>
         ))}
-      </div>
+      </div> */}
 
       {loading ? (
         <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />
-      ) : error ? (
-        <Alert
-          message="Error loading quiz reports"
-          description={error.message || 'Failed to fetch quiz history'}
-          type="error"
-          showIcon
-        />
+      // ) : error ? (
+      //   <Alert
+      //     message="Error loading quiz reports"
+      //     description={error.message || 'Failed to fetch quiz history'}
+      //     type="error"
+      //     showIcon
+      //   />
       ) : !results?.length ? (
         <Empty description="No MCQ reports available" />
       ) : (

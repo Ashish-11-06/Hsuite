@@ -36,12 +36,18 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/codes")) return "3";
     if (location.pathname.startsWith("/profile")) return "4";
     if (location.pathname.startsWith("/users")) return "5";
-    if (location.pathname.startsWith("/createset")) return "6-1";
-    if (location.pathname.startsWith("/assessents")) return "6-2";
-    if (location.pathname.startsWith("/report")) return "6-3";
-    if (location.pathname.startsWith("/createmcq")) return "7-1";
-    if (location.pathname.startsWith("/mcqtest")) return "7-2";
-    if (location.pathname.startsWith("/mcqreport")) return "7-3";
+
+    if (location.pathname.startsWith("/assessment")) return "6";
+
+    if (location.pathname.startsWith("/createset")) return "6";
+    if (location.pathname.startsWith("/assessents")) return "6";
+    if (location.pathname.startsWith("/report")) return "6";
+    if (location.pathname.startsWith("/createmcq")) return "6";
+    if (location.pathname.startsWith("/mcqtest")) return "6";
+    if (location.pathname.startsWith("/mcqreport")) return "6";
+    if (location.pathname.startsWith("/createegogram")) return "6";
+    if (location.pathname.startsWith("/testegogram")) return "6";
+    if (location.pathname.startsWith("/egogramreport")) return "6";
     return "1";
   };
 
@@ -70,7 +76,7 @@ const Sidebar = () => {
         </Menu.Item>
 
         {/* Personality Test SubMenu */}
-        <SubMenu key="6" icon={<AuditOutlined />} title="Personality Test">
+        {/* <SubMenu key="6" icon={<AuditOutlined />} title="Personality Test">
           {userRole === "Admin" && (
             <Menu.Item key="6-1" icon={<CheckCircleOutlined />}>
               <Link to="/createset">Create Set</Link>
@@ -84,7 +90,7 @@ const Sidebar = () => {
           </Menu.Item>
         </SubMenu>
 
-        {/* Assessments SubMenu */}
+        
         <SubMenu key="7" icon={<AuditOutlined />} title="Assessments">
           {userRole === "Admin" && (
             <Menu.Item key="7-1" icon={<CheckCircleOutlined />}>
@@ -97,7 +103,12 @@ const Sidebar = () => {
           <Menu.Item key="7-3" icon={<BarChartOutlined />}>
             <Link to="/mcqreport">MCQ Report</Link>
           </Menu.Item>
-        </SubMenu>
+        </SubMenu> */}
+
+        <Menu.Item key="6" icon={<AuditOutlined />}>
+          <Link to="/assessment">Assessments</Link>
+        </Menu.Item>
+
 
         {userRole === "Admin" && (
           <Menu.Item key="5" icon={<InfoCircleOutlined />}>
