@@ -66,74 +66,81 @@ const EgoTestResultModal = ({ visible, onClose, userId, ratings }) => {
     : 10;
 
   const chartConfig = {
-    data: chartData,
-    xField: 'category',
-    yField: 'score',
-    height: 350,
-    point: {
-      size: 5,
-      shape: 'diamond',
+  data: chartData,
+  xField: 'category',
+  yField: 'score',
+  height: 350,
+  smooth: true,
+   area: {
+    style: {
+      fill: 'rgb(230, 247, 255)',
+      fillOpacity: 1,
+    },
+  },
+  point: {
+    size: 5,
+    shape: 'diamond',
+    style: {
+      fill: 'white',
+      stroke: '#5B8FF9',
+      lineWidth: 2,
+    },
+  },
+  lineStyle: {
+    lineWidth: 3,
+    stroke: '#1890ff',
+  },
+  color: '#1890ff',
+  xAxis: {
+    title: {
+      text: 'Categories',
       style: {
-        fill: 'white',
-        stroke: '#5B8FF9',
-        lineWidth: 2,
+        fontSize: 14,
       },
     },
-    xAxis: {
-      title: {
-        text: 'Categories',
-        style: {
-          fontSize: 14,
-        },
+    label: {
+      style: {
+        fontSize: 12,
       },
-      label: {
-        style: {
-          fontSize: 12,
-        },
-        autoRotate: true,
+      autoRotate: true,
+    },
+  },
+  yAxis: {
+    title: {
+      text: 'Scores',
+      style: {
+        fontSize: 14,
       },
     },
-    yAxis: {
-      title: {
-        text: 'Scores',
-        style: {
-          fontSize: 14,
-        },
-      },
-      min: 0,
-      max: maxScore,
-      tickInterval: 2,
-      label: {
-        formatter: (value) => `${value} pts`,
+    min: 0,
+    max: maxScore,
+    tickInterval: 2,
+    label: {
+      formatter: (value) => `${value} pts`,
+    },
+  },
+  tooltip: {
+    showCrosshairs: true,
+    shared: true,
+    formatter: (datum) => {
+      return {
+        name: datum.category,
+        value: `${datum.score} points`,
+      };
+    },
+    domStyles: {
+      'g2-tooltip': {
+        boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)',
       },
     },
-    tooltip: {
-      showCrosshairs: true,
-      shared: true,
-      formatter: (datum) => {
-        return { 
-          name: datum.category, 
-          value: `${datum.score} points` 
-        };
-      },
-      domStyles: {
-        'g2-tooltip': {
-          boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)',
-        },
-      },
-    },
-    lineStyle: {
-      lineWidth: 3,
-      stroke: '#1890ff',
-    },
-    color: '#1890ff',
-    smooth: true,
-    interactions: [
-      { type: 'element-active' },
-      { type: 'tooltip' },
-    ],
-    // Removed the invalid regionFilter annotation
-  };
+  },
+  interactions: [
+    { type: 'element-active' },
+    { type: 'tooltip' },
+  ],
+};
+
+
 
   return (
     <Modal

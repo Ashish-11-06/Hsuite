@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Spin, Alert, Card, Tag, Button, Modal, Typography } from "antd";
+import { Table, Spin, Alert, Card, Tag, Button, Modal, Typography, Empty } from "antd";
 import { fetchEgogramHistory, fetchAllEgogramCategories } from "../Redux/Slices/egoSlice";
 
 const { Title, Text } = Typography;
@@ -75,7 +75,6 @@ const EgogramReport = () => {
         <div>
           <strong>{result?.category || 'N/A'}</strong>
           <br />
-          {/* <small>{result?.category_description || 'No description available'}</small> */}
         </div>
       ),
     },
@@ -140,76 +139,98 @@ const EgogramReport = () => {
   };
 
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={tableData}
-        rowKey={(record) => record.id}
-        pagination={{ pageSize: 10 }}
-        locale={{ emptyText: "No egogram history available" }}
-      />
+    <div style={{ padding: 24 }}>
+      <Title level={2} style={{ marginBottom: 24 }}>Egogram Performance Report</Title>
+      
+      {tableData.length === 0 ? (
+        <Card 
+          style={{ 
+            width: '100%', 
+            borderRadius: 8,
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+            border: '1px solid #f0f0f0'
+          }}
+        >
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <Text type="secondary">No Egogram reports available</Text>
+            }
+          />
+        </Card>
+      ) : (
+        <>
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            rowKey={(record) => record.id}
+            pagination={{ pageSize: 10 }}
+            style={{ marginTop: 16 }}
+          />
 
-      <Modal
-        title="Egogram Test Details"
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={[
-          <Button key="close" onClick={handleModalClose}>
-            Close
-          </Button>
-        ]}
-        width={800}
-      >
-        <div style={{ 
-          maxHeight: 'calc(100vh - 240px)', 
-          overflowY: 'auto',
-          paddingRight: '8px'
-        }}>
-          {selectedRecord && (
-            <>
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ background: '#f0f0f0', padding: 16, borderRadius: 4 }}>
-                  <Text strong style={{ fontSize: 16 }}>
-                    {selectedRecord.final_result?.category || 'N/A'}
-                  </Text>
-                  <br />
-                  <Text type="secondary">
-                    {selectedRecord.final_result?.category_description || 'No description available'}
-                  </Text>
-                </div>
-                <div style={{ marginTop: 16 }}>
-                  <Text strong>Test Date: </Text>
-                  <Text>{new Date(selectedRecord.created_at).toLocaleString()}</Text>
-                </div>
-              </div>
+          <Modal
+            title="Egogram Test Details"
+            visible={isModalVisible}
+            onCancel={handleModalClose}
+            footer={[
+              <Button key="close" onClick={handleModalClose}>
+                Close
+              </Button>
+            ]}
+            width={800}
+          >
+            <div style={{ 
+              maxHeight: 'calc(100vh - 240px)', 
+              overflowY: 'auto',
+              paddingRight: '8px'
+            }}>
+              {selectedRecord && (
+                <>
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ background: '#f0f0f0', padding: 16, borderRadius: 4 }}>
+                      <Text strong style={{ fontSize: 16 }}>
+                        {selectedRecord.final_result?.category || 'N/A'}
+                      </Text>
+                      <br />
+                      <Text type="secondary">
+                        {selectedRecord.final_result?.category_description || 'No description available'}
+                      </Text>
+                    </div>
+                    <div style={{ marginTop: 16 }}>
+                      <Text strong>Test Date: </Text>
+                      <Text>{new Date(selectedRecord.created_at).toLocaleString()}</Text>
+                    </div>
+                  </div>
 
-              <Title level={5} style={{ marginBottom: 16 }}>Category Scores</Title>
-              <Table 
-                dataSource={getModalTableData()}
-                columns={[
-                  {
-                    title: 'Category',
-                    dataIndex: 'category',
-                    key: 'category',
-                    render: (text, record) => (
-                      <Tag color={record.color}>{text}</Tag>
-                    )
-                  },
-                  {
-                    title: 'Score',
-                    dataIndex: 'score',
-                    key: 'score',
-                    align: 'right'
-                  }
-                ]}
-                pagination={false}
-                bordered
-              />
-            </>
-          )}
-        </div>
-      </Modal>
-    </>
+                  <Title level={5} style={{ marginBottom: 16 }}>Category Scores</Title>
+                  <Table 
+                    dataSource={getModalTableData()}
+                    columns={[
+                      {
+                        title: 'Category',
+                        dataIndex: 'category',
+                        key: 'category',
+                        render: (text, record) => (
+                          <Tag color={record.color}>{text}</Tag>
+                        )
+                      },
+                      {
+                        title: 'Score',
+                        dataIndex: 'score',
+                        key: 'score',
+                        align: 'right'
+                      }
+                    ]}
+                    pagination={false}
+                    bordered
+                  />
+                </>
+              )}
+            </div>
+          </Modal>
+        </>
+      )}
+    </div>
   );
 };
 
