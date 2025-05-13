@@ -69,15 +69,15 @@ const AddEgoQuesModal = ({ open, onClose }) => {
 
   // Calculate categories from selected statements
   useEffect(() => {
-    const categoriesInUse = new Set();
-    selectedStatement.forEach(statementId => {
-      const statement = statements.find(s => s.id === statementId);
-      if (statement?.category) {
-        categoriesInUse.add(statement.category);
-      }
-    });
-    setUsedCategories(categoriesInUse);
-  }, [selectedStatement, statements]);
+  const categoriesInUse = new Set();
+  selectedStatement.forEach(statementId => {
+    const statement = statements.find(s => s.id === statementId);
+    if (statement && statement.category) {
+      categoriesInUse.add(statement.category);
+    }
+  });
+  setUsedCategories(categoriesInUse);
+}, [selectedStatement, statements]);
 
    useEffect(() => {
     if (statements.length > 0) {
@@ -87,35 +87,34 @@ const AddEgoQuesModal = ({ open, onClose }) => {
   }, [statements]);
 
    // Filter statements based on category selection limits
-  const filteredStatements = useMemo(() => {
-    // Count currently selected statements per category
-    const categoryCounts = {};
-    selectedCategories.forEach(catId => {
-      categoryCounts[catId] = selectedStatement.filter(id => {
-        const stmt = statements.find(s => s.id === id);
-        return stmt?.category === catId;
-      }).length;
-    });
+ const filteredStatements = useMemo(() => {
+  const categoryCounts = {};
+  selectedCategories.forEach(catId => {
+    categoryCounts[catId] = selectedStatement.filter(id => {
+      const stmt = statements.find(s => s.id === id);
+      return stmt && stmt.category === catId;
+    }).length;
+  });
 
-    return statements.map(statement => {
-      const isCategorySelected = selectedCategories.has(statement.category);
-      const currentCount = categoryCounts[statement.category] || 0;
-      
-      // Disable if:
-      // 1. Not already selected AND
-      // 2. Either:
-      //    a. Category is not selected and we already have 4 categories OR
-      //    b. Category is selected but has reached its statement limit
-      const isDisabled = !selectedStatement.includes(statement.id) && 
-                       ((!isCategorySelected && selectedCategories.size >= 4) ||
-                        (isCategorySelected && currentCount >= statementsPerCategory));
+ return statements
+  .filter(statement => statement && typeof statement.category !== 'undefined') // safeguard
+  .map(statement => {
+    const isCategorySelected = selectedCategories.has(statement.category);
+    const currentCount = categoryCounts[statement.category] || 0;
 
-      return {
-        ...statement,
-        disabled: isDisabled
-      };
-    });
-  }, [statements, selectedStatement, selectedCategories, statementsPerCategory]);
+    const isDisabled =
+      !selectedStatement.includes(statement.id) &&
+      ((!isCategorySelected && selectedCategories.size >= 4) ||
+        (isCategorySelected && currentCount >= statementsPerCategory));
+
+    return {
+      ...statement,
+      disabled: isDisabled,
+    };
+  });
+
+}, [statements, selectedStatement, selectedCategories, statementsPerCategory]);
+
 
   const handleStatementSelection = (values) => {
     // Determine which categories are being used
