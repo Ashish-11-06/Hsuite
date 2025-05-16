@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Select, Spin, Row, Col, Input, Typography, Empty } from "antd";
+import { Modal, Select, Spin, Row, Col, Input, Typography, Empty, Button } from "antd";
+import {FileAddOutlined, PlusSquareOutlined} from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux";
 import CreateQuizModal from "../Modals/CreateQuizModal";
 import Test from "./Test";
@@ -96,7 +97,8 @@ const Createset = () => {
         </Col>
         <Col xs={24} md={12} style={{ textAlign: "right", marginTop: { xs: "16px", md: "0" } }}>
           <div style={{ display: "inline-flex", gap: "10px" }}>
-            <button
+            <Button
+            icon={<PlusSquareOutlined />}
               onClick={showQuizModal}
               style={{
                 padding: "8px 16px",
@@ -108,11 +110,13 @@ const Createset = () => {
                 cursor: "pointer",
                 minWidth: "120px"
               }}
+              
             >
               Add Quiz
-            </button>
+            </Button>
 
-            <button
+            <Button
+            icon={<FileAddOutlined />}
               onClick={showTestModal}
               style={{
                 padding: "8px 16px",
@@ -126,7 +130,7 @@ const Createset = () => {
               }}
             >
               Add Question
-            </button>
+            </Button>
           </div>
         </Col>
       </Row>

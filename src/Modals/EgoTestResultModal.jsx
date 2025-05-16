@@ -151,6 +151,7 @@ const EgoTestResultModal = ({ visible, onClose, userId, ratings }) => {
       destroyOnClose
       width={750}
       style={{ top: 20 }}
+      styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: '24px' }}>

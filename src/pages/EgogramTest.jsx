@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetch20TestsFotTest } from '../Redux/Slices/egoSlice';
 import { Card, Button, Row, Col, Spin, message } from 'antd';
+import { PlayCircleOutlined } from "@ant-design/icons"; 
 import EgoTestQuestionModal from '../Modals/EgoTestQuestionModal';
 
 const EgogramTest = () => {
@@ -45,6 +46,31 @@ const EgogramTest = () => {
       ) : (
         <>
           <h1 style={{ marginBottom: '16px' }}>Egogram Tests</h1>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <Card
+              title="Egogram Test Instructions"
+              bordered={true}
+              style={{
+                width: '100%',
+                maxWidth: '800px',
+                border: '1px solid blue',
+                borderRadius: '8px',
+                backgroundColor: 'rgb(230, 247, 255)',
+                boxShadow: '0 2px 8px rgba(18, 8, 8, 0.05)',
+              }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <ul style={{ display: 'inline-block', textAlign: 'left', paddingLeft: '20px', marginBottom: 0 }}>
+                  <li>There are a total of <strong>20 statements</strong>.</li>
+                  <li>Each statement includes a <strong>slider</strong> to rate from <strong>0 to 10</strong>.</li>
+                  <li>Each statement has a <strong>timer of 10 seconds</strong>.</li>
+                  <li>At the end of the test, you can <strong>view your results</strong>.</li>
+                  <li>You can <strong>retake the test</strong> as many times as you want.</li>
+                </ul>
+              </div>
+            </Card>
+          </div>
           
           <Row gutter={[16, 16]}>
             {testsFor20 && testsFor20.length > 0 ? (
@@ -68,6 +94,7 @@ const EgogramTest = () => {
                   >
                     <p style={{ minHeight: '60px' }}>{test.test_description || 'No description available'}</p>
                     <Button 
+                    icon={<PlayCircleOutlined />}
                       style={{
                         backgroundColor: "#ffcc00",
                         color: "#333",

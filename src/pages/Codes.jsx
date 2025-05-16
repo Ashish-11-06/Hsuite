@@ -5,7 +5,7 @@ import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactio
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
 import HistoryModal from "../Modals/HistoryModal";
-import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled } from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled, PlusOutlined } from "@ant-design/icons";
 
 const Codes = () => {
   const dispatch = useDispatch();
@@ -343,9 +343,11 @@ const handleViewHistory = async (code) => {
 
              {/* ✅ View History Button */}
              {(userRole === "Admin" || userRole === "Edit") && (
-              <Button type="default" onClick={() => handleViewHistory(record)}
+              <Button
+              icon={<HistoryOutlined />} 
+              type="default" onClick={() => handleViewHistory(record)}
                style={{display: "block", marginLeft: 5}} 
-               icon={<HistoryOutlined />}>
+               >
               View History
               </Button>
              )}
@@ -441,7 +443,11 @@ if (userRole === "Admin" || userRole === "Edit" || userRole === "View") {
 
        {/* Only Admin & Edit can add codes */}
        {(userRole === "Admin" || userRole === "Edit") && (
-      <Button type="primary" onClick={showModal} style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>
+      <Button 
+      icon={<PlusOutlined />}
+      type="primary" 
+      onClick={showModal} 
+      style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>
         Add Code
       </Button>)}
      

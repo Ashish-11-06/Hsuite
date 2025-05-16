@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Spin, Row, Col, Button, Modal, Radio, Tag } from "antd";
+import { ArrowRightOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import { getQuizName, getTestQuestions } from "../Redux/Slices/quizSlice";
 import QuizResultModal from "../Modals/QuizResultModal";
 
@@ -162,6 +163,7 @@ const QuizList = () => {
                   {quiz.quiz_description}
                 </p>
                 <Button
+                icon = {<PlayCircleOutlined />}
                   style={{
                     backgroundColor: "#ffcc00",
                     color: "#333",
@@ -185,9 +187,32 @@ const QuizList = () => {
   title={`Question ${currentQuestionIndex + 1}`}
   open={viewModalVisible}
   onCancel={() => {
-    clearInterval(timerRef.current);
-    setViewModalVisible(false);
-  }}
+  clearInterval(timerRef.current); // Stop timer immediately
+
+  Modal.confirm({
+    title: "Are you sure you want to exit the test?",
+    content: "Your progress will be lost if you close the test now.",
+    okText: "Yes, Exit",
+    cancelText: "Cancel",
+    onOk: () => {
+      setViewModalVisible(false);
+    },
+    onCancel: () => {
+      // If user cancels exit, restart timer
+      timerRef.current = setInterval(() => {
+        setSecondsLeft((prev) => {
+          if (prev === 1) {
+            clearInterval(timerRef.current);
+            goToNextQuestion();
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    },
+  });
+}}
+
+  maskClosable={false} // prevents clicking outside to close
   footer={[
     <div
       key="footer"
@@ -203,6 +228,7 @@ const QuizList = () => {
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
+        icon ={<ArrowRightOutlined />}
           type="primary"
           onClick={goToNextQuestion}
           style={{ backgroundColor: "#1890ff", padding: "10px" }}

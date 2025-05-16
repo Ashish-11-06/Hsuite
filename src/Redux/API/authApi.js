@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "./axiosInstance.js";
 
 const authAPI = {
@@ -13,8 +14,17 @@ const authAPI = {
    // 🔹 Update Profile
    updateProfile: (profileData) => axiosInstance.put(`/accounts/update-profile/`, profileData),
 
-   // 🔹 Fetch Users from JSON Server
-  // fetchAllUsers: () => axiosInstance.get(`/users`).then((res) => res.data),
+  sendResetOTP: (emailData) => {
+    return axiosInstance.post('accounts/send-reset-otp/', emailData);
+  },
+
+  verfiyResetOTP: (otpData) => {
+    return axiosInstance.post('accounts/verify-reset-otp/', otpData);
+  },
+
+  ResetPassword: (passwordData) => {
+    return axiosInstance.post('accounts/reset-password/', passwordData);
+  }
 };
 
 export default authAPI;

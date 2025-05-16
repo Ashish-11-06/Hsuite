@@ -218,7 +218,7 @@ const EgogramReport = () => {
                         title: 'Score',
                         dataIndex: 'score',
                         key: 'score',
-                        align: 'right'
+                        align: 'center'
                       }
                     ]}
                     pagination={false}

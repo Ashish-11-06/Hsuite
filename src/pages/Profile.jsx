@@ -153,19 +153,42 @@ const Profile = () => {
                   {isEditing ? "Save" : "Edit"}
                 </Button>
 
-                <Button
-                  type="primary"
-                  danger
-                  onClick={handleLogout}
-                  icon={<LogoutOutlined />}
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    width: "48%",
-                  }}
-                >
-                  Logout
-                </Button>
+                {isEditing ? (
+  <Button
+    type="default"
+    danger
+    onClick={() => {
+      // Reset form to original user data and exit editing
+      setProfileData({
+        email: user.email,
+        username: user.username,
+      });
+      setIsEditing(false);
+    }}
+    style={{
+      fontWeight: "bold",
+      width: "48%",
+    }}
+  >
+    Cancel
+  </Button>
+) : (
+  // <Button
+  //   type="primary"
+  //   danger
+  //   onClick={handleLogout}
+  //   icon={<LogoutOutlined />}
+  //   style={{
+  //     fontSize: "16px",
+  //     fontWeight: 600,
+  //     width: "48%",
+  //   }}
+  // >
+  //   Logout
+  // </Button>
+  null
+)}
+
               </div>
             </Card>
           </div>

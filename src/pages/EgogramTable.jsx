@@ -9,8 +9,12 @@ import {
   Input,
   Select,
   message,
-  Spin
+  Spin,
+  Row,
+  Col,
+  Typography
 } from "antd";
+import {EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   editStatement,
@@ -19,6 +23,8 @@ import {
   clearEgoState
 } from "../Redux/Slices/egoSlice";
 
+const { Text } = Typography;
+
 const EgogramTable = ({ statements = [], refreshData }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -26,21 +32,6 @@ const EgogramTable = ({ statements = [], refreshData }) => {
   const dispatch = useDispatch();
 
   const { statementCategories, loading, error, success } = useSelector((state) => state.ego);
-
-  // Handle messages from Redux
-  useEffect(() => {
-    if (error) {
-      message.error(error);
-      dispatch(clearEgoState());
-    }
-  }, [error, dispatch]);
-
-  useEffect(() => {
-    if (success) {
-      message.success(success);
-      dispatch(clearEgoState());
-    }
-  }, [success, dispatch]);
 
   useEffect(() => {
     dispatch(fetchAllEgogramCategories());
@@ -64,30 +55,43 @@ const EgogramTable = ({ statements = [], refreshData }) => {
         test: editingItem.test,
       };
 
-      await dispatch(
+      // Clear any existing messages
+      message.destroy();
+      
+      const result = await dispatch(
         editStatement({
           updatedStatement: payload,
           statement_id: editingItem.id,
         })
       );
 
-      setEditModalVisible(false);
-      setEditingItem(null);
-      form.resetFields();
-
-      if (refreshData) refreshData();
+      if (!result.error) {
+        setEditModalVisible(false);
+        setEditingItem(null);
+        form.resetFields();
+        if (refreshData) refreshData();
+      } else {
+        message.error("Failed to update statement");
+      }
     } catch (error) {
-      // message.error("Failed to update statement. Please try again.");
-      // console.error("Validation failed or edit dispatch error:", error);
+      console.error("Validation failed or edit dispatch error:", error);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteStatement(id));
-      if (refreshData) refreshData();
+      // Clear any existing messages
+      message.destroy();
+      
+      const result = await dispatch(deleteStatement(id));
+      
+      if (!result.error) {
+        if (refreshData) refreshData();
+      } else {
+        message.error("Failed to delete statement");
+      }
     } catch (error) {
-      // message.error("Failed to delete statement. Please try again.");
+      console.error("Delete dispatch error:", error);
     }
   };
 
@@ -120,6 +124,7 @@ const EgogramTable = ({ statements = [], refreshData }) => {
       render: (_, record) => (
         <Space>
           <Button 
+          icon={<EditOutlined />}
             onClick={() => handleEdit(record)} 
             type="link"
             disabled={loading}
@@ -133,7 +138,7 @@ const EgogramTable = ({ statements = [], refreshData }) => {
             cancelText="No"
             disabled={loading}
           >
-            <Button type="link" danger disabled={loading}>
+            <Button icon={<DeleteOutlined />} type="link" danger disabled={loading}>
               Delete
             </Button>
           </Popconfirm>
@@ -144,6 +149,17 @@ const EgogramTable = ({ statements = [], refreshData }) => {
 
   return (
     <>
+     <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+        <Col>
+          <Text strong>Total statements: {statements.length}</Text>
+        </Col>
+        <Col>
+          <Text type="danger">
+            Note: A minimum of 20 statements is mandatory for the quiz.
+          </Text>
+        </Col>
+      </Row>
+      
       <Table
         columns={columns}
         dataSource={statements}

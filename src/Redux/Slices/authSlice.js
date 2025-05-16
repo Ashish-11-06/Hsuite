@@ -54,6 +54,68 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Send Reset OTP
+export const sendResetOTP = createAsyncThunk(
+  "auth/sendResetOTP",
+  async (emailData, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.sendResetOTP(emailData);
+      return {
+        success: true,
+        message: response.data?.message || "OTP sent successfully",
+        email: emailData.email,
+        data: response.data
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message || "Failed to send OTP",
+        error: error.response?.data
+      });
+    }
+  }
+);
+
+// Verify Reset OTP
+export const verifyResetOTP = createAsyncThunk(
+  "auth/verifyResetOTP",
+  async (otpData, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.verfiyResetOTP(otpData);
+      return {
+        success: true,
+        message: response.data?.message || "OTP verified successfully",
+        data: response.data
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message || "OTP verification failed",
+        error: error.response?.data
+      });
+    }
+  }
+);
+
+// Reset Password
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (passwordData, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.ResetPassword(passwordData);
+      return {
+        success: true,
+        message: response.data?.message || "Password reset successful",
+        data: response.data
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message || "Password reset failed",
+        error: error.response?.data
+      });
+    }
+  }
+);
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -62,6 +124,13 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     userId: null,
+    resetPassword: {
+      loading: false,
+      error: null,
+      success: false,
+      email: null,
+      step: 1 // 1 = email, 2 = OTP, 3 = new password
+    }
   },
   reducers: {
     loginSuccess: (state, action) => {
@@ -74,6 +143,18 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     },
+    resetPasswordState: (state) => {
+      state.resetPassword = {
+        loading: false,
+        error: null,
+        success: false,
+        email: null,
+        step: 1
+      };
+    },
+    setResetPasswordStep: (state, action) => {
+      state.resetPassword.step = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -123,8 +204,50 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
+     // Send Reset OTP
+      .addCase(sendResetOTP.pending, (state) => {
+        state.resetPassword.loading = true;
+        state.resetPassword.error = null;
+      })
+      .addCase(sendResetOTP.fulfilled, (state, action) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.email = action.payload.email;
+        state.resetPassword.step = 2;
+      })
+      .addCase(sendResetOTP.rejected, (state, action) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.error = action.payload?.message || "Failed to send OTP";
+      })
+
+      // Verify Reset OTP
+      .addCase(verifyResetOTP.pending, (state) => {
+        state.resetPassword.loading = true;
+        state.resetPassword.error = null;
+      })
+      .addCase(verifyResetOTP.fulfilled, (state) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.step = 3;
+      })
+      .addCase(verifyResetOTP.rejected, (state, action) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.error = action.payload?.message || "OTP verification failed";
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.resetPassword.loading = true;
+        state.resetPassword.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.success = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.resetPassword.loading = false;
+        state.resetPassword.error = action.payload?.message || "Password reset failed";
+      });
   },
 });
 
-export const { logout, loginSuccess } = authSlice.actions;
+export const { logout, loginSuccess, resetPasswordState, setResetPasswordStep } = authSlice.actions;
 export default authSlice.reducer;

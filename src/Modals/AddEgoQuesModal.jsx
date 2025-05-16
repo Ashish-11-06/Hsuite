@@ -27,21 +27,6 @@ const AddEgoQuesModal = ({ open, onClose }) => {
    const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [statementsPerCategory, setStatementsPerCategory] = useState(0);
 
-  // Show messages when error or success changes
-  useEffect(() => {
-    if (error) {
-      message.error(error);
-      dispatch(clearEgoState());
-    }
-  }, [error, dispatch]);
-
-  useEffect(() => {
-    if (success) {
-      message.success(success);
-      dispatch(clearEgoState());
-    }
-  }, [success, dispatch]);
-
   // Clear messages when modal opens/closes
   useEffect(() => {
     if (open) {
@@ -162,18 +147,24 @@ const AddEgoQuesModal = ({ open, onClose }) => {
   };
 
   const handleAddStatementToTest = () => {
-    dispatch(
-      addStatementsToEgogramTest({
-        test_id: selectedEgogramName,
-        statement_ids: selectedStatement,
-      })
-    ).then((res) => {
-      if (!res.error) {
-        setSelectedStatement([]);
-        onClose();
-      }
-    });
-  };
+  // Clear any existing messages first
+  message.destroy();
+  
+  dispatch(
+    addStatementsToEgogramTest({
+      test_id: selectedEgogramName,
+      statement_ids: selectedStatement,
+    })
+  ).then((res) => {
+    if (res.error) {
+      message.error("Failed to add statements");
+    } else {
+      message.success("Statements added successfully");
+      setSelectedStatement([]);
+      onClose();
+    }
+  });
+};
 
   const selectedTest = Array.isArray(tests)
     ? tests.find((test) => test?.id === selectedEgogramName)
@@ -186,6 +177,7 @@ const AddEgoQuesModal = ({ open, onClose }) => {
         title="Add Egogram Test"
         visible={open}
         onCancel={onClose}
+        styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
         footer={[
           <Button key="back" onClick={onClose}>
             Cancel

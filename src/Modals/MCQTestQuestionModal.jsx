@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Modal, Spin, Card, Radio, Checkbox, Button } from 'antd';
+import { Modal as AntModal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
+import { ArrowRightOutlined } from "@ant-design/icons";
 import MCQTestResultModal from './MCQTestResultModal';
 import { getQuestionsInQuiz, clearQuestions } from '../Redux/Slices/mcqSlice';
 
@@ -12,6 +14,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timer, setTimer] = useState(10);
+  const timerRef = useRef(null);
   
   const currentQuestion = questions[currentIndex];
 
@@ -36,26 +39,31 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
     );
   };
 
-  useEffect(() => {
-    if (!currentQuestion) return;
-  
-    setTimer(10); // reset timer for new question
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev === 1) {
-          clearInterval(interval);
-          if (currentIndex === questions.length - 1) {
-            handleSubmit(); // auto-submit on last question
-          } else {
-            setCurrentIndex((prevIndex) => prevIndex + 1);
-          }
+ useEffect(() => {
+  if (!currentQuestion) return;
+
+  setTimer(10); // reset timer
+
+  // clear any previous interval
+  clearInterval(timerRef.current);
+
+  timerRef.current = setInterval(() => {
+    setTimer((prev) => {
+      if (prev === 1) {
+        clearInterval(timerRef.current);
+        if (currentIndex === questions.length - 1) {
+          handleSubmit(); // auto-submit
+        } else {
+          setCurrentIndex((prevIndex) => prevIndex + 1);
         }
-        return prev - 1;
-      });
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [currentIndex, currentQuestion]);
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(timerRef.current);
+}, [currentIndex, currentQuestion]);
+
 
   useEffect(() => {
     if (open && quizData?.id) {
@@ -103,14 +111,44 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
     onClose(); // Close test modal also
   };
 
+  const handleCancelWithConfirm = () => {
+  clearInterval(timerRef.current); // ⛔ Pause timer before showing modal
+
+  AntModal.confirm({
+    title: "Exit Quiz?",
+    content: "Are you sure you want to exit? Your progress will be lost.",
+    okText: "Yes, Exit",
+    cancelText: "Cancel",
+    onOk: onClose,
+    onCancel: () => {
+      // 🟢 Resume timer if user cancels
+      timerRef.current = setInterval(() => {
+        setTimer((prev) => {
+          if (prev === 1) {
+            clearInterval(timerRef.current);
+            if (currentIndex === questions.length - 1) {
+              handleSubmit();
+            } else {
+              setCurrentIndex((prevIndex) => prevIndex + 1);
+            }
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    },
+  });
+};
+
+
   return (
     <Modal
       title={quizData?.name || "Quiz Test"}
       open={open}
-      onCancel={onClose}
+      onCancel={handleCancelWithConfirm}
       footer={null}
       width={600}
       destroyOnClose
+      maskClosable={false}
     >
       {loading ? (
         <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -154,19 +192,19 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
               {renderDots()}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
-                <Button
+                {/* <Button
                   disabled={currentIndex === 0}
                   onClick={handlePrev}
                 >
                   Previous
-                </Button>
+                </Button> */}
 
                 {currentIndex === questions.length - 1 ? (
                   <Button type="primary" onClick={handleSubmit}>
                     Submit Test
                   </Button>
                 ) : (
-                  <Button type="primary" onClick={handleNext}>
+                  <Button icon={<ArrowRightOutlined />} type="primary" onClick={handleNext}>
                     Next
                   </Button>
                 )}

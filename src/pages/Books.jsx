@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Table, Typography, Spin, Alert, Button, Space, Popconfirm, message, Input } from "antd";
 import { fetchBooks, deleteBook } from "../Redux/Slices/bookSlice";
-import {EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import AddBookModal from "../Modals/AddBookModal";
 import EditBookModal from "../Modals/EditBookModal"; // Import edit modal
 
@@ -117,6 +117,7 @@ const Books = () => {
         <Space>
           {/* Contributor & Admin can edit */}
           <Button 
+          icon={<EditOutlined />}
             type="primary" 
             onClick={() => showEditModal(record)}
             style={{ backgroundColor: "#ff9f00", borderColor: "#ff9f00", color: "black" }}
@@ -132,7 +133,10 @@ const Books = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="primary" style={{ backgroundColor: "#d90027", borderColor: "#d90027" }}>
+              <Button 
+              icon={<DeleteOutlined />}
+              type="primary" 
+              style={{ backgroundColor: "#d90027", borderColor: "#d90027" }}>
                 Delete
               </Button>
             </Popconfirm>
@@ -157,7 +161,11 @@ const Books = () => {
 
       {/* Button to open the modal */}
       {(userRole === "Admin" || userRole === "Edit") && (
-      <Button type="primary" onClick={showModal} style={{ marginBottom: 20 }}>
+      <Button 
+      icon ={<PlusOutlined />}
+      type="primary" 
+      onClick={showModal} s
+      tyle={{ marginBottom: 20 }}>
         Add Book
       </Button>
       )}

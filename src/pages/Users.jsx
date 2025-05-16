@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, message, Modal, Form, Input, Select, Switch} from "antd";
+import { Table, Button, message, Modal, Form, Input, Select, Switch } from "antd";
+import {EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers, updateUser, toggleUserActive, createUser } from "../Redux/Slices/userSlice";
 
@@ -14,7 +15,6 @@ const Users = () => {
   const [form] = Form.useForm();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [addForm] = Form.useForm();
-
 
   const roleDisplayMap = {
     Admin: "Admin",
@@ -41,7 +41,7 @@ const Users = () => {
       if (updateUser.fulfilled.match(resultAction)) {
         setIsEditModalVisible(false);
         message.success("User updated successfully!");
-        dispatch(fetchUsers()); // Refresh the list to ensure UI updates
+        dispatch(fetchUsers());
       } else {
         throw new Error("Update failed");
       }
@@ -51,11 +51,8 @@ const Users = () => {
   };
 
   const toggleUserStatus = async (user) => {
-    console.log("Toggling user status for:", user); // Is this showing?
     try {
       const resultAction = await dispatch(toggleUserActive(user.id));
-      console.log("Toggle User Result:", resultAction); // 🔍 log the response
-  
       if (toggleUserActive.fulfilled.match(resultAction)) {
         const { is_active } = resultAction.payload;
         message.success(`User ${is_active ? "enabled" : "disabled"} successfully!`);
@@ -63,7 +60,6 @@ const Users = () => {
         throw new Error("Toggle failed");
       }
     } catch (error) {
-      console.error("Error toggling user:", error); // 🔍
       message.error("Failed to update user status.");
     }
   };
@@ -75,7 +71,7 @@ const Users = () => {
         message.success("User created successfully!");
         setIsAddModalVisible(false);
         addForm.resetFields();
-        dispatch(fetchUsers()); // Refresh user list
+        dispatch(fetchUsers());
       } else {
         throw new Error("Failed");
       }
@@ -94,7 +90,6 @@ const Users = () => {
       key: "role",
       render: (role) => roleDisplayMap[role] || role || "N/A",
     },
-    
     {
       title: "Status",
       dataIndex: "disabled",
@@ -105,35 +100,26 @@ const Users = () => {
           checkedChildren="Enabled"
           unCheckedChildren="Disabled"
           onChange={() => toggleUserStatus(record)}
-          style={{
-            backgroundColor: disabled ? "#ff4d4f" : "#52c41a",
-          }}
+          style={{ backgroundColor: disabled ? "#ff4d4f" : "#52c41a" }}
         />
       ),
     },
-    
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <span>
-          <Button
-            type="primary"
-            style={{ marginRight: 8 }}
-            onClick={() => editUser(record)}
-          >
-            Edit
-          </Button>
-        </span>
+        <Button icon={<EditOutlined />} type="primary" onClick={() => editUser(record)}>
+          Edit
+        </Button>
       ),
     },
   ];
 
   return (
-    <div >
+    <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Users List</h2>
-        <Button type="primary" onClick={() => setIsAddModalVisible(true)}>
+        <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsAddModalVisible(true)}>
           Add User
         </Button>
       </div>
@@ -147,17 +133,11 @@ const Users = () => {
         rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
       />
 
-      <style>
-      {`
-        .disabled-row {
-          background-color: #fff1f0 !important;
-          color: #cf1322;
-        }
-      `}
-      </style>
+      <style>{`.disabled-row { background-color: #fff1f0 !important; color: #cf1322; }`}</style>
 
+      {/* Add User Modal */}
       <Modal
-        title="Add User"
+        title="Add New User"
         open={isAddModalVisible}
         onCancel={() => setIsAddModalVisible(false)}
         footer={null}
@@ -166,51 +146,53 @@ const Users = () => {
           <Form.Item
             name="username"
             label="Username"
-            rules={[{ required: true, message: "Username is required!" }]}
+            rules={[{ required: true, message: "Please input username!" }]}
           >
-            <Input />
+            <Input placeholder="e.g., john_doe" />
           </Form.Item>
 
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, message: "Email is required!" }]}
+            rules={[
+              { required: true, message: "Please input email!" },
+              { type: 'email', message: 'Please enter a valid email!' }
+            ]}
           >
-            <Input />
+            <Input placeholder="e.g., john@example.com" />
           </Form.Item>
 
           <Form.Item
             name="password"
             label="Password"
-            rules={[{ required: true, message: "Password is required!" }]}
+            rules={[{ required: true, message: "Please input password!" }]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Enter secure password" />
           </Form.Item>
 
           <Form.Item
             name="role"
             label="Role"
-            rules={[{ required: true, message: "Role is required!" }]}
+            rules={[{ required: true, message: "Please select role!" }]}
           >
-            <Select placeholder="Select a role">
-              <Option value="Admin">Admin</Option>
-              <Option value="Edit">Contributor</Option>
-              <Option value="View">Student/User</Option>
+            <Select placeholder="Select user role">
+              <Option value="Admin">Admin (Full access)</Option>
+              <Option value="Edit">Contributor (Edit access)</Option>
+              <Option value="View">Student/User (View only)</Option>
             </Select>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" block>
               Create User
             </Button>
           </Form.Item>
         </Form>
       </Modal>
 
-
       {/* Edit User Modal */}
       <Modal
-        title="Edit User"
+        title={`Edit User - ${editingUser?.username || ''}`}
         open={isEditModalVisible}
         onCancel={() => setIsEditModalVisible(false)}
         footer={null}
@@ -219,34 +201,39 @@ const Users = () => {
           <Form.Item
             name="username"
             label="Username"
-            rules={[{ required: true, message: "Username is required!" }]}
+            rules={[{ required: true, message: "Please input username!" }]}
           >
-            <Input />
+            <Input placeholder="Enter new username" />
           </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, message: "Email is required!" }]}
+            rules={[
+              { required: true, message: "Please input email!" },
+              { type: 'email', message: 'Please enter valid email!' }
+            ]}
           >
-            <Input />
+            <Input placeholder="Enter new email" />
           </Form.Item>
+
           <Form.Item
             name="role"
             label="Role"
-            rules={[{ required: true, message: "Role is required!" }]}
+            rules={[{ required: true, message: "Please select role!" }]}
           >
-            <Select placeholder="Select a role">
-              {Object.entries(roleDisplayMap).map(([backendRole, displayName]) => (
-                <Option key={backendRole} value={backendRole}>
-                  {displayName}
+            <Select placeholder="Select new role">
+              {Object.entries(roleDisplayMap).map(([value, label]) => (
+                <Option key={value} value={value}>
+                  {label}
                 </Option>
               ))}
             </Select>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Save Changes
+            <Button type="primary" htmlType="submit" block>
+              Update User
             </Button>
           </Form.Item>
         </Form>

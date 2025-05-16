@@ -17,6 +17,7 @@ import {
   message,
   Popconfirm
 } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -211,6 +212,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
             render={(text, record) => (
               <div style={{ display: "flex", gap: "10px" }}>
                 <Button
+                icon={<EditOutlined />}
                   onClick={() => showEditModal(record)}
                   style={{
                     backgroundColor: "#ff9f00",
@@ -227,6 +229,7 @@ const AllTestQuestions = ({ quizId, searchTerm }) => {
                   cancelText="No"
                 >   
                   <Button
+                  icon ={<DeleteOutlined />}
                     style={{
                       backgroundColor: "#d90027",
                       borderColor: "#d90027",

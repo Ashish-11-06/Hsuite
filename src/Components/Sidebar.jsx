@@ -8,8 +8,8 @@ import {
   LogoutOutlined,
   BookOutlined,
   AuditOutlined,
-  BarChartOutlined,
-  CheckCircleOutlined,
+  CodeOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -55,7 +55,7 @@ const Sidebar = () => {
     <Sider>
       <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center" }}>
         <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-          Medical Coding
+          HSuite
         </Link>
       </div>
 
@@ -71,7 +71,7 @@ const Sidebar = () => {
         <Menu.Item key="2" icon={<BookOutlined />}>
           <Link to="/books">Books</Link>
         </Menu.Item>
-        <Menu.Item key="3" icon={<InfoCircleOutlined />}>
+        <Menu.Item key="3" icon={<CodeOutlined />}>
           <Link to="/codes">Codes</Link>
         </Menu.Item>
 
@@ -111,7 +111,7 @@ const Sidebar = () => {
 
 
         {userRole === "Admin" && (
-          <Menu.Item key="5" icon={<InfoCircleOutlined />}>
+          <Menu.Item key="5" icon={<TeamOutlined />}>
             <Link to="/users">Users</Link>
           </Menu.Item>
         )}

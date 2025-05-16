@@ -12,10 +12,10 @@ import {
   Empty,
   Row,
   Col,
-  Spin 
+  Spin, 
 } from "antd";
+import { DeleteOutlined, EditOutlined, FileAddOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import AddMCQQuestionModal from "../Modals/AddMCQQuestionModal";
-// import AddMCQ2QuestionModal from "../Modals/AddMCQ2QuestionModal";
 import AddMcqQuizModal from "../Modals/AddMcqQuizModal";
 import EditMCQModal from "../Modals/EditMCQModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -160,7 +160,7 @@ const CreateMCQ = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button onClick={() => handleEdit(record)} 
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} 
           style={{
                     backgroundColor: "#ff9f00",
                     borderColor: "#ff9f00",
@@ -173,7 +173,7 @@ const CreateMCQ = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button style={{
+            <Button icon={<DeleteOutlined />} style={{
                     backgroundColor: "#d90027",
                     borderColor: "#d90027",
                     color: "white"
@@ -239,7 +239,8 @@ const CreateMCQ = () => {
         </Col>
         <Col xs={24} md={12} style={{ textAlign: "right", marginTop: { xs: "16px", md: "0" } }}>
           <div style={{ display: "inline-flex", gap: "10px" }}>
-            <button
+            <Button
+            icon={<PlusSquareOutlined />}
               onClick={handleOpenQuizModal}
               style={{
                 padding: "8px 16px",
@@ -253,9 +254,10 @@ const CreateMCQ = () => {
               }}
             >
               Add Quiz
-            </button>
+            </Button>
 
-            <button
+            <Button
+            icon={<FileAddOutlined />}
               onClick={handleOpenModal}
               style={{
                 padding: "8px 16px",
@@ -269,7 +271,7 @@ const CreateMCQ = () => {
               }}
             >
               Add Question
-            </button>
+            </Button>
           </div>
         </Col>
       </Row>

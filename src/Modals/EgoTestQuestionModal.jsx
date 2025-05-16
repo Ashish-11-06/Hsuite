@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Modal, Button, Spin, Alert, Typography, Slider } from "antd";
+import { Modal as AntModal } from "antd";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import EgoTestResultModal from "./EgoTestResultModal";
 import { fetchStatementsByTestIdToTest } from "../Redux/Slices/egoSlice";
 
 const { Title, Text } = Typography;
 
-const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
+const EgoTestQuestionModal = ({ testId, open, onClose }) => {
   const dispatch = useDispatch();
   const { statementsByTestToTest, loading, error } = useSelector((state) => state.ego);
   const userId = useSelector((state) => state.auth?.user?.id); // Get userId from Redux store
@@ -15,38 +17,42 @@ const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
   const [ratings, setRatings] = useState({});
   const [timer, setTimer] = useState(10);
   const [resultModalVisible, setResultModalVisible] = useState(false);
+  const intervalRef = useRef(null);
 
   const currentStatement = statementsByTestToTest[currentIndex];
 
   useEffect(() => {
-    if (visible && testId) {
+    if (open && testId) {
       dispatch(fetchStatementsByTestIdToTest(testId));
       setCurrentIndex(0);
       setRatings({});
       setResultModalVisible(false);
     }
-  }, [visible, testId, dispatch]);
+  }, [open, testId, dispatch]);
 
-  useEffect(() => {
-    if (!currentStatement) return;
+ useEffect(() => {
+  if (!currentStatement) return;
 
-    setTimer(10);
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev === 1) {
-          clearInterval(interval);
-          autoNext();
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  setTimer(10);
 
-    return () => clearInterval(interval);
-  }, [currentIndex, currentStatement]);
+  if (intervalRef.current) clearInterval(intervalRef.current);
+
+  intervalRef.current = setInterval(() => {
+    setTimer((prev) => {
+      if (prev === 1) {
+        clearInterval(intervalRef.current);
+        autoNext();
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(intervalRef.current);
+}, [currentIndex, currentStatement]);
 
   const autoNext = () => {
     const currentId = currentStatement?.id;
-    const currentValue = ratings[currentId] ?? 5;
+    const currentValue = ratings[currentId] ?? 0;
     setRatings((prev) => ({ ...prev, [currentId]: currentValue }));
 
     if (currentIndex < statementsByTestToTest.length - 1) {
@@ -63,7 +69,34 @@ const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
     setRatings({ ...ratings, [currentStatementId]: value });
   };
 
-  const handleClose = () => onClose();
+ const handleCloseWithConfirm = () => {
+  if (intervalRef.current) clearInterval(intervalRef.current); // stop the timer
+
+  const pausedTime = timer; // Save current timer value
+
+  AntModal.confirm({
+    title: "Are you sure you want to exit the test?",
+    content: "Your progress will be lost.",
+    okText: "Yes, Exit",
+    cancelText: "Cancel",
+    onOk: () => onClose(),
+    onCancel: () => {
+      // Resume timer from where it left off
+      setTimer(pausedTime); 
+      if (intervalRef.current) clearInterval(intervalRef.current); // safety
+      intervalRef.current = setInterval(() => {
+        setTimer((prev) => {
+          if (prev === 1) {
+            clearInterval(intervalRef.current);
+            autoNext();
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    },
+  });
+};
+
 
   const renderDots = () => (
     <div style={{ display: "flex", justifyContent: "center", gap: 10, margin: "20px 0" }}>
@@ -85,10 +118,11 @@ const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
     <>
       <Modal
         title="Egogram Test Questions"
-        open={visible}
-        onCancel={handleClose}
+        open={open}
+        onCancel={handleCloseWithConfirm}
         footer={null}
         destroyOnClose
+        maskClosable={false}
       >
         {loading ? (
           <Spin size="large" />
@@ -115,7 +149,7 @@ const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
                 min={0}
                 max={10}
                 step={1}
-                value={ratings[currentStatement.id] ?? 5}
+                value={ratings[currentStatement.id] ?? 0}
                 onChange={handleSliderChange}
                 marks={{
                   0: <div style={markerStyle("red")} />,
@@ -141,7 +175,7 @@ const EgoTestQuestionModal = ({ testId, visible, onClose }) => {
             {renderDots()}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button type="primary" onClick={handleNext}>
+              <Button type="primary" onClick={handleNext} icon={<ArrowRightOutlined />}>
                 {currentIndex === statementsByTestToTest.length - 1 ? "Finish" : "Next"}
               </Button>
             </div>
