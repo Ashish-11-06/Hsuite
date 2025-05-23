@@ -13,7 +13,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(15);
   const timerRef = useRef(null);
   
   const currentQuestion = questions[currentIndex];
@@ -42,7 +42,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
  useEffect(() => {
   if (!currentQuestion) return;
 
-  setTimer(10); // reset timer
+  setTimer(15); // reset timer
 
   // clear any previous interval
   clearInterval(timerRef.current);
@@ -59,7 +59,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
       }
       return prev - 1;
     });
-  }, 1000);
+  }, 1500);
 
   return () => clearInterval(timerRef.current);
 }, [currentIndex, currentQuestion]);

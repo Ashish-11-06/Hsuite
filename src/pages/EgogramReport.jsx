@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Table, Spin, Alert, Card, Tag, Button, Modal, Typography, Empty } from "antd";
 import { fetchEgogramHistory, fetchAllEgogramCategories } from "../Redux/Slices/egoSlice";
+import AddEgoPredefinedTreatModal from "../Modals/AddEgoPredefinedTreatModal";  // Adjust path as needed
+
 
 const { Title, Text } = Typography;
 
@@ -26,6 +28,7 @@ const EgogramReport = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [colorMap, setColorMap] = useState({});
+  const [treatmentModalVisible, setTreatmentModalVisible] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -173,8 +176,12 @@ const EgogramReport = () => {
             visible={isModalVisible}
             onCancel={handleModalClose}
             footer={[
-              <Button key="close" onClick={handleModalClose}>
-                Close
+             <Button 
+                key="treatment" 
+                type="primary" 
+                onClick={() => setTreatmentModalVisible(true)}
+              >
+                Predefined Treatment
               </Button>
             ]}
             width={800}
@@ -228,6 +235,19 @@ const EgogramReport = () => {
               )}
             </div>
           </Modal>
+
+       {treatmentModalVisible && selectedRecord && (
+  <AddEgoPredefinedTreatModal
+    visible={treatmentModalVisible}
+    onClose={() => setTreatmentModalVisible(false)}
+    userId={user.id}
+    statementCategories={statementCategories}
+    resultCategories={Object.keys(selectedRecord.statement_marks || {}).map(id => ({
+      id,
+      name: statementCategories[id] || `Category ${id}`
+    }))}
+  />
+)}
         </>
       )}
     </div>

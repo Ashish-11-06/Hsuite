@@ -1,12 +1,5 @@
 # HSuite  – Medical Coding Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
 HSuite is a web-based platform designed for medical students, professionals, and doctors to access, manage, and review medical books and coding systems. The application includes role-based access tailored to different user types, enabling a collaborative and interactive environment for learning and professional development.
 
 Purpose

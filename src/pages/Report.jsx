@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Tag, Typography, Spin, Alert, Empty, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuizReportHistory } from "../Redux/Slices/quizSlice";
+import AddPredefinedTreatModal from "../Modals/AddPredefinedTreatModal";
 
 const { Title, Text } = Typography;
 
@@ -12,6 +13,7 @@ const Report = () => {
   const { user } = useSelector((state) => state.auth); 
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showTreatModal, setShowTreatModal] = useState(false);
 
   useEffect(() => {
     dispatch(getQuizReportHistory());
@@ -210,8 +212,8 @@ const Report = () => {
   visible={isModalVisible}
   onCancel={handleCancel}
   footer={[
-    <Button key="back" onClick={handleCancel}>
-      Close
+    <Button key="treatment" type="primary" onClick={() => setShowTreatModal(true)}>
+      Predefined Treatment
     </Button>
   ]}
   width={800}
@@ -272,6 +274,14 @@ const Report = () => {
     </div>
   )}
 </Modal>
+
+<AddPredefinedTreatModal
+  visible={showTreatModal}
+  onClose={() => setShowTreatModal(false)}
+  userId={user?.id}
+  quizResult={selectedReport}
+/>
+
         </>
       )}
     </Card>

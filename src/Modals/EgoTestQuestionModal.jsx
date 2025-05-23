@@ -15,7 +15,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ratings, setRatings] = useState({});
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(15);
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const intervalRef = useRef(null);
 
@@ -33,7 +33,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
  useEffect(() => {
   if (!currentStatement) return;
 
-  setTimer(10);
+  setTimer(15);
 
   if (intervalRef.current) clearInterval(intervalRef.current);
 
@@ -45,7 +45,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
       }
       return prev - 1;
     });
-  }, 1000);
+  }, 1500);
 
   return () => clearInterval(intervalRef.current);
 }, [currentIndex, currentStatement]);

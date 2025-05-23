@@ -80,7 +80,7 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
             )}
           </Select>
         </Form.Item>
-        <Form.Item label="Code" name="code" rules={[{ required: true, message: "Please input the code!" }]}>
+        <Form.Item label="Code (Category)" name="code" rules={[{ required: true, message: "Please input the code!" }]}>
           <Input placeholder="Enter code" />
         </Form.Item>
         <Form.Item label="Description" name="description" rules={[{ required: true, message: "Please input the description!" }]}>

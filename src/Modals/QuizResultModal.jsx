@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
-import { Modal, Table, Tag, Spin, Card, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Table, Tag, Spin, Card, Typography, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { submitQuizResults, resetResultsState } from "../Redux/Slices/quizSlice";
+import AddPredefinedTreatModal from "./AddPredefinedTreatModal";
 
 const { Title, Text } = Typography;
 
@@ -9,6 +10,8 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
   const dispatch = useDispatch();
   const { quizResults, resultsLoading, resultsError } = useSelector((state) => state.quiz);
   const { user } = useSelector((state) => state.auth);
+
+  const [predefinedTreatModalVisible, setPredefinedTreatModalVisible] = useState(false);
 
   useEffect(() => {
     if (visible && questions?.length > 0) {
@@ -135,29 +138,51 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
   };
 
   return (
-    <Modal
-      title="Quiz Results"
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      width={800}
-      destroyOnClose
-    >
-      {resultsLoading ? (
-        <div style={{ textAlign: "center", padding: "40px 0" }}>
-          <Spin size="large" />
-          <p>Calculating your results...</p>
-        </div>
-      ) : resultsError ? (
-        <div style={{ textAlign: "center", padding: "40px 0" }}>
-          <p style={{ color: "red" }}>
-            Error loading results: {resultsError.message || "Unknown error"}
-          </p>
-        </div>
-      ) : (
-        renderResults()
-      )}
-    </Modal>
+    <>
+      <Modal
+        title="Quiz Results"
+        open={visible}
+        onCancel={onClose}
+        footer={null}
+        width={800}
+        destroyOnClose
+      >
+        {resultsLoading ? (
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <Spin size="large" />
+            <p>Calculating your results...</p>
+          </div>
+        ) : resultsError ? (
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <p style={{ color: "red" }}>
+              Error loading results: {resultsError.message || "Unknown error"}
+            </p>
+          </div>
+        ) : (
+          <>
+            {renderResults()}
+            <div style={{ textAlign: "right", marginTop: 20 }}>
+              <Button 
+                type="primary" 
+                onClick={() => setPredefinedTreatModalVisible(true)}
+                disabled={!quizResults} // Disable button if no results
+              >
+                Predefined Treatment
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
+      
+      <AddPredefinedTreatModal
+      // userId={someValidUserId}
+      
+        visible={predefinedTreatModalVisible}
+        onClose={() => setPredefinedTreatModalVisible(false)}
+        quizResult={quizResults}
+        userId={user?.id}
+      />
+    </>
   );
 };
 

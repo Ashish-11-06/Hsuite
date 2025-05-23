@@ -14,7 +14,7 @@ const QuizList = () => {
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [secondsLeft, setSecondsLeft] = useState(5);
+  const [secondsLeft, setSecondsLeft] = useState(15);
   const timerRef = useRef(null);
   const [selectedQuizType, setSelectedQuizType] = useState(""); // <-- NEW
   const [randomOptions, setRandomOptions] = useState([]); // <-- NEW
@@ -43,7 +43,7 @@ const QuizList = () => {
   const goToNextQuestion = () => {
     if (Array.isArray(testQuestions) && currentQuestionIndex < testQuestions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
-      setSecondsLeft(10);
+      setSecondsLeft(15);
   
       if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
         const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
@@ -70,7 +70,7 @@ const QuizList = () => {
   // Timer logic
   useEffect(() => {
     if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
-      setSecondsLeft(10); // reset timer on new question
+      setSecondsLeft(15); // reset timer on new question
       clearInterval(timerRef.current);
 
       timerRef.current = setInterval(() => {
@@ -81,7 +81,7 @@ const QuizList = () => {
           }
           return prev - 1;
         });
-      }, 1000);
+      }, 1500);
       if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
         const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
         setRandomOptions(twoOptions);
@@ -207,7 +207,7 @@ const QuizList = () => {
           }
           return prev - 1;
         });
-      }, 1000);
+      }, 1500);
     },
   });
 }}

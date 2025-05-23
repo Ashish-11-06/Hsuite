@@ -48,6 +48,10 @@ const Sidebar = () => {
     if (location.pathname.startsWith("/createegogram")) return "6";
     if (location.pathname.startsWith("/testegogram")) return "6";
     if (location.pathname.startsWith("/egogramreport")) return "6";
+    if (location.pathname.startsWith("/automation")) return "7";
+    if (location.pathname.startsWith("/clinical")) return "8";
+    if (location.pathname.startsWith("/work")) return "9";
+    if (location.pathname.startsWith("/treatment")) return "10";
     return "1";
   };
 
@@ -107,6 +111,23 @@ const Sidebar = () => {
 
         <Menu.Item key="6" icon={<AuditOutlined />}>
           <Link to="/assessment">Assessments</Link>
+        </Menu.Item>
+
+        <Menu.Item key="10" icon={<AuditOutlined />}>
+          <Link to="/treatment">Treatment</Link>
+        </Menu.Item>
+
+         <Menu.Item key="7" icon={<AuditOutlined />}>
+          <Link to="/automation">Coding Automation</Link>
+        </Menu.Item>
+
+        <Menu.Item key="8" icon={<AuditOutlined />}>
+          <Link to="/clinical">Clinical Notes</Link>
+        </Menu.Item>
+
+        
+        <Menu.Item key="9" icon={<AuditOutlined />}>
+          <Link to="/work">Work Organisation</Link>
         </Menu.Item>
 
 
