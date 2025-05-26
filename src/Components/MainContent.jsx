@@ -15,11 +15,11 @@ import Assessment from "../pages/Assessment.jsx";
 import CreateEgogram from "../pages/CreateEgogram.jsx";
 import EgogramTest from "../pages/EgogramTest.jsx";
 import EgogramReport from "../pages/EgogramReport.jsx";
-import CodingAutomation from "../pages/CodingAutomation.jsx";
-import ClinicalNotes from "../pages/ClinicalNotes.jsx";
-import WorkOrganisation from "../pages/WorkOrganisation.jsx";
+// import CodingAutomation from "../pages/CodingAutomation.jsx";
+// import ClinicalNotes from "../pages/ClinicalNotes.jsx";
+// import WorkOrganisation from "../pages/WorkOrganisation.jsx";
 import Treatment from "../pages/Treatment.jsx";
-import Counsellor from "../pages/Counsellor.jsx";
+// import Counsellor from "../pages/Counsellor.jsx";
 
 const MainContent = () => {
   return (
