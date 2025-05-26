@@ -15,10 +15,11 @@ import Assessment from "../pages/Assessment.jsx";
 import CreateEgogram from "../pages/CreateEgogram.jsx";
 import EgogramTest from "../pages/EgogramTest.jsx";
 import EgogramReport from "../pages/EgogramReport.jsx";
-import CodingAutomation from "../pages/CodingAutomation.jsx";
-import ClinicalNotes from "../pages/ClinicalNotes.jsx";
-import WorkOrganisation from "../pages/WorkOrganisation.jsx";
+// import CodingAutomation from "../pages/CodingAutomation.jsx";
+// import ClinicalNotes from "../pages/ClinicalNotes.jsx";
+// import WorkOrganisation from "../pages/WorkOrganisation.jsx";
 import Treatment from "../pages/Treatment.jsx";
+// import Counsellor from "../pages/Counsellor.jsx";
 
 const MainContent = () => {
   return (
@@ -39,12 +40,12 @@ const MainContent = () => {
       <Route path="/createegogram" element={<CreateEgogram />}/>
       <Route path="/testegogram" element={<EgogramTest />}/>
       <Route path="/egogramreport" element={<EgogramReport />}/>
-      <Route path="/automation" element={<CodingAutomation />} />
-      <Route path="/clinical" element={<ClinicalNotes />} />
-      <Route path="/work" element={< WorkOrganisation />} />
+      {/* <Route path="/automation" element={<CodingAutomation />} /> */}
+      {/* <Route path="/clinical" element={<ClinicalNotes />} /> */}
+      {/* <Route path="/work" element={< WorkOrganisation />} /> */}
      <Route path="/treatment" element={<Treatment />} />
 <Route path="/treatment/:treatmentId" element={<Treatment />} />
-
+{/* <Route path="/counsellor" element={<Counsellor />} /> */}
     </Routes>
   );
 };
