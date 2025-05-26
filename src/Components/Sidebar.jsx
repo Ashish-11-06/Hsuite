@@ -117,7 +117,7 @@ const Sidebar = () => {
           <Link to="/treatment">Treatment</Link>
         </Menu.Item>
 
-         <Menu.Item key="7" icon={<AuditOutlined />}>
+         {/* <Menu.Item key="7" icon={<AuditOutlined />}>
           <Link to="/automation">Coding Automation</Link>
         </Menu.Item>
 
@@ -128,7 +128,7 @@ const Sidebar = () => {
         
         <Menu.Item key="9" icon={<AuditOutlined />}>
           <Link to="/work">Work Organisation</Link>
-        </Menu.Item>
+        </Menu.Item> */}
 
 
         {userRole === "Admin" && (
