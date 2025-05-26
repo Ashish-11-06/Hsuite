@@ -109,7 +109,7 @@ const EditBookModal = ({ open, onClose, book, loggedInUserId }) => {
           </Button>
         </Form.Item>
       </Form>
-      </div>
+      {/* </div> */}
     </Modal>
   );
 };

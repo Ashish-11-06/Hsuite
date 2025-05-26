@@ -3,7 +3,6 @@ import { Modal, Typography, Button, Spin, Alert, Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Line } from '@ant-design/charts';
 import {
-  postEgogramResult,
   resetEgogramResult,
   fetchAllEgogramCategories,
 } from "../Redux/Slices/egoSlice";
@@ -11,38 +10,20 @@ import AddEgoPredefinedTreatModal from "./AddEgoPredefinedTreatModal";
 
 const { Title, Text } = Typography;
 
-const EgoTestResultModal = ({ visible, onClose, userId, ratings }) => {
+const EgoTestResultModal = ({ visible, onClose, result}) => {
   const dispatch = useDispatch();
-  const { result, loading, error, statementCategories } = useSelector((state) => state.ego);
+  const { loading, error, statementCategories } = useSelector((state) => state.ego);
   const user = useSelector((state) => state.auth.user); // Adjust this based on your auth setup
 
   const [predefinedTreatModalVisible, setPredefinedTreatModalVisible] = useState(false);
 
   useEffect(() => {
-    if (!visible) return;
-
-    if (!userId) {
-      console.error("User ID is required but not available");
-      return;
-    }
-
-    if (!ratings || Object.keys(ratings).length === 0) {
-      console.error("No ratings provided");
-      return;
-    }
-
-    const payload = {
-      user: userId,
-      statement_marks: ratings,
-    };
-
     dispatch(fetchAllEgogramCategories());
-    dispatch(postEgogramResult(payload));
 
     return () => {
       dispatch(resetEgogramResult());
     };
-  }, [visible, userId, ratings, dispatch]);
+  }, [visible]);
 
   useEffect(() => {
     if (result?.final_result) {
@@ -173,7 +154,7 @@ const EgoTestResultModal = ({ visible, onClose, userId, ratings }) => {
         style={{ top: 20 }}
         styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
       >
-        {loading ? (
+        {!result ? (
           <div style={{ textAlign: 'center', padding: '24px' }}>
             <Spin size="large" />
             <Text style={{ display: 'block', marginTop: 16 }}>Processing your results...</Text>

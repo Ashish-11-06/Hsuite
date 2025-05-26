@@ -135,7 +135,7 @@ const AddCodeModal = ({ open, onClose, loggedInUserId }) => {
           </Button>
         </Form.Item>
       </Form>
-      </div>
+      {/* </div> */}
     </Modal>
   );
 };

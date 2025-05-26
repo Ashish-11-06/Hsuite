@@ -4,7 +4,7 @@ import { Modal as AntModal } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import EgoTestResultModal from "./EgoTestResultModal";
-import { fetchStatementsByTestIdToTest } from "../Redux/Slices/egoSlice";
+import { fetchStatementsByTestIdToTest, postEgogramResult } from "../Redux/Slices/egoSlice";
 
 const { Title, Text } = Typography;
 
@@ -18,6 +18,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
   const [timer, setTimer] = useState(15);
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const intervalRef = useRef(null);
+  const [result, setResult] = useState(null);
 
   const currentStatement = statementsByTestToTest[currentIndex];
 
@@ -30,25 +31,25 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
     }
   }, [open, testId, dispatch]);
 
- useEffect(() => {
-  if (!currentStatement) return;
+  useEffect(() => {
+    if (!currentStatement) return;
 
-  setTimer(15);
+    setTimer(15);
 
-  if (intervalRef.current) clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
 
-  intervalRef.current = setInterval(() => {
-    setTimer((prev) => {
-      if (prev === 1) {
-        clearInterval(intervalRef.current);
-        autoNext();
-      }
-      return prev - 1;
-    });
-  }, 1500);
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(intervalRef.current);
+          autoNext();
+        }
+        return prev - 1;
+      });
+    }, 1500);
 
-  return () => clearInterval(intervalRef.current);
-}, [currentIndex, currentStatement]);
+    return () => clearInterval(intervalRef.current);
+  }, [currentIndex, currentStatement]);
 
   const autoNext = () => {
     const currentId = currentStatement?.id;
@@ -58,8 +59,21 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
     if (currentIndex < statementsByTestToTest.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      setResultModalVisible(true);
+      const payload = {
+        user: userId,
+        statement_marks: ratings,
+      }
+
+      const f = async () => {
+      const result = await dispatch(postEgogramResult(payload));
+        //  dispatch(fetchAllEgogramCategories());
+        setResult(result.payload);
+        setResultModalVisible(true);
+      }
+        
+      f();
     }
+
   };
 
   const handleNext = () => autoNext();
@@ -69,33 +83,33 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
     setRatings({ ...ratings, [currentStatementId]: value });
   };
 
- const handleCloseWithConfirm = () => {
-  if (intervalRef.current) clearInterval(intervalRef.current); // stop the timer
+  const handleCloseWithConfirm = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current); // stop the timer
 
-  const pausedTime = timer; // Save current timer value
+    const pausedTime = timer; // Save current timer value
 
-  AntModal.confirm({
-    title: "Are you sure you want to exit the test?",
-    content: "Your progress will be lost.",
-    okText: "Yes, Exit",
-    cancelText: "Cancel",
-    onOk: () => onClose(),
-    onCancel: () => {
-      // Resume timer from where it left off
-      setTimer(pausedTime); 
-      if (intervalRef.current) clearInterval(intervalRef.current); // safety
-      intervalRef.current = setInterval(() => {
-        setTimer((prev) => {
-          if (prev === 1) {
-            clearInterval(intervalRef.current);
-            autoNext();
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    },
-  });
-};
+    AntModal.confirm({
+      title: "Are you sure you want to exit the test?",
+      content: "Your progress will be lost.",
+      okText: "Yes, Exit",
+      cancelText: "Cancel",
+      onOk: () => onClose(),
+      onCancel: () => {
+        // Resume timer from where it left off
+        setTimer(pausedTime);
+        if (intervalRef.current) clearInterval(intervalRef.current); // safety
+        intervalRef.current = setInterval(() => {
+          setTimer((prev) => {
+            if (prev === 1) {
+              clearInterval(intervalRef.current);
+              autoNext();
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      },
+    });
+  };
 
 
   const renderDots = () => (
@@ -124,7 +138,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
         destroyOnClose
         maskClosable={false}
       >
-        {loading ? (
+        {!currentStatement ? (
           <Spin size="large" />
         ) : error ? (
           <Alert message="Error" description={error} type="error" />
@@ -191,6 +205,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
           setResultModalVisible(false);
           onClose();
         }}
+        result={result}
         userId={userId}
         ratings={ratings}
       />
