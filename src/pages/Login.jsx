@@ -1,163 +1,143 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Card, message, Modal, Select } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  message,
+  Typography,
+  Space,
+} from "antd";
+import { LoginOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, registerUser, verifyOtp } from "../Redux/Slices/authSlice";
-import { setUserData } from "../Redux/Slices/profileSlice";
+import { loginUser } from "../Redux/Slices/authSlice";
+import RegisterModal from "../Modals/RegisterModal";
+import ForgotPasswordModal from "../Modals/ForgotPasswordModal";
 
-//const { Option } = Select;
+const { Text } = Typography;
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { loading, userId } = useSelector((state) => state.auth);
-
+  const { loading } = useSelector((state) => state.auth);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setotpSent] = useState(false);
-  const [form] = Form.useForm();
+  const [showForgotModal, setShowForgotModal] = useState(false);
 
-  const handleRegister = async (values) => {
+  const handleLogin = async (values) => {
     try {
-      const response = await dispatch(registerUser(values)).unwrap();
-      //console.log("Registration Response:", response);
-      message.success(response.message || "OTP sent to your email!");
-      setEmail(values.email);
-      //setotpSent(true); // ✅ Update state to change button label
+      const response = await dispatch(loginUser(values)).unwrap();
+      message.success(response?.message || "Login successful!");
+      setTimeout(() => navigate("/profile"), 1500);
     } catch (error) {
-      //console.error("Registration Error:", error);
-      message.error(error?.error || error.username[0] || "Registration failed!");
+      message.error(error?.error || "Invalid email or password");
     }
   };
-  
-
-  // 🔹 Handle Verify OTP & Complete Registration
-  const handleVerifyAndRegister = async () => {
-    if (!otp) {
-      message.error("Enter OTP first!");
-      return;
-    }
-
-    try {
-      await dispatch(verifyOtp({ user_id: userId, email_otp: otp })).unwrap();
-      message.success("OTP Verified! Registration successful.");
-      setIsModalVisible(false);
-    } catch (error) {
-      message.error(error?.message || "Invalid OTP, or user already verified");
-    }
-  };
-
-    // 🔹 Handle Login with Messages
-    const handleLogin = async (values) => {
-      try {
-        const response = await dispatch(loginUser(values)).unwrap();
-       // console.log("Login Response:", response);
-        message.success(response?.message || "Login successful!");
-        //dispatch(loginSuccess(response.user));
-        setTimeout(() => navigate("/profile"), 1500);
-
-      } catch (error) {
-        //console.log("Login Error:", error);
-        message.error(error?.error || "Invalid email or password");
-      }
-    };
-
-     // 🔹 Handle OTP Button Click
-     const handleSendOtp = () => {
-      if (!email) return;
-      setotpSent(true); // ✅ Change button text to "Resend OTP"
-    };
-    
-    
 
   return (
-    <div style={{overflow: "hidden"}}>
-    <Card title="Login" style={{ width: 350, margin: "100px auto"}}>
-      <Form layout="vertical" onFinish={handleLogin}>
-        <Form.Item label="Email" name="email" rules={[{ required: true, type: "email" }]}>
-          <Input />
-        </Form.Item>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        // background: "linear-gradient(to bottom, #cbe9ff, #eaf6ff)",
+        background: "linear-gradient(178deg, rgba(179, 233, 255, 1) 0%, rgba(255, 255, 255, 1) 100%)"
 
-        <Form.Item label="Password" name="password" rules={[{ required: true }]}>
-          <Input.Password />
-        </Form.Item>
+      }}
+    >
+      <Card
+        style={{
+          width: 400,
+          padding: "20px 10px",
+          borderRadius: "20px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+          backdropFilter: "blur(10px)",
+          background: "rgba(255, 255, 255, 0.75)",
+          border: "1px solid rgba(255,255,255,0.3)",
+        }}
+        variant="borderless"
+      >
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <LoginOutlined style={{ fontSize: 40, color: "#1890ff" }} />
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 600,
+              color: "#333",
+              marginTop: 10,
+              marginBottom: 8,
+            }}
+          >
+            Sign in with email
+          </div>
+        </div>
 
-          {/* 🔹 Role Selection Field */}
-          {/* <Form.Item label="Role" name="role" rules={[{ required: true, message: "Please select a role!" }]}>
-          <Select placeholder="Select Role">
-            <Option value="admin">Admin</Option>
-            <Option value="viewer">Viewer</Option>
-            <Option value="editor">Editor</Option>
-          </Select>
-        </Form.Item> */}
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" block loading={loading}>
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
-{/* 
-      <p>
-        Don't have an account?{" "}
-        <Button type="link" onClick={() => setIsModalVisible(true)}>
-          Register
-        </Button>
-      </p> */}
-
-      {/* 🔹 Registration Modal */}
-      <Modal title="Register" open={isModalVisible} onCancel={() => setIsModalVisible(false)} footer={null}>
-        <Form layout="vertical" onFinish={handleRegister} form={form}>
-          <Form.Item label="Username" name="username" rules={[{ required: true }]}>
-            <Input />
+        <Form layout="vertical" onFinish={handleLogin}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, type: "email" }]}
+          >
+            <Input size="large" placeholder="Enter your email address" />
           </Form.Item>
 
-          <Form.Item label="Password" name="password" rules={[{ required: true }]}>
-            <Input.Password />
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true }]}
+          >
+            <Input.Password size="large" placeholder="Enter your password" />
           </Form.Item>
 
-
-          <Form.Item label="Email" required>
-    <Input.Group compact>
-      <Form.Item name="email" noStyle rules={[{ required: true, type: "email" }]}>
-        <Input 
-        style={{ width: "70%" }} 
-        onChange={(e) => setEmail(e.target.value)} />
-      </Form.Item>
-      <Button type="primary" onClick={() => {
-        handleSendOtp();
-        form.submit();}}
-       style={{ width: "30%" }}
-       >
-        {otpSent ? "Resend OTP" : "Send OTP"}
-      </Button>
-    </Input.Group>
-  </Form.Item>
-
-                {/* 🔹 OTP Input & Send OTP Button */}
-          <Form.Item label="Enter OTP" name="otp">
-            <Input
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              // enterButton={
-              //   <Button type="primary" onClick={() => form.submit()}>
-              //     Send OTP
-              //   </Button>
-              // }
-            />
-          </Form.Item>
-          
           <Form.Item>
-            <Button type="primary" block loading={loading} onClick={handleVerifyAndRegister}>
-              Verify & Register
+            <div style={{ textAlign: "right", marginTop: -8 }}>
+              <Button
+                type="link"
+                size="small"
+                style={{ padding: 0 }}
+                onClick={() => setShowForgotModal(true)}
+              >
+                Forgot password?
+              </Button>
+
+            </div>
+          </Form.Item>
+
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={loading}
+              style={{
+                borderColor: "#000",
+                borderRadius: 8,
+              }}
+            >
+              Login
             </Button>
           </Form.Item>
         </Form>
-      </Modal>
-    </Card>
+
+        <p style={{ textAlign: "center", marginTop: 16 }}>
+          Don't have an account?{" "}
+          <Button type="link" onClick={() => setIsModalVisible(true)}>
+            Register
+          </Button>
+        </p>
+
+        <RegisterModal
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+        <ForgotPasswordModal 
+        visible={showForgotModal}
+        onCancel={() => setShowForgotModal(false)}
+        />
+      </Card>
     </div>
   );
 };

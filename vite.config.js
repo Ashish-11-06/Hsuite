@@ -2,6 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+
+  server: {
+    allowedHosts: ['3aff-103-211-60-165.ngrok-free.app'],
+  },
+
   plugins: [react()],
   css: {
     preprocessorOptions: {

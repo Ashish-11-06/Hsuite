@@ -1,4 +1,5 @@
 // services/quizAPI.js
+import axios from "axios";
 import { submitQuizResults, updateTestQuestion, getQuizReportHistory  } from "../Slices/quizSlice.js";
 import axiosInstance from "./axiosInstance.js";
 
@@ -53,6 +54,7 @@ const quizAPI = {
     }
     return axiosInstance.get(`assessments/quiz/results/user/${user_id}/`);
   }
+  
 };
 
 export default quizAPI;

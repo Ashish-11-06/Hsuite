@@ -20,6 +20,17 @@ export const toggleUserActive = createAsyncThunk(
   }
 );
 
+export const createUser = createAsyncThunk(
+  "users/createUser",
+  async (userData, { rejectWithValue }) => {
+    try {
+      return await userAPI.createUser(userData);
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error creating user");
+    }
+  }
+);
+
 
 // Slice
 const userSlice = createSlice({
@@ -81,9 +92,18 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      
-           
 
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally push the new user to the list
+        state.list.push(action.payload);
+      })
+      .addCase(createUser.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 

@@ -9,6 +9,12 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
     const dispatch = useDispatch();
     const { loading, error, success, quizzes } = useSelector((state) => state.mcq);
     const [form] = Form.useForm();
+    
+    // Separate state for quiz type and quiz selection
+    const [quizType, setQuizType] = useState("single-choice");
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
+    
+    // Questions state now only contains question-specific fields
     const [questions, setQuestions] = useState([{
       question: "",
       options_1: "",
@@ -16,114 +22,124 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
       options_3: "",
       options_4: "",
       correct_ans: [],
-      type: "single-choice", // 'single-choice' or 'multiple-choice'
-      quizId: null
     }]);
-  
-    // Fetch quizzes when modal opens
+
+    // Fetch quizzes when modal opens or quizType changes
     useEffect(() => {
-      if (open) {
-        dispatch(getQuizByType('single-choice')); // Fetch quizzes based on default type
-      }
-    }, [open, dispatch]);
-  
-    const handleInputChange = (index, field, value) => {
-        const updatedQuestions = [...questions];
-      
-        if (field === 'type' && value === 'single-choice' && updatedQuestions[index].correct_ans.length > 1) {
-          updatedQuestions[index].correct_ans = [updatedQuestions[index].correct_ans[0]];
-        }
-      
-        updatedQuestions[index][field] = value;
-      
-        if (field === 'type') {
-          dispatch(getQuizByType(value));  // Fetch quizzes based on new question type
-        }
-      
-        setQuestions(updatedQuestions);
-      };
-      
-      useEffect(() => {
-        if (error) {
-          message.error(error);
-          dispatch(resetQuizState());
-          form.resetFields(); // Reset form fields if error occurs
-        }
-      }, [error, dispatch, form]);
-      
-  
-      const handleSubmit = async () => {
+      const fetchQuizzes = async () => {
         try {
-            console.log("Starting submission...");
-            // await form.validateFields(); // Ensure form is validated
-            console.log("Form validation passed");
-          
-            const payload = questions.map((questionData) => {
-              return {
-                question: questionData.question,
-                options_1: questionData.options_1,
-                options_2: questionData.options_2,
-                options_3: questionData.options_3,
-                options_4: questionData.options_4,
-                correct_ans: questionData.correct_ans, // Ensure the correct answer is passed as expected
-                type: questionData.type, // The type of the question (single-choice or multiple-choice)
-                quiz_id: questionData.quizId, // Ensure quizId is included and correctly mapped
-              };
-            });
-          
-            // Dispatching the action to add MCQ questions
-            const result = await dispatch(addMCQQuestion(payload)); // Dispatching the action
-            console.log("Dispatch result:", result);
-            message.success("Questions added successfully!");
-            handleClose(); // Close the modal after successful submission
-          } catch (err) {
-            console.error("Full submission error:", err);
-            if (err?.response?.data) {
-              console.error("Response error details:", err.response.data);
+          if (open) {
+            const response = await dispatch(getQuizByType(quizType));
+            if (!Array.isArray(response.quizzes)) {
+              console.warn("API response is not an array:", response.quizzes);
             }
-            message.error(err.response?.data?.message || err.message || "Submission failed");
           }
-          
+        } catch (err) {
+          console.error("Error fetching quizzes:", err);
+          message.error("Failed to fetch quizzes");
+        }
       };
-      
-  
-    const getFilteredQuizzes = (questionType) => {
-      return quizzes.filter(quiz => 
-        quiz.type === questionType
-      );
+      fetchQuizzes();
+    }, [open, quizType, dispatch]);
+
+    const handleInputChange = (index, field, value) => {
+      const updatedQuestions = [...questions];
+    
+      if (field === 'correct_ans') {
+        updatedQuestions[index][field] = Array.isArray(value)
+          ? (quizType === 'single-choice' ? [value[0]] : value)
+          : [value];
+      } else {
+        updatedQuestions[index][field] = value;
+      }
+    
+      setQuestions(updatedQuestions);
     };
-  
-    const validateCorrectAnswers = (_, value, questionIndex) => {
-        const question = questions[questionIndex];
-        
-        // Check if no correct answer is selected
-        if (!value || value.length === 0) {
-          return Promise.reject('Please select at least one correct answer');
+    
+    
+
+    useEffect(() => {
+      const handleError = () => {
+        try {
+          if (error) {
+            message.error(error);
+            dispatch(resetQuizState());
+          }
+        } catch (err) {
+          console.error("Error handling quiz state reset:", err);
         }
-      
-        // For single-choice, only one correct answer should be selected
-        if (question.type === 'single-choice' && value.length > 1) {
-          return Promise.reject('Single choice question can only have one correct answer');
-        }
-      
-        // Get the available options for the question
-        const availableOptions = [1, 2, 3, 4]
-          .map(num => question[`options_${num}`])
-          .filter(Boolean);  // Remove any empty options
-      
-        // Validate that the selected answers are part of the available options
-        const invalidAnswers = value.filter(ans => !availableOptions.includes(ans));
-      
-        if (invalidAnswers.length > 0) {
-          return Promise.reject(`Selected answers (${invalidAnswers.join(', ')}) don't match any options`);
-        }
-      
-        return Promise.resolve();
       };
-      
-  
+      handleError();
+    }, [error, dispatch]);
+
+    const handleSubmit = async () => {
+      try {
+        const payload = questions.map((q) => {
+          // Map correct_ans values to option keys (if not already mapped)
+          const correctAnsKeys = q.correct_ans.map((ans) => {
+            if (ans === q.options_1) return 'options_1';
+            if (ans === q.options_2) return 'options_2';
+            if (ans === q.options_3) return 'options_3';
+            if (ans === q.options_4) return 'options_4';
+            return ans; // fallback (shouldn't happen if validation passed)
+          });
+    
+          return {
+            quiz: selectedQuiz,
+            type: quizType,
+            question: q.question,
+            options_1: q.options_1,
+            options_2: q.options_2,
+            options_3: q.options_3,
+            options_4: q.options_4,
+            correct_ans: correctAnsKeys, // Store the keys, not values
+          };
+        });
+    
+        console.log("Final Payload ===>", payload); // Check the final payload
+    
+        await dispatch(addMCQQuestion(payload));
+        message.success("Questions added successfully!");
+        handleClose();
+      } catch (err) {
+        console.error("Submission error:", err);
+        message.error(err.response?.data?.message || err.message || "Submission failed");
+      }
+    };
+    
+    
+    const getFilteredQuizzes = () => {
+      return Array.isArray(quizzes) && quizzes.length
+        ? quizzes.filter(quiz => quiz.type === quizType)
+        : []; // Return empty array if quizzes is not an array or empty
+    };    
+
+    const validateCorrectAnswers = (_, value, questionIndex) => {
+      const question = questions[questionIndex];
+    
+      if (!value || value.length === 0) {
+        // return Promise.reject('Please select at least one correct answer');
+      }
+    
+      if (quizType === 'single-choice' && value.length > 1) {
+        // return Promise.reject('Single choice question can only have one correct answer');
+      }
+    
+      const validKeys = ['options_1', 'options_2', 'options_3', 'options_4'];
+      const invalidKeys = value.filter((key) => !validKeys.includes(key));
+    
+      if (invalidKeys.length > 0) {
+        return Promise.reject(`Invalid keys selected: ${invalidKeys.join(', ')}`);
+      }
+    
+      return Promise.resolve();
+    };
+    
+
     const handleClose = () => {
       form.resetFields();
+      setQuizType("single-choice");
+      setSelectedQuiz(null);
       setQuestions([{
         question: "",
         options_1: "",
@@ -131,13 +147,11 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
         options_3: "",
         options_4: "",
         correct_ans: [],
-        type: "single-choice",
-        quizId: null
       }]);
       dispatch(resetQuizState());
       onClose();
     };
-  
+
     const addQuestion = () => {
       setQuestions([...questions, {
         question: "",
@@ -146,154 +160,157 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
         options_3: "",
         options_4: "",
         correct_ans: [],
-        type: "single-choice",
-        quizId: null
       }]);
     };
-  
-    useEffect(() => {
-      if (error) {
-        message.error(error);
-        dispatch(resetQuizState());
+
+    return (
+      <Modal 
+        title="Add MCQ Questions" 
+        open={open} 
+        onCancel={onClose}
+        footer={null}
+        width={700}
+        styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
+      >
+        <Form form={form} layout="vertical">
+          {/* Question Type - Only appears once at the top */}
+          <Form.Item
+            label="Question Type"
+            name="type"
+            initialValue="single-choice"
+          >
+            <Radio.Group
+              value={quizType}
+              buttonStyle="solid"
+              onChange={(e) => {
+                setQuizType(e.target.value);
+                setSelectedQuiz(null); // Reset quiz selection when type changes
+              }}
+            >
+              <Radio.Button value="single-choice">Single Choice</Radio.Button>
+              <Radio.Button value="multiple-choice">Multiple Choice</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* Quiz Selection - Only appears once at the top */}
+          <Form.Item
+            label="Select Quiz"
+            name="quiz"
+            rules={[{ required: true, message: 'Please select a quiz' }]}
+          >
+            <Select
+              placeholder="Select a quiz"
+              value={selectedQuiz}
+              onChange={setSelectedQuiz}
+              loading={loading}
+            >
+              {Array.isArray(quizzes) && getFilteredQuizzes().map(quiz => (
+                <Option key={quiz.id} value={quiz.id}>
+                  {quiz.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* Questions list */}
+          {questions.map((item, index) => (
+            <div key={index} style={{ marginBottom: 24 }}>
+              <Form.Item
+                label={`Question ${index + 1}`}
+                name={`question_${index}`}
+                rules={[{ required: true, message: 'Please enter the question' }]}
+              >
+                <Input
+                  value={item.question}
+                  onChange={(e) => handleInputChange(index, 'question', e.target.value)}
+                  placeholder="Enter your question"
+                />
+              </Form.Item>
+
+              <Form.Item label="Options" required>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  {[1, 2, 3, 4].map((num) => (
+                    <Form.Item
+                      key={`optionz_${num}_${index}`}
+                      name={`optionz_${num}_${index}`}
+                      rules={[{ required: num <= 2, message: `Optionz ${num} is required` }]}
+                      noStyle
+                    >
+                      <Input
+                        value={item[`options_${num}`]}
+                        onChange={(e) => handleInputChange(index, `options_${num}`, e.target.value)}
+                        placeholder={`Options ${num}`}
+                        style={{ marginBottom: 8 }}
+                      />
+                    </Form.Item>
+                  ))}
+                </Space>
+              </Form.Item>
+
+<Form.Item
+  label={`Correct Answer(s) (${quizType === 'single-choice' ? 'Select one' : 'Select up to 3'})`}
+  name={`correct_ans_${index}`}
+  extra={
+    quizType === 'single-choice'
+      ? 'Note: Single choice question can only have one correct answer.'
+      : 'Note: Multiple choice question can select up to 3 correct answers.'
+  }
+>
+  <Select
+    mode={quizType === 'single-choice' ? null : 'multiple'}
+    placeholder="Select correct answers"
+    value={item.correct_ans}
+    onChange={(value) => {
+      if (quizType === 'single-choice') {
+        handleInputChange(index, 'correct_ans', [value]); // Only one
+      } else {
+        // Allow up to 3 selections
+        const limitedValue = value.slice(0, 3);
+        handleInputChange(index, 'correct_ans', limitedValue);
       }
-    }, [error, dispatch]);
+    }}
+  >
+    {[1, 2, 3, 4].map((num) => {
+      const key = `options_${num}`;
+      const label = item[key];
+      return label ? (
+        <Option key={key} value={key}>
+          {label}
+        </Option>
+      ) : null;
+    })}
+  </Select>
+</Form.Item>
 
-  return (
-    <Modal 
-      title="Add MCQ Questions" 
-      open={open} 
-      onCancel={onClose}
-      footer={null}
-      width={700}
-    >
-      <Form form={form} layout="vertical">
-        {questions.map((item, index) => (
-          <div key={index} style={{ marginBottom: 24, borderBottom: '1px solid #f0f0f0', paddingBottom: 16 }}>
-            
-            <Form.Item
-              label="Question Type"
-              name={`type_${index}`}
-              initialValue="single-choice"
+
+
+            </div>
+          ))}
+
+          <Form.Item>
+            <Button
+              type="dashed"
+              onClick={addQuestion}  
+              style={{ width: "100%", marginBottom: "16px" }}
             >
-              <Radio.Group
-                value={item.type}
-                onChange={(e) => {
-                  handleInputChange(index, 'type', e.target.value);
-                  // Clear quiz selection when type changes
-                  handleInputChange(index, 'quizId', null);
-                }}
-              >
-                <Radio value="single-choice">Single Choice</Radio>
-                <Radio value="multiple-choice">Multiple Choice</Radio>
-              </Radio.Group>
-            </Form.Item>
+              + Add Another Question
+            </Button>
+          </Form.Item>
 
-            {/* Quiz Selection Dropdown */}
-            <Form.Item
-              label="Select Quiz"
-              name={`quiz_${index}`}
-              rules={[{ required: true, message: 'Please select a quiz' }]}>
-              <Select
-                placeholder="Select a quiz"
-                value={item.quizId}
-                onChange={(value) => handleInputChange(index, 'quizId', value)}
-                loading={loading}
-              >
-                {getFilteredQuizzes(item.type).map(quiz => (
-                  <Option key={quiz.id} value={quiz.id}>
-                    {quiz.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              label={`Question ${index + 1}`}
-              name={`question_${index}`}
-              rules={[{ required: true, message: 'Please enter the question' }]}
+          <Form.Item>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              loading={loading}
+              block
+              htmlType="submit"
             >
-              <Input
-                value={item.question}
-                onChange={(e) => handleInputChange(index, 'question', e.target.value)}
-                placeholder="Enter your question"
-              />
-            </Form.Item>
-
-            <Form.Item label="Options" required>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                {[1, 2, 3, 4].map((num) => (
-                  <Form.Item
-                    key={`option_${num}_${index}`}
-                    name={`option_${num}_${index}`}
-                    rules={[{ required: num <= 2, message: `Option ${num} is required` }]}
-                    noStyle
-                  >
-                    <Input
-                      value={item[`options_${num}`]}
-                      onChange={(e) => handleInputChange(index, `options_${num}`, e.target.value)}
-                      placeholder={`Option ${num}`}
-                      style={{ marginBottom: 8 }}
-                    />
-                  </Form.Item>
-                ))}
-              </Space>
-            </Form.Item>
-
-            <Form.Item
-              label={`Correct Answer(s) (${item.type === 'single-choice' ? 'Select one' : 'Select multiple'})`}
-              name={`correct_ans_${index}`}
-              rules={[
-                { 
-                  validator: (_, value) => validateCorrectAnswers(_, value, index) 
-                }
-              ]}
-            >
-              <Select
-                mode={item.type === 'single-choice' ? null : 'multiple'}
-                placeholder="Select correct answers"
-                value={item.correct_ans}
-                onChange={(value) => {
-                    const formattedValue = item.type === 'single-choice' ? [value] : value;
-                    handleInputChange(index, 'correct_ans', formattedValue);
-                  }}                  
-              >
-                {[1, 2, 3, 4].map((num) => {
-                  const optionText = item[`options_${num}`];
-                  return optionText ? (
-                    <Option key={optionText} value={optionText}>
-                      {optionText}
-                    </Option>
-                  ) : null;
-                }).filter(Boolean)}
-              </Select>
-            </Form.Item>
-          </div>
-        ))}
-
-        <Form.Item>
-          <Button
-            type="dashed"
-            onClick={addQuestion}  
-            style={{ width: "100%", marginBottom: "16px" }}
-          >
-            + Add Another Question
-          </Button>
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            loading={loading}
-            block
-            htmlType="submit"
-          >
-            Submit Questions
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
+              Submit Questions
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    );
 };
 
 export default AddMCQQuestionModal;

@@ -175,7 +175,8 @@ const quizSlice = createSlice({
     questionSuccess: false,
     quizResults: null,
     resultsLoading: false,
-    resultsError: null
+    resultsError: null,
+    
   },
   reducers: {
     resetQuizState: (state) => {
@@ -350,7 +351,9 @@ const quizSlice = createSlice({
       .addCase(getQuizName.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+     
   },
 });
 

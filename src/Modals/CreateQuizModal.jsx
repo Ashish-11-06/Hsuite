@@ -8,6 +8,7 @@ const CreateQuizModal = ({ visible, onCancel, onSuccess }) => {
   const { loading, error, success, data, message: apiMessage } = useSelector((state) => state.quiz || {});
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [quizName, setQuizName] = useState("");
+  const [quizDescription, setQuizDescription] = useState("");
   const [quizType, setQuizType] = useState("question"); // 'question' or 'statement'
   const [formData, setFormData] = useState({
     category_1: "",
@@ -38,6 +39,7 @@ const CreateQuizModal = ({ visible, onCancel, onSuccess }) => {
     setFormSubmitted(false);
     const payload = {
       quiz_name: quizName,
+      quiz_description: quizDescription,
       quiz_type: quizType,
       ...formData,
     };
@@ -101,6 +103,21 @@ const CreateQuizModal = ({ visible, onCancel, onSuccess }) => {
           value={quizName}
           onChange={(e) => setQuizName(e.target.value)}
           placeholder="Enter quiz name"
+          style={{
+            width: "100%",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            border: "1px solid #d9d9d9",
+            fontSize: "14px",
+          }}
+        />
+
+        <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Description:</label>
+        <input
+          type="text"
+          value={quizDescription}
+          onChange={(e) => setQuizDescription(e.target.value)}
+          placeholder="Enter Description "
           style={{
             width: "100%",
             padding: "6px 12px",

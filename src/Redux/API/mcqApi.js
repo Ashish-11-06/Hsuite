@@ -35,6 +35,10 @@ const mcqAPIs = {
         return axiosInstance.get(`assessments/mcq-quizzes/`)
     },
 
+    getQuestionInQuizID: (quizId)=>{
+      return axiosInstance.get(`assessments/mcq-quiz/${quizId}/questions/`)
+  },
+
     updateQuestion: async (questionId, questionData) => {
         try {
           const response = await axiosInstance.put(`assessments/mcq-questions/${questionId}/edit/`, questionData);
@@ -66,17 +70,32 @@ const mcqAPIs = {
       },
 
       fetchQuestionsByType: async (type) => {
-        const response = await axiosInstance.get(`/assessments/mcq-questions/type/${type}`);
+        const response = await axiosInstance.get(`/assessments/mcq-questions/type/${type}/`);
         return response.data;
       },
 
       fetchQuizByType: async (quiztype) => {
-        const response = await axiosInstance.get(`assessments/mcq-quiz/type/${quiztype}`);
+        const response = await axiosInstance.get(`assessments/mcq-quiz/type/${quiztype}/`);
         return response.data;
       },
       
     fetchAllQuestionsByQuiz: (quizId) => {
         return axiosInstance.get(`assessments/mcq-quiz/${quizId}/questions-all/`)
+    },
+
+    AddMcqQuizResult: (data) => {
+      return axiosInstance.post(`assessments/submit-mcq-quiz/`, data);
+    },
+
+    getMcqQuizResult: async (userId) => {
+      console.log("Fetching results for user:", userId); // Debug log
+      const response = await axiosInstance.get(`assessments/mcq-result-history/${userId}/`);
+      console.log("API Response:", response.data); // Debug log
+      return response;
+    },
+
+    getTestGetMcqQuiz: ()=> {
+      return axiosInstance.get(`assessments/test-mcq-quizzes/`)
     }
     
 };

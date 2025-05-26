@@ -5,7 +5,7 @@ import { fetchCodes, deleteCode, editCode, fetchBooks, addReaction, clearReactio
 import AddCodeModal from "../Modals/AddCodeModal";
 import EditCodeModal from "../Modals/EditCodeModal"; // Import the EditCodeModal
 import HistoryModal from "../Modals/HistoryModal";
-import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled } from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, DislikeTwoTone, LikeTwoTone, DislikeFilled, LikeFilled, PlusOutlined } from "@ant-design/icons";
 
 const Codes = () => {
   const dispatch = useDispatch();
@@ -300,7 +300,7 @@ const handleViewHistory = async (code) => {
     
   ];
 
-    if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") {
+    if (userRole === "Admin" || userRole === "Edit") {
       columns.push({
         title: "Actions",
         key: "actions",
@@ -311,7 +311,7 @@ const handleViewHistory = async (code) => {
           <Space direction="vertical" style={{ width: "180px"}}>
             <div>
             {/* Admin & Contributor can Edit */}
-            {(userRole === "Admin" || userRole === "Contributor") && (
+            {(userRole === "Admin" || userRole === "Edit") && (
               <Button
                 type="primary"
                 icon= {<EditOutlined />}
@@ -323,7 +323,7 @@ const handleViewHistory = async (code) => {
             )}
   
             {/* Admin can Delete */}
-            {(userRole === "Admin" || userRole === "Contributor") && (
+            {(userRole === "Admin" || userRole === "Edit") && (
               <Popconfirm
                 title="Are you sure you want to delete this code?"
                 onConfirm={() => handleDelete(record.id)}
@@ -342,10 +342,12 @@ const handleViewHistory = async (code) => {
             </div>
 
              {/* ✅ View History Button */}
-             {(userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer") && (
-              <Button type="default" onClick={() => handleViewHistory(record)}
+             {(userRole === "Admin" || userRole === "Edit") && (
+              <Button
+              icon={<HistoryOutlined />} 
+              type="default" onClick={() => handleViewHistory(record)}
                style={{display: "block", marginLeft: 5}} 
-               icon={<HistoryOutlined />}>
+               >
               View History
               </Button>
              )}
@@ -355,7 +357,7 @@ const handleViewHistory = async (code) => {
     }
 
     // ✅ Add Reactions column LAST and make it visible only for Admin, Contributor, and Reviewer
-if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer"|| userRole === "View") {
+if (userRole === "Admin" || userRole === "Edit" || userRole === "View") {
   columns.push({
     title: "Reactions",
     key: "reactions",
@@ -439,9 +441,13 @@ if (userRole === "Admin" || userRole === "Contributor" || userRole === "reviewer
         style={{ marginBottom: "16px", width: "500px", marginRight: "40%" }}
       />
 
-       {/* Only Admin & Contributor can add codes */}
-       {(userRole === "Admin" || userRole === "Contributor") && (
-      <Button type="primary" onClick={showModal} style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>
+       {/* Only Admin & Edit can add codes */}
+       {(userRole === "Admin" || userRole === "Edit") && (
+      <Button 
+      icon={<PlusOutlined />}
+      type="primary" 
+      onClick={showModal} 
+      style={{ marginBottom: "16px", backgroundColor: "#007BFF"}}>
         Add Code
       </Button>)}
      

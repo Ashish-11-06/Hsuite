@@ -1,7 +1,7 @@
 {
-  "name": "my-app",
+  "name": "h_suite",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/charts": "^2.2.7",
+    "@ant-design/plots": "^2.3.3",
     "@reduxjs/toolkit": "^2.6.0",
     "antd": "^5.24.2",
     "axios": "^1.7.9",

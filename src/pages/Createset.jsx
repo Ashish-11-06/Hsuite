@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Select, Spin, Row, Col, Input, Typography, Empty } from "antd";
+import { Modal, Select, Spin, Row, Col, Input, Typography, Empty, Button } from "antd";
+import {FileAddOutlined, PlusSquareOutlined, OrderedListOutlined} from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux";
 import CreateQuizModal from "../Modals/CreateQuizModal";
 import Test from "./Test";
 import AllTestQuestions from "./AllTestQuestions";
 import { getQuizCategories } from "../Redux/Slices/quizSlice";
+import PersonalityStepsModal from "../Modals/PersonalityStepsModal";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -13,6 +15,7 @@ const { Text } = Typography;
 const Createset = () => {
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isStepsModalOpen, setIsStepsModalOpen] = useState(false); 
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const openModal = () => setIsQuizModalOpen(true);
@@ -27,10 +30,12 @@ const Createset = () => {
 
   const showQuizModal = () => setIsQuizModalOpen(true);
   const showTestModal = () => setIsTestModalOpen(true);
+  const showStepsModal = () => setIsStepsModalOpen(true);
 
   const handleCancel = () => {
     setIsQuizModalOpen(false);
     setIsTestModalOpen(false);
+    setIsStepsModalOpen(false);
   };
 
   const handleSearch = (value) => {
@@ -96,7 +101,8 @@ const Createset = () => {
         </Col>
         <Col xs={24} md={12} style={{ textAlign: "right", marginTop: { xs: "16px", md: "0" } }}>
           <div style={{ display: "inline-flex", gap: "10px" }}>
-            <button
+            <Button
+            icon={<PlusSquareOutlined />}
               onClick={showQuizModal}
               style={{
                 padding: "8px 16px",
@@ -108,11 +114,13 @@ const Createset = () => {
                 cursor: "pointer",
                 minWidth: "120px"
               }}
+              
             >
               Add Quiz
-            </button>
+            </Button>
 
-            <button
+            <Button
+            icon={<FileAddOutlined />}
               onClick={showTestModal}
               style={{
                 padding: "8px 16px",
@@ -126,22 +134,30 @@ const Createset = () => {
               }}
             >
               Add Question
-            </button>
+            </Button>
+
+             <Button
+              icon={<OrderedListOutlined />}
+              onClick={showStepsModal}
+              style={{
+                padding: "8px 16px",
+                fontSize: "14px",
+                color: "#fff",
+                backgroundColor: "#722ed1",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                minWidth: "120px"
+              }}
+            >
+              Add Steps
+            </Button>
           </div>
         </Col>
       </Row>
 
       {/* Modals */}
-      {/* <Modal
-        title="Create Quiz"
-        open={isQuizModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-        destroyOnClose
-      >
-        <Quizz onSuccess={handleCancel} />
-      </Modal> */}
-
+      {/* to add quiz name and categories */}
       <CreateQuizModal
         visible={isQuizModalOpen}
         onCancel={handleCancel}  // This will actually close the modal programmatically
@@ -159,6 +175,12 @@ const Createset = () => {
       >
         <Test onSuccess={handleCancel} selectedQuizId={selectedQuizId} />
       </Modal>
+
+      <PersonalityStepsModal 
+      visible={isStepsModalOpen}
+        onCancel={handleCancel}
+        onSuccess={handleCancel}
+        />
 
       {/* Content area */}
       {selectedQuizId ? (
