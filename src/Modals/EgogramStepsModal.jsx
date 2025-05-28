@@ -84,7 +84,7 @@ const EgogramStepsModal = ({ visible, onCancel, onSuccess }) => {
 
   return (
     <Modal
-      title="Add Egogram Steps"
+      title="Add Egogram treatment Steps"
       open={visible}
       onCancel={onCancel}
       footer={null}
