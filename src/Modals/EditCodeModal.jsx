@@ -64,7 +64,7 @@ const EditCodeModal = ({ open, onClose, code, onEdit, loggedInUserId }) => {
         width={800}
         styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}>
             <div style={{
-                maxHeight: "400px",
+                // maxHeight: "400px",
                 overflowY: "auto",
                 paddingRight: "8px"
             }}>
