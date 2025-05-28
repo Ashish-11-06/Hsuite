@@ -20,7 +20,7 @@ const Books = () => {
   const userRole = currentUser?.role; // Get current user role
 
   useEffect(() => {
-    if (status === "idle") {
+    if (!books || books.length === 0) {
       dispatch(fetchBooks()); // Fetch books on mount
     }
   }, [status, dispatch]);

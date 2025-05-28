@@ -31,11 +31,13 @@ const EgogramReport = () => {
   const [treatmentModalVisible, setTreatmentModalVisible] = useState(false);
 
   useEffect(() => {
+    if (!EgogramHistory || EgogramHistory.length === 0) {
     if (user?.id) {
       dispatch(fetchEgogramHistory(user.id));
       dispatch(fetchAllEgogramCategories());
     }
-  }, [dispatch, user?.id]);
+  }
+  }, [user]);
 
   useEffect(() => {
     if (statementCategories) {
@@ -123,7 +125,7 @@ const EgogramReport = () => {
   }
 
   if (loading) return <Spin size="large" />;
-  if (error) return <Alert message="Error" description={error} type="error" />;
+  if (error) return <Alert message="Error" description={error.detail} type="error" />;
 
   const tableData = Array.isArray(EgogramHistory) ? EgogramHistory : [];
 
