@@ -7,10 +7,58 @@ import "./App.css";
 import Login from "./pages/Login.jsx";
 import Sidebar from "./Components/Sidebar.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import { useEffect } from "react";
 
 const { Header, Content, Footer } = Layout;
 
 function App() {
+    useEffect(() => {
+    // const EXPIRY_HOURS = 24;
+    // const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000;
+    const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
+console.log("App component mounted, setting up localStorage expiry check");
+console.log('expiry in ms:', EXPIRY_MS);
+
+
+    const LAST_ACTIVE_KEY = 'lastActiveTime';
+
+    const updateLastActiveTime = () => {
+      localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+    };
+
+    const checkExpiry = () => {
+      const lastActive = localStorage.getItem(LAST_ACTIVE_KEY);
+      if (lastActive) {
+        const now = Date.now();
+        const diff = now - parseInt(lastActive, 10);
+        if (diff > EXPIRY_MS) {
+          localStorage.clear(); // or selectively remove items
+          console.log('localStorage cleared due to 24h inactivity');
+        }
+      }
+    };
+
+    // Set initial activity time if not present
+    if (!localStorage.getItem(LAST_ACTIVE_KEY)) {
+      updateLastActiveTime();
+    }
+
+    // Check every 1 minute
+    const intervalId = setInterval(checkExpiry, 60 * 1000);
+
+    // Listen for user activity to reset the time
+    const resetTimer = () => updateLastActiveTime();
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('click', resetTimer);
+    };
+  }, []);
   return (
     <Router>
       <Routes>
