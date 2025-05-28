@@ -35,6 +35,13 @@ const filteredCategories = categories?.filter(
     )
 );
 
+useEffect(() => {
+  if (visible) {
+  console.log(`Modal opened, fetching categories...${filteredCategories}`);
+  console.log(`categories:`, categories);
+  }
+}, [visible]);
+
   useEffect(() => {
   if (visible) {
     dispatch(fetchAllEgogramCategories());
@@ -92,7 +99,7 @@ useEffect(() => {
   return (
     <>
     <Modal
-      title="Select Category"
+      title="Select Categorykk"
       open={visible}
       onCancel={onClose}
       footer={null}

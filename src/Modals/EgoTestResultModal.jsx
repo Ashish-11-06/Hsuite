@@ -62,67 +62,7 @@ const EgoTestResultModal = ({ visible, onClose, result}) => {
         fillOpacity: 1,
       },
     },
-    point: {
-      size: 5,
-      shape: 'diamond',
-      style: {
-        fill: 'white',
-        stroke: '#5B8FF9',
-        lineWidth: 2,
-      },
-    },
-    lineStyle: {
-      lineWidth: 3,
-      stroke: '#1890ff',
-    },
-    color: '#1890ff',
-    xAxis: {
-      title: {
-        text: 'Categories',
-        style: {
-          fontSize: 14,
-        },
-      },
-      label: {
-        style: {
-          fontSize: 12,
-        },
-        autoRotate: true,
-      },
-    },
-    yAxis: {
-      title: {
-        text: 'Scores',
-        style: {
-          fontSize: 14,
-        },
-      },
-      min: 0,
-      max: maxScore,
-      tickInterval: 2,
-      label: {
-        formatter: (value) => `${value} pts`,
-      },
-    },
-    tooltip: {
-      showCrosshairs: true,
-      shared: true,
-      formatter: (datum) => {
-        return {
-          name: datum.category,
-          value: `${datum.score} points`,
-        };
-      },
-      domStyles: {
-        'g2-tooltip': {
-          boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)',
-        },
-      },
-    },
-    interactions: [
-      { type: 'element-active' },
-      { type: 'tooltip' },
-    ],
+  
   };
 
   // ✅ Define renderResults function

@@ -12,6 +12,8 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
   const dispatch = useDispatch();
   const { statementsByTestToTest, loading, error } = useSelector((state) => state.ego);
   const userId = useSelector((state) => state.auth?.user?.id); // Get userId from Redux store
+  const autoNextCalled = useRef(false);
+
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ratings, setRatings] = useState({});
@@ -28,6 +30,7 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
       setCurrentIndex(0);
       setRatings({});
       setResultModalVisible(false);
+      autoNextCalled.current = false; // Reset guard
     }
   }, [open, testId, dispatch]);
 
@@ -51,30 +54,33 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
     return () => clearInterval(intervalRef.current);
   }, [currentIndex, currentStatement]);
 
-  const autoNext = () => {
-    const currentId = currentStatement?.id;
-    const currentValue = ratings[currentId] ?? 0;
-    setRatings((prev) => ({ ...prev, [currentId]: currentValue }));
+ const autoNext = () => {
+  if (autoNextCalled.current) return; // prevent duplicate calls
+  autoNextCalled.current = true;
 
-    if (currentIndex < statementsByTestToTest.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      const payload = {
-        user: userId,
-        statement_marks: ratings,
-      }
+  const currentId = currentStatement?.id;
+  const currentValue = ratings[currentId] ?? 0;
+  setRatings((prev) => ({ ...prev, [currentId]: currentValue }));
 
-      const f = async () => {
+  if (currentIndex < statementsByTestToTest.length - 1) {
+    setCurrentIndex((prev) => prev + 1);
+    autoNextCalled.current = false; // allow for next question
+  } else {
+    const payload = {
+      user: userId,
+      statement_marks: ratings,
+    };
+
+    const f = async () => {
       const result = await dispatch(postEgogramResult(payload));
-        //  dispatch(fetchAllEgogramCategories());
-        setResult(result.payload);
-        setResultModalVisible(true);
-      }
-        
-      f();
-    }
+      setResult(result.payload);
+      setResultModalVisible(true);
+    };
 
-  };
+    f();
+  }
+};
+
 
   const handleNext = () => autoNext();
 
