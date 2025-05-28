@@ -6,6 +6,7 @@ import {
   fetchStatementsByTestId,
   editStatement,
   deleteStatement,
+  fetchAllEgogramTests,
 } from "../Redux/Slices/egoSlice";
 import { PlusSquareOutlined, OrderedListOutlined, FileAddOutlined } from "@ant-design/icons";
 import EgogramTable from "./EgogramTable";
@@ -41,6 +42,9 @@ const CreateEgogram = () => {
   useEffect(() => {
     if (testId) {
       fetchStatements();
+    }
+    if (!tests || tests.length === 0) {
+      dispatch(fetchAllEgogramTests());
     }
   }, [dispatch, testId]);
 
