@@ -27,18 +27,10 @@ const categoryNamesInResult = quizResult?.category_scores
   ? Object.keys(quizResult.category_scores).map((name) => name.trim().toLowerCase())
   : [];
 
-const filteredCategories = categories?.filter(
-  (cat, index, self) =>
-    categoryNamesInResult.includes(cat.category.trim().toLowerCase()) &&
-    index === self.findIndex(
-      (c) => c.category.trim().toLowerCase() === cat.category.trim().toLowerCase()
-    )
-);
-
 useEffect(() => {
   if (visible) {
-  console.log(`Modal opened, fetching categories...${filteredCategories}`);
-  console.log(`categories:`, categories);
+  // console.log(`Modal opened, fetching categories...`);
+  // console.log(`categories:`, categories);
   }
 }, [visible]);
 
@@ -88,7 +80,7 @@ useEffect(() => {
           });
         });
     } catch (error) {
-      console.error("Form submission error:", error);
+      // console.error("Form submission error:", error);
       Modal.error({
         title: "Error",
         content: error.message || "Form validation failed",
@@ -99,7 +91,7 @@ useEffect(() => {
   return (
     <>
     <Modal
-      title="Select Categorykk"
+      title="Select Category"
       open={visible}
       onCancel={onClose}
       footer={null}
@@ -119,54 +111,80 @@ useEffect(() => {
           showIcon
         />
       ) : (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{ type: "increase" }}
-        >
-          <Form.Item
-            label="Step Type"
-            name="type"
-            rules={[{ required: true, message: "Please select a step type" }]}
-          >
-            <Radio.Group buttonStyle="solid">
-              <Radio.Button value="increase">Increase</Radio.Button>
-              <Radio.Button value="decrease">Decrease</Radio.Button>
-            </Radio.Group>
-          </Form.Item>
+        (() => {
+          // Debug logs to help you inspect the data
+          // console.log("categoryNamesInResult:", categoryNamesInResult);
+          // console.log("categories:", categories);
 
-          <Form.Item
-            name="category_id"
-            label="Select a Category"
-            rules={[{ required: true, message: "Please select a category" }]}
-          >
-            <Select
-              placeholder="Select a category"
-              showSearch
-              optionFilterProp="children"
-              getPopupContainer={(triggerNode) => triggerNode.parentNode}
-              filterOption={(input, option) =>
-                option?.children?.toLowerCase().includes(input.toLowerCase())
-              }
+          const filteredCategories = categories?.filter(
+            (cat, index, self) =>
+              cat.category &&
+              categoryNamesInResult.includes(cat.category.trim().toLowerCase()) &&
+              index === self.findIndex(
+                (c) => c.category && c.category.trim().toLowerCase() === cat.category.trim().toLowerCase()
+              )
+          );
+
+          // Debug log for filtered categories
+          // console.log("filteredCategories:", filteredCategories);
+
+          return (
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              initialValues={{ type: "increase" }}
             >
-              {filteredCategories?.map((category) => (
-  <Option key={category.id} value={category.id}>
-    {category.category} 
-    {/* ({categoryScores[category.category] || 0}) */}
-  </Option>
-))}
+              <Form.Item
+                label="Step Type"
+                name="type"
+                rules={[{ required: true, message: "Please select a step type" }]}
+              >
+                <Radio.Group buttonStyle="solid">
+                  <Radio.Button value="increase">Increase</Radio.Button>
+                  <Radio.Button value="decrease">Decrease</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
 
+              <Form.Item
+                name="category_id"
+                label="Select a Category"
+                rules={[{ required: true, message: "Please select a category" }]}
+              >
+                <Select
+                  placeholder="Select a category"
+                  showSearch
+                  optionFilterProp="children"
+                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                  filterOption={(input, option) =>
+                    option?.children?.toLowerCase().includes(input.toLowerCase())
+                  }
+                  notFoundContent={
+                    <span>
+                      {categories && categories.length > 0
+                        ? "No matching categories found"
+                        : "No categories available"}
+                    </span>
+                  }
+                >
+                  {/* Show all categories */}
+                  {categories &&
+                    categories.map((category) => (
+                      <Option key={category.id} value={category.id}>
+                        {category.category}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
 
-            </Select>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Treatment
-            </Button>
-          </Form.Item>
-        </Form>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Treatment
+                </Button>
+              </Form.Item>
+            </Form>
+          );
+        })()
       )}
     </Modal>
 

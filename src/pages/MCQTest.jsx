@@ -113,9 +113,19 @@ const MCQTest = () => {
                   border: '1px solid #1890ff',
                   borderRadius: '8px',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+                bodyStyle={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                  padding: '16px',
                 }}
               >
-                <p style={{ minHeight: '60px' }}>{quiz.description}</p>
+                <div style={{ flex: 1 }}>
+                  <p style={{ minHeight: '60px' }}>{quiz.description}</p>
+                </div>
                 <Button 
                   icon={<PlayCircleOutlined />}
                   style={{
@@ -124,6 +134,7 @@ const MCQTest = () => {
                     border: 'none',
                     width: '100%',
                     fontWeight: 'bold',
+                    marginTop: 'auto',
                   }}
                   onClick={() => handleTakeTest(quiz)}
                 >

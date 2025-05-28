@@ -18,7 +18,18 @@ const EgogramTest = () => {
   const [selectedTest, setSelectedTest] = useState(null);
 
   useEffect(() => {
-    dispatch(fetch20TestsFotTest());
+    const fetchTests = async () => {
+      try {
+   const res=await dispatch(fetch20TestsFotTest());
+   console.log("Tests fetched:", res);
+      }
+      catch (err) {
+        console.error("Error fetching tests:", err);
+        message.error("Failed to fetch tests. Please try again later.");
+      }
+    }
+    fetchTests();
+   
   }, [dispatch]);
 
   useEffect(() => {
