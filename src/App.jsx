@@ -16,9 +16,9 @@ function InactivityHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // const EXPIRY_HOURS = 24;
-    // const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000; //24 hrs
-    const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
+    const EXPIRY_HOURS = 24;
+    const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000; //24 hrs
+    // const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
     console.log("App component mounted, setting up localStorage expiry check");
     console.log('expiry in ms:', EXPIRY_MS);
 
