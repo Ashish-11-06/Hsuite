@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom"; 
 import { Layout } from "antd";
 import HeaderComponent from "./Components/HeaderComponent.jsx";
 import FooterComponent from "./Components/FooterComponent.jsx";
@@ -11,14 +11,16 @@ import { useEffect } from "react";
 
 const { Header, Content, Footer } = Layout;
 
-function App() {
-    useEffect(() => {
-    // const EXPIRY_HOURS = 24;
-    // const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000;
-    const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
-console.log("App component mounted, setting up localStorage expiry check");
-console.log('expiry in ms:', EXPIRY_MS);
+// New component to handle inactivity logout using navigate inside Router
+function InactivityHandler() {
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    // const EXPIRY_HOURS = 24;
+    // const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000; //24 hrs
+    const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
+    console.log("App component mounted, setting up localStorage expiry check");
+    console.log('expiry in ms:', EXPIRY_MS);
 
     const LAST_ACTIVE_KEY = 'lastActiveTime';
 
@@ -33,7 +35,9 @@ console.log('expiry in ms:', EXPIRY_MS);
         const diff = now - parseInt(lastActive, 10);
         if (diff > EXPIRY_MS) {
           localStorage.clear(); // or selectively remove items
-          console.log('localStorage cleared due to 24h inactivity');
+          // console.log('localStorage cleared due to 24h inactivity');
+          // navigate....................................
+          navigate("/login");
         }
       }
     };
@@ -58,9 +62,17 @@ console.log('expiry in ms:', EXPIRY_MS);
       window.removeEventListener('keydown', resetTimer);
       window.removeEventListener('click', resetTimer);
     };
-  }, []);
+  }, [navigate]);
+
+  return null; // This component does not render anything visible
+}
+
+function App() {
   return (
     <Router>
+      {/* Add inactivity check inside Router so we can use navigate */}
+      <InactivityHandler />
+
       <Routes>
         <Route path="/login" element={<Login />}/>
 
