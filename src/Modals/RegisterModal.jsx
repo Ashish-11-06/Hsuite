@@ -1,20 +1,30 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Button, message } from "antd";
+import { Modal, Form, Input, Button, message, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, verifyOtp } from "../Redux/Slices/authSlice";
+import AddCounsellorDetailsModal from "./AddCounsellorDetailsModal";
 
 const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
   const dispatch = useDispatch();
   const { loading, userId } = useSelector((state) => state.auth);
 
+  const {Option} = Select
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [form] = Form.useForm();
+  const [isCounsellorModalVisible, setIsCounsellorModalVisible] = useState(false);
+  const [selectRole, setSelectRole] = useState("");
 
   const handleRegister = async (values) => {
+
+    const updatedValues = {
+      ...values,
+      role: 'View'
+    }
+
     try {
-      const response = await dispatch(registerUser(values)).unwrap();
+      const response = await dispatch(registerUser(updatedValues)).unwrap();
       message.success(response.message || "OTP sent to your email!");
       setEmail(values.email);
     } catch (error) {
@@ -33,9 +43,14 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
     try {
       await dispatch(verifyOtp({ user_id: userId, email_otp: otp })).unwrap();
       message.success("OTP Verified! Registration successful.");
-      setIsModalVisible(false);
-    } catch (error) {
-      message.error(error?.message || "Invalid OTP, or user already verified");
+
+      // if (selectRole === "Counsellor") {
+      //   setIsCounsellorModalVisible(true);
+      // } else {
+        setIsModalVisible(false);
+      // }
+        } catch (error) {
+        message.error(error?.message || "Invalid OTP, or user already verified");
     }
   };
 
@@ -45,6 +60,7 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
   };
 
   return (
+    <>
     <Modal
       title="Register"
       open={isModalVisible}
@@ -123,6 +139,22 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
           />
         </Form.Item>
 
+        {/* <Form.Item
+          label="Role"
+          name="role"
+          rules={[{ required: true, message: "Please select a role" }]}
+        >
+          <Select 
+          placeholder="Select your role"
+          onChange={(value) => setSelectRole(value)}
+          >
+            <Option value="Contributor">Contributor</Option>
+            <Option value="Student">Student/User</Option>
+            <Option value="Counsellor">Counsellor</Option>
+          </Select> */}
+        {/* </Form.Item> */}
+
+
         <Form.Item>
           <Button
             type="primary"
@@ -135,6 +167,16 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
         </Form.Item>
       </Form>
     </Modal>
+    
+    <AddCounsellorDetailsModal 
+      visible={isCounsellorModalVisible}
+      onClose={() => {
+        setIsCounsellorModalVisible(false);
+        setIsModalVisible(false);
+      }}
+       userId={userId}
+    />
+    </>
   );
 };
 
