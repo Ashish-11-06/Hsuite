@@ -158,21 +158,24 @@ const GetPersonalityStepsModal = ({
           <Spin size="large" />
           <p>Loading steps...</p>
         </div>
-      ) : allStepsError ? (
+      ) 
+      : allStepsError ? (
         <Alert
-          // message="Error loading steps"
-          // description={allStepsError.message || "Failed to load steps"}
-          type="error"
+          message="Error loading steps"
+          description={allStepsError.message || "Failed to load steps"}
+          type="Warning"
           showIcon
         />
-      ) : stepArray.length === 0 ? (
-        <Alert
-          message="No steps found"
-          description={`No ${type} steps found for the selected category`}
-          type="warning"
-          showIcon
-        />
-      ) : (
+      ) 
+      // : stepArray.length === 0 ? (
+      //   <Alert
+      //     message="No steps found"
+      //     description={`No ${type} steps found for the selected category`}
+      //     type="warning"
+      //     showIcon
+      //   />
+      // )
+       : (
         <>
           <div
             style={{

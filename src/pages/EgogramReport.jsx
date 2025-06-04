@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Table, Spin, Alert, Card, Tag, Button, Modal, Typography, Empty } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Line } from '@ant-design/charts';
 import { fetchEgogramHistory, fetchAllEgogramCategories } from "../Redux/Slices/egoSlice";
-import AddEgoPredefinedTreatModal from "../Modals/AddEgoPredefinedTreatModal";  // Adjust path as needed
+// import AddEgoPredefinedTreatModal from "../Modals/AddEgoPredefinedTreatModal";  // Adjust path as needed
+import ActionModal from "../Modals/ActionModal";
 
 
 const { Title, Text } = Typography;
@@ -23,6 +27,7 @@ const TAG_COLORS = [
 
 const EgogramReport = () => {
   const dispatch = useDispatch();
+    const navigate = useNavigate();
   const { EgogramHistory, statementCategories, loading, error } = useSelector((state) => state.ego);
   const { user } = useSelector((state) => state.auth);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -143,8 +148,46 @@ const EgogramReport = () => {
     });
   };
 
+const chartData = selectedRecord?.statement_marks
+  ? Object.entries(selectedRecord.statement_marks).map(([categoryId, score]) => ({
+      id: categoryId,
+      category: statementCategories?.[categoryId] || `Category ${categoryId}`,
+      score: Number(score),
+    }))
+  : [];
+
+  const chartConfig = {
+    data: chartData,
+    xField: 'category',
+    yField: 'score',
+    height: 350,
+    smooth: true,
+    area: {
+      style: {
+        fill: 'rgb(230, 247, 255)',
+        fillOpacity: 1,
+      },
+    },
+  };
+
+
   return (
-    <div style={{ padding: 24 }}>
+    <>
+    <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+    <div style={{ padding: 30 }}>
       <Title level={2} style={{ marginBottom: 24 }}>Egogram Performance Report</Title>
       
       {tableData.length === 0 ? (
@@ -157,10 +200,9 @@ const EgogramReport = () => {
           }}
         >
           <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
-              <Text type="secondary">No Egogram reports available</Text>
-            }
+            description=
+            "No Egogram reports available"
+            
           />
         </Card>
       ) : (
@@ -175,7 +217,7 @@ const EgogramReport = () => {
 
           <Modal
             title="Egogram Test Details"
-            visible={isModalVisible}
+            open={isModalVisible}
             onCancel={handleModalClose}
             footer={[
              <Button 
@@ -183,7 +225,7 @@ const EgogramReport = () => {
                 type="primary" 
                 onClick={() => setTreatmentModalVisible(true)}
               >
-                Predefined Treatment
+                Show actions
               </Button>
             ]}
             width={800}
@@ -212,47 +254,51 @@ const EgogramReport = () => {
                   </div>
 
                   <Title level={5} style={{ marginBottom: 16 }}>Category Scores</Title>
-                  <Table 
-                    dataSource={getModalTableData()}
-                    columns={[
-                      {
-                        title: 'Category',
-                        dataIndex: 'category',
-                        key: 'category',
-                        render: (text, record) => (
-                          <Tag color={record.color}>{text}</Tag>
-                        )
-                      },
-                      {
-                        title: 'Score',
-                        dataIndex: 'score',
-                        key: 'score',
-                        align: 'center'
-                      }
-                    ]}
-                    pagination={false}
-                    bordered
-                  />
+<Table 
+  dataSource={getModalTableData()}
+  columns={[
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      render: (text, record) => (
+        <Tag color={record.color}>{text}</Tag>
+      )
+    },
+    {
+      title: 'Score',
+      dataIndex: 'score',
+      key: 'score',
+      align: 'center'
+    }
+  ]}
+  pagination={false}
+  bordered
+  style={{ marginBottom: 24 }}
+/>
+
+<Title level={5} style={{ marginBottom: 16 }}>Graphical Overview</Title>
+<Line {...chartConfig} />
                 </>
               )}
             </div>
           </Modal>
 
-       {treatmentModalVisible && selectedRecord && (
-  <AddEgoPredefinedTreatModal
+  <ActionModal
     visible={treatmentModalVisible}
     onClose={() => setTreatmentModalVisible(false)}
-    userId={user.id}
-    statementCategories={statementCategories}
-    resultCategories={Object.keys(selectedRecord.statement_marks || {}).map(id => ({
-      id,
-      name: statementCategories[id] || `Category ${id}`
-    }))}
+     quizResult={{
+          category_scores: Object.fromEntries(
+            chartData.map(item => [item.category, item.score])
+          ),
+          result: selectedRecord?.final_result?.category
+        }}
+        userId={user?.id}
   />
-)}
         </>
       )}
     </div>
+    </>
   );
 };
 

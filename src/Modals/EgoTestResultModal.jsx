@@ -6,22 +6,22 @@ import {
   resetEgogramResult,
   fetchAllEgogramCategories,
 } from "../Redux/Slices/egoSlice";
-import AddEgoPredefinedTreatModal from "./AddEgoPredefinedTreatModal";
+import ActionModal from "./ActionModal"; // Import the ActionModal component
 
 const { Title, Text } = Typography;
 
-const EgoTestResultModal = ({ visible, onClose, result}) => {
+const EgoTestResultModal = ({ visible, onClose, result }) => {
   const dispatch = useDispatch();
   const { loading, error, statementCategories } = useSelector((state) => state.ego);
-  const user = useSelector((state) => state.auth.user); // Adjust this based on your auth setup
+  const user = useSelector((state) => state.auth.user);
 
-  const [predefinedTreatModalVisible, setPredefinedTreatModalVisible] = useState(false);
+  const [actionModalVisible, setActionModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-  const res=await dispatch(fetchAllEgogramCategories());
-  console.log("Statement Categories fetched:", res);
+        const res = await dispatch(fetchAllEgogramCategories());
+        console.log("Statement Categories fetched:", res);
       } catch (err) {
         console.error("Error fetching categories:", err);
         message.error("Failed to fetch categories. Please try again later.");
@@ -49,14 +49,11 @@ const EgoTestResultModal = ({ visible, onClose, result}) => {
 
   const chartData = result?.statement_marks
     ? Object.entries(result.statement_marks).map(([categoryId, score]) => ({
+        id: categoryId,
         category: statementCategories?.[categoryId] || `Category ${categoryId}`,
         score: Number(score),
       }))
     : [];
-
-  const maxScore = chartData.length > 0 
-    ? Math.max(...chartData.map(item => item.score)) + 2 
-    : 10;
 
   const chartConfig = {
     data: chartData,
@@ -70,15 +67,7 @@ const EgoTestResultModal = ({ visible, onClose, result}) => {
         fillOpacity: 1,
       },
     },
-  
   };
-
-  // ✅ Define renderResults function
-  const renderResults = () => (
-    <div>
-      <Text type="secondary">Waiting for the result...</Text>
-    </div>
-  );
 
   return (
     <>
@@ -86,17 +75,7 @@ const EgoTestResultModal = ({ visible, onClose, result}) => {
         title="Egogram Test Result"
         open={visible}
         onCancel={handleClose}
-        footer={[
-  <Button
-    key="predefined"
-    type="primary"
-    onClick={() => setPredefinedTreatModalVisible(true)}
-    disabled={!result}
-  >
-    Predefined Treatment
-  </Button>
-]}
-
+        footer={null}
         destroyOnClose
         width={750}
         style={{ top: 20 }}
@@ -169,33 +148,33 @@ const EgoTestResultModal = ({ visible, onClose, result}) => {
                 style={{ marginBottom: 24 }}
               />
             </div>
-          </div>
-        ) : (
-          <>
-            {/* {renderResults()}
+
+            {/* Changed to match QuizResultModal's action button */}
             <div style={{ textAlign: "right", marginTop: 20 }}>
               <Button 
                 type="primary" 
-                onClick={() => setPredefinedTreatModalVisible(true)}
-                disabled={!quizResults}
+                onClick={() => setActionModalVisible(true)}
+                disabled={!result}
               >
-                Predefined Treatment
+                Show Actions
               </Button>
-            </div> */}
-          </>
-        )}
+            </div>
+          </div>
+        ) : null}
       </Modal>
 
-      <AddEgoPredefinedTreatModal
-  visible={predefinedTreatModalVisible}
-  onClose={() => setPredefinedTreatModalVisible(false)}
-  userId={user?.id}
-  statementCategories={statementCategories}
-  resultCategories={chartData.map(item => ({
-    id: Object.entries(statementCategories).find(([id, name]) => name === item.category)?.[0] || '',
-    name: item.category
-  }))}
-/>
+      {/* Added ActionModal similar to QuizResultModal */}
+      <ActionModal
+        visible={actionModalVisible}
+        onClose={() => setActionModalVisible(false)}
+        quizResult={{
+          category_scores: Object.fromEntries(
+            chartData.map(item => [item.category, item.score])
+          ),
+          result: result?.final_result?.category
+        }}
+        userId={user?.id}
+      />
     </>
   );
 };

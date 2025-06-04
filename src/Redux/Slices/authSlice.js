@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authAPI from "../API/authApi";
+import { act, useCallback } from "react";
 
 // 🔹 Register User & Send OTP (combined)
 export const registerUser = createAsyncThunk(
@@ -115,6 +116,37 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+//Counsellor thunk
+export const CompleteCounsellorProfile = createAsyncThunk(
+  "auth/completeCounsellorProfile", 
+  async(profileData, { rejectWithValue}) => {
+    try {
+      const response = await authAPI.CompleteCounsellor(profileData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "failed to complete profile");
+    }
+  }
+);
+
+//update counsellor thunk
+export const UpdateCounsellorProfile = createAsyncThunk(
+  "auth/updateCounsellorProfile",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      console.log('Sending to API - ID:', id);
+      console.log('Sending to API - Data:', data);
+      
+      const response = await authAPI.UpdateCounsellorProfile(id, data);
+      
+      console.log('API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('API error:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || "Failed to update profile");
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -124,13 +156,24 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     userId: null,
+    counsellorProfile: {
+      loading: false,
+      success: false,
+      error: null
+    },
     resetPassword: {
       loading: false,
       error: null,
       success: false,
       email: null,
       step: 1 // 1 = email, 2 = OTP, 3 = new password
-    }
+    },
+    updateCounsellorProfile: {
+  loading: false,
+  success: false,
+  error: null
+},
+
   },
   reducers: {
     loginSuccess: (state, action) => {
@@ -245,7 +288,37 @@ const authSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPassword.loading = false;
         state.resetPassword.error = action.payload?.message || "Password reset failed";
-      });
+      })
+
+      //counsellor profile
+      .addCase(CompleteCounsellorProfile.pending, (state) => {
+        state.counsellorProfile.loading = true;
+        state.counsellorProfile.error = null;
+        state.counsellorProfile.success= false;
+      })
+      .addCase(CompleteCounsellorProfile.fulfilled, (state) => {
+        state.counsellorProfile.loading = false;
+        state.counsellorProfile.success = true;
+      })
+      .addCase(CompleteCounsellorProfile.rejected, (state,action) => {
+        state.counsellorProfile.loading = false;
+        state.counsellorProfile.error = action.payload || "failed to complete profile";
+      })
+
+      .addCase(UpdateCounsellorProfile.pending, (state) => {
+  state.updateCounsellorProfile.loading = true;
+  state.updateCounsellorProfile.error = null;
+  state.updateCounsellorProfile.success = false;
+})
+.addCase(UpdateCounsellorProfile.fulfilled, (state) => {
+  state.updateCounsellorProfile.loading = false;
+  state.updateCounsellorProfile.success = true;
+})
+.addCase(UpdateCounsellorProfile.rejected, (state, action) => {
+  state.updateCounsellorProfile.loading = false;
+  state.updateCounsellorProfile.error = action.payload || "Failed to update profile";
+})
+
   },
 });
 

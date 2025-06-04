@@ -1,15 +1,32 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import QuizList from "./QuizList";
-import BasedQuestions from "./Basedquestions";
-import { Card } from "antd";
+import { Card, Button } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const Assessments = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("quiz");
+    const navigate = useNavigate();
 
   return (
-    <div style={{ padding: "24px" }}>
+    <>
+    <div style={{ position: "relative", margin: "-18px" }}>
+    <Button
+      icon={<ArrowLeftOutlined />}
+      type="primary"
+      onClick={() => navigate(-1)}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        // fontSize: "40px",
+        color: "white",
+      }}
+    >Back</Button>
+  </div>
+    <div style={{ padding: "50px" }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
         <Card
           title="Personality test Instructions"
@@ -40,6 +57,7 @@ const Assessments = () => {
 
       {activeTab === "quiz" && <QuizList />}
     </div>
+    </>
   );
 };
 

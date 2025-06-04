@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card, Typography, Button, Row, Col, Spin, Alert, Divider,
-  Tag, Input, Select, Progress, Empty
+  Tag, Input, Select, Progress, Empty, Modal
 } from 'antd';
 import { RiseOutlined, FallOutlined, PlusOutlined } from '@ant-design/icons';
 import { getTreatmentById, getTreatmentsByUser, getStepByStepsId } from '../Redux/Slices/personaltreatmentSlice';
@@ -20,6 +20,7 @@ const Treatment = () => {
   const dispatch = useDispatch();
 
   const [searchText, setSearchText] = useState('');
+   const [isModalVisible, setIsModalVisible] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTreatment, setSelectedTreatment] = useState(null);
@@ -51,40 +52,6 @@ const Treatment = () => {
   useEffect(() => {
     refreshTreatments();
   }, [dispatch, userId]);
-
-  // const handleContinue = async (treatId) => {
-  //   try {
-  //     const resultAction = await dispatch(getTreatmentById({
-  //       user_id: userId,
-  //       treatmentid: treatId
-  //     }));
-
-  //     if (getTreatmentById.fulfilled.match(resultAction)) {
-  //       const treatmentData = resultAction.payload;
-  //       setSelectedTreatment(treatmentData.data);
-  //       setModalVisible(true);
-  //     }
-  //    const stepId = treatmentData.data.steps;
-  //   console.log(stepId);
-
-  //     const stepResult = await dispatch(getStepByStepsId(stepId));
-  //     if (getStepByStepsId.fulfilled.match(stepResult)){
-  //       console.log(stepResult.payload);
-  //       setStepsData(stepResult.payload);
-  //     }else{
-  //       console.error("failed to fetch step data");
-  //     }
-
-
-  //   // const response = await axios.get(`http://192.168.1.34:8000/api/assessments/steps/${stepId}/`);
-  //   //     console.log(response.data);
-  //       setStepsData(response.data);
-
-      
-  //   } catch (error) {
-  //     console.error("Error fetching treatment:", error);
-  //   }
-  // };
 
   const handleContinue = async (treatId) => {
   try {
@@ -139,7 +106,31 @@ const Treatment = () => {
   if (treatmentLoading || treatmentsLoading || refreshing) return <Spin size="large" />;
   if (treatmentError || treatmentsError) return <Alert message="Error loading treatments" type="error" />;
 
+    const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   return (
+    <>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <h1>Predefined Treatment</h1>
+      <Button type="secondary" onClick={showModal}>Help ?</Button>
+
+      <Modal
+  // title="Help"
+  visible={isModalVisible}
+  onCancel={handleCancel}
+  footer={null}  // <-- This removes OK and Cancel buttons
+  closable={true} // (default is true) shows the close (X) icon
+>
+  <p>This page shows treatments that are either ongoing or completed from the predefined treatments made by the admin. These treatments appear after a user takes a test and wants to change a personality trait or category. The system or admin selects the steps, and this page displays those treatments as completed or ongoing.</p>
+</Modal>
+
+    </div>
+
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       {treatmentId && treatment && (
         <>
@@ -283,6 +274,7 @@ const Treatment = () => {
         />
       )}
     </div>
+    </>
   );
 };
 

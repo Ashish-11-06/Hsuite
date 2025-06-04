@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import { fetch20TestsFotTest } from '../Redux/Slices/egoSlice';
-import { Card, Button, Row, Col, Spin, message } from 'antd';
-import { PlayCircleOutlined } from "@ant-design/icons"; 
+import { Card, Button, Row, Col, Spin, message,  } from 'antd';
+import { PlayCircleOutlined, ArrowLeftOutlined } from "@ant-design/icons"; 
 import EgoTestQuestionModal from '../Modals/EgoTestQuestionModal';
 
 const EgogramTest = () => {
@@ -16,6 +17,7 @@ const EgogramTest = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+    const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -49,13 +51,29 @@ const EgogramTest = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <>
+    <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+    <div style={{ padding: "25px" }}>
       {loading ? (
         <div style={{ textAlign: 'center', marginTop: '100px' }}>
           <Spin size="large" />
         </div>
       ) : (
         <>
+        
           <h1 style={{ marginBottom: '16px' }}>Egogram Tests</h1>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
@@ -146,6 +164,7 @@ const EgogramTest = () => {
         testId={selectedTest?.id}
       />
     </div>
+    </>
   );
 };
 

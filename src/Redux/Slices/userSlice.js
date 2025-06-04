@@ -7,16 +7,34 @@ export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   return res.data;
 });
 
-export const updateUser = createAsyncThunk("users/updateUser", async ({ id, data }) => {
-  const res = await userAPI.updateUser(id, data);
-  return res.data;
+export const updateUser = createAsyncThunk(
+  "users/updateUser",
+  async ( {id, data}, {rejectWithValue}) => {
+    try{
+      const response = await userAPI.updateUser(id, data);
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 
+                            error.response?.data?.message ||
+                            error.message ||
+                            "failed to update";
+      return rejectWithValue(errorMessage);
+    }
 });
 
 export const toggleUserActive = createAsyncThunk(
   "users/toggleUserActive",
-  async (id) => {
-    const res = await userAPI.toggleUserActive(id);
-    return res.data;
+  async (id, {rejectWithValue}) => {
+    try{
+      const res = await userAPI.toggleUserActive(id);
+      return res.data;
+    }catch (err){
+      const errorMessage = err.res?.data?.err || 
+                            err.res?.data?.message ||
+                            err.message ||
+                            "failed to active";
+      return rejectWithValue(errorMessage);
+    }
   }
 );
 
@@ -24,13 +42,20 @@ export const createUser = createAsyncThunk(
   "users/createUser",
   async (userData, { rejectWithValue }) => {
     try {
-      return await userAPI.createUser(userData);
-    } catch (err) {
-      return rejectWithValue(err.response?.data || "Error creating user");
+      const response = await userAPI.createUser(userData);
+      return {
+        user: response.data.user,
+        message: response.data.message
+      };
+    } catch (error) {
+       const errorMessage = error.response?.data?.error || 
+                         error.response?.data?.message ||
+                         error.message ||
+                         "Failed to create user";
+      return rejectWithValue(errorMessage);
     }
   }
 );
-
 
 // Slice
 const userSlice = createSlice({
@@ -96,14 +121,20 @@ const userSlice = createSlice({
       .addCase(createUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.loading = false;
-        // Optionally push the new user to the list
-        state.list.push(action.payload);
-      })
-      .addCase(createUser.rejected, (state) => {
-        state.loading = false;
-      });
+    .addCase(createUser.fulfilled, (state, action) => {
+      state.loading = false;
+      if (action.payload.user) {
+        state.list.push({
+          ...action.payload.user,
+          disabled: !action.payload.user.is_active,
+        });
+      }
+    })
+    .addCase(createUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;  // Store the error message
+    });
+
   },
 });
 

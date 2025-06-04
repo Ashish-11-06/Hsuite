@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Card, Typography, Button, Descriptions, Input, message, Avatar } from "antd";
 import { EditOutlined, SaveOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import { logout, loginSuccess } from "../Redux/Slices/authSlice";
+import { loginSuccess, logout } from "../Redux/Slices/authSlice";
 import { updateProfile } from "../Redux/Slices/profileSlice";
 import { useNavigate } from "react-router-dom";
-import  User_img  from '../assets/user.jpg';
+import User_img from '../assets/user.jpg';
+import { BASE_URL } from '../Redux/API/axiosInstance';
+import CounsellorProfile from './CounsellorProfile';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -13,11 +15,9 @@ const { Title, Text } = Typography;
 const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const user = useSelector((state) => state.auth.user);
-// OR if you want to fall back to profile data:
-// const user = useSelector((state) => state.auth.user || state.profile.userData);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isCounsellor = user?.role === 'Counsellor';
 
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -25,15 +25,22 @@ const Profile = () => {
     username: user?.username || "",
   });
 
+  const [userImageUrl, setUserImageUrl] = useState(null);
+
   useEffect(() => {
     if (user) {
       setProfileData({
         email: user.email,
         username: user.username,
       });
+      
+      const userPhotoUrl = user.photo ? 
+        (user.photo.startsWith('http') ? user.photo : `${BASE_URL}${user.photo}`) : 
+        null;
+      setUserImageUrl(userPhotoUrl);
     }
   }, [user]);
-  
+
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
@@ -42,24 +49,25 @@ const Profile = () => {
     dispatch(updateProfile(profileData))
       .then((res) => {
         if (res.type.includes("fulfilled")) {
-          const updatedUser = res.payload.user; // Get user from response
-          
-          // Update all states consistently
-          setProfileData(updatedUser);
+          const updatedUser = res.payload.user;
+          setProfileData({
+            email: updatedUser.email,
+            username: updatedUser.username,
+          });
           dispatch(loginSuccess(updatedUser));
           localStorage.setItem("user", JSON.stringify(updatedUser));
-          
           setIsEditing(false);
-          message.success(res.payload.message); // "Profile updated successfully"
+          message.success("Profile updated successfully");
         } else {
           message.error("Failed to update profile.");
         }
       });
   };
-  
 
   const handleLogout = () => {
     dispatch(logout());
+     localStorage.setItem('isLoggedIn', 'false'); 
+    localStorage.clear(); 
     navigate("/login");
   };
 
@@ -72,13 +80,14 @@ const Profile = () => {
         alignItems: "left",
         minHeight: "80vh",
         backgroundColor: "#e2f0ff",
-        // borderRadius:'10px'
       }}
     >
       <Content>
-        <Title level={2} style={{ textAlign: "center", fontWeight: 700, color: "#333" ,paddingRight: "0px" }}>
+        <Title level={2} style={{ textAlign: "center", fontWeight: 700, color: "#333", paddingRight: "0px" }}>
           Profile
         </Title>
+
+        
 
         {isAuthenticated && user ? (
           <div
@@ -89,18 +98,25 @@ const Profile = () => {
               padding: "20px",
             }}
           >
+            {isCounsellor && (
+              <div style={{ marginLeft: "20px" }}>
+                <CounsellorProfile user={user} />
+              </div>
+            )}
             {/* User Avatar on Left Side */}
-            <div style={{ textAlign: "center", paddingRight:"100px", marginLeft:"0px" }}>
+            {!isCounsellor && (
+            <div style={{ textAlign: "center", paddingRight: "100px", marginLeft: "0px" }}>
               <Avatar
                 size={250}
-                src={user.image || User_img}
-                icon={!user.image && <UserOutlined />}
+                src={userImageUrl || User_img}
+                icon={!userImageUrl && <UserOutlined />}
                 style={{ border: "2px solid #ddd" }}
               />
               <Text strong style={{ display: "block", marginTop: "10px", fontSize: "18px" }}>
                 {profileData.username}
               </Text>
             </div>
+            )}
 
             {/* Profile Card */}
             <Card
@@ -128,13 +144,15 @@ const Profile = () => {
                   )}
                 </Descriptions.Item>
 
-                <Descriptions.Item label="Verified at">
-                  {new Date(profileData.verified_at || user.verified_at).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </Descriptions.Item>
+                {user?.verified_at && (
+                  <Descriptions.Item label="Verified at">
+                    {new Date(user.verified_at).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </Descriptions.Item>
+                )}
               </Descriptions>
 
               {/* Buttons */}
@@ -154,43 +172,43 @@ const Profile = () => {
                 </Button>
 
                 {isEditing ? (
-  <Button
-    type="default"
-    danger
-    onClick={() => {
-      // Reset form to original user data and exit editing
-      setProfileData({
-        email: user.email,
-        username: user.username,
-      });
-      setIsEditing(false);
-    }}
-    style={{
-      fontWeight: "bold",
-      width: "48%",
-    }}
-  >
-    Cancel
-  </Button>
-) : (
-  // <Button
-  //   type="primary"
-  //   danger
-  //   onClick={handleLogout}
-  //   icon={<LogoutOutlined />}
-  //   style={{
-  //     fontSize: "16px",
-  //     fontWeight: 600,
-  //     width: "48%",
-  //   }}
-  // >
-  //   Logout
-  // </Button>
-  null
-)}
-
+                  <Button
+                    type="default"
+                    danger
+                    onClick={() => {
+                      setProfileData({
+                        email: user.email,
+                        username: user.username,
+                      });
+                      setIsEditing(false);
+                    }}
+                    style={{
+                      fontWeight: "bold",
+                      width: "48%",
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    danger
+                    onClick={handleLogout}
+                    icon={<LogoutOutlined />}
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: 600,
+                      width: "48%",
+                    }}
+                  >
+                    Logout
+                  </Button>
+                )}
               </div>
             </Card>
+
+            {/* Counsellor Profile Section */}
+            
           </div>
         ) : (
           <Text style={{ textAlign: "center", fontSize: "16px", fontWeight: 500 }}>
@@ -202,4 +220,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Profile;

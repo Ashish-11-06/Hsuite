@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Table, Spin, Alert, Tag, Card, Typography, Empty, Button, Modal, Descriptions } from 'antd';
-import { StarFilled, TrophyFilled, CrownFilled, FireFilled, MehFilled } from '@ant-design/icons';
+import { StarFilled, TrophyFilled, CrownFilled, FireFilled, MehFilled , ArrowLeftOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMcqResultsByUser, getAllQuizzes } from '../Redux/Slices/mcqSlice';
 
@@ -8,6 +9,7 @@ const { Title, Text } = Typography;
 
 const MCQReport = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { results, loading, error, quizzes } = useSelector((state) => state.mcq);
   const { user } = useSelector((state) => state.auth);
   const [filteredQuiz, setFilteredQuiz] = useState(null);
@@ -177,38 +179,25 @@ const MCQReport = () => {
   ] : [];
 
   return (
-    <Card style={{ margin: 20 }}>
+    <>
+    <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+    <Card style={{ margin: 40 }}>
       <Title level={3}>MCQ Performance Report</Title>
-
-      {/* <div style={{ marginBottom: 20 }}>
-        <Button
-          type={!filteredQuiz ? 'primary' : 'default'}
-          onClick={() => setFilteredQuiz(null)}
-          style={{ marginRight: 10 }}
-        >
-          All Quizzes
-        </Button>
-        {quizNames.map((name) => (
-          <Button
-            key={name}
-            type={filteredQuiz === name ? 'primary' : 'default'}
-            onClick={() => setFilteredQuiz(name)}
-            style={{ marginRight: 10 }}
-          >
-            {name}
-          </Button>
-        ))}
-      </div> */}
-
       {loading ? (
         <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />
-      // ) : error ? (
-      //   <Alert
-      //     message="Error loading quiz reports"
-      //     description={error.message || 'Failed to fetch quiz history'}
-      //     type="error"
-      //     showIcon
-      //   />
       ) : !results?.length ? (
         <Empty description="No MCQ reports available" />
       ) : (
@@ -263,6 +252,7 @@ const MCQReport = () => {
         )}
       </Modal>
     </Card>
+    </>
   );
 };
 

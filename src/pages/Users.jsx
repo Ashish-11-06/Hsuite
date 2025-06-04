@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Modal, Form, Input, Select, Switch } from "antd";
-import {EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers, updateUser, toggleUserActive, createUser } from "../Redux/Slices/userSlice";
 
@@ -32,53 +32,52 @@ const Users = () => {
     setIsEditModalVisible(true);
   };
 
-  const handleEditSave = async (values) => {
-    try {
-      const resultAction = await dispatch(
-        updateUser({ id: editingUser.id, data: values })
-      );
-      
-      if (updateUser.fulfilled.match(resultAction)) {
-        setIsEditModalVisible(false);
-        message.success("User updated successfully!");
-        dispatch(fetchUsers());
-      } else {
-        throw new Error("Update failed");
-      }
-    } catch (error) {
-      message.error("Failed to update user.");
-    }
-  };
+const handleEditSave = async (values) => {
+  try {
+    const result = await dispatch(
+      updateUser({ id: editingUser.id, data: values })
+    ).unwrap(); // this throws if rejected
 
-  const toggleUserStatus = async (user) => {
-    try {
-      const resultAction = await dispatch(toggleUserActive(user.id));
-      if (toggleUserActive.fulfilled.match(resultAction)) {
-        const { is_active } = resultAction.payload;
-        message.success(`User ${is_active ? "enabled" : "disabled"} successfully!`);
-      } else {
-        throw new Error("Toggle failed");
-      }
-    } catch (error) {
-      message.error("Failed to update user status.");
-    }
-  };
+    message.success(result.message || "User updated successfully!");
+    setIsEditModalVisible(false);
+    dispatch(fetchUsers());
+  } catch (error) {
+    message.error(error || "Failed to update user.");
+    console.error("Update error:", error);
+  }
+};
 
-  const handleAddUser = async (values) => {
-    try {
-      const resultAction = await dispatch(createUser(values));
-      if (createUser.fulfilled.match(resultAction)) {
-        message.success("User created successfully!");
-        setIsAddModalVisible(false);
-        addForm.resetFields();
-        dispatch(fetchUsers());
-      } else {
-        throw new Error("Failed");
-      }
-    } catch (error) {
-      message.error("Failed to create user.");
-    }
-  };
+
+const toggleUserStatus = async (user) => {
+  try {
+    const result = await dispatch(toggleUserActive(user.id)).unwrap();
+    const { is_active, message: backendMessage } = result;
+
+    message.success(
+      backendMessage || `User ${is_active ? "enabled" : "disabled"} successfully!`
+    );
+  } catch (error) {
+    // `error` here is what was returned from `rejectWithValue` in the thunk
+    message.error(error || "Failed to update user status.");
+  }
+};
+
+
+ const handleAddUser = async (values) => {
+  const resultAction = await dispatch(createUser(values));
+
+  if (createUser.fulfilled.match(resultAction)) {
+    message.success(resultAction.payload?.message || "User created");
+    setIsAddModalVisible(false);
+    addForm.resetFields();
+    dispatch(fetchUsers());
+  } else if (createUser.rejected.match(resultAction)) {
+    const backendError = resultAction.payload || resultAction.error?.message || "Failed to create user";
+    message.error(backendError);
+    console.error("User creation error:", backendError);
+  }
+};
+
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", width: 60 },
@@ -129,11 +128,11 @@ const Users = () => {
         dataSource={users}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 5 }}
-        rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
+        pagination={{ pageSize: 10, showSizeChanger: false, }}
+        // rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
       />
 
-      <style>{`.disabled-row { background-color: #fff1f0 !important; color: #cf1322; }`}</style>
+      {/* <style>{`.disabled-row { background-color: #fff1f0 !important; color: #cf1322; }`}</style> */}
 
       {/* Add User Modal */}
       <Modal
@@ -144,12 +143,19 @@ const Users = () => {
       >
         <Form form={addForm} layout="vertical" onFinish={handleAddUser}>
           <Form.Item
-            name="username"
-            label="Username"
-            rules={[{ required: true, message: "Please input username!" }]}
-          >
-            <Input placeholder="e.g., john_doe" />
-          </Form.Item>
+  name="username"
+  label="Username"
+  rules={[
+    { required: true, message: "Please input username!" },
+    {
+      pattern: /^[a-zA-Z0-9_]+$/,
+      message: "Username must not contain symbols or spaces. Only letters, numbers, and underscores are allowed.",
+    },
+  ]}
+>
+  <Input placeholder="e.g., john_doe" />
+</Form.Item>
+
 
           <Form.Item
             name="email"
@@ -163,12 +169,30 @@ const Users = () => {
           </Form.Item>
 
           <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please input password!" }]}
-          >
-            <Input.Password placeholder="Enter secure password" />
-          </Form.Item>
+    name="password"
+    label="Password"
+    rules={[
+      { required: true, message: "Please input password!" },
+      {
+        pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/,
+        message:
+          "Min 6 characters, include 1 uppercase, 1 number, and 1 special character"
+      },
+      ({ getFieldValue }) => ({
+        validator(_, value) {
+          if (!value || value !== getFieldValue("username")) {
+            return Promise.resolve();
+          }
+          return Promise.reject(
+            new Error("Password cannot be the same as username")
+          );
+        }
+      })
+    ]}
+  >
+    <Input.Password placeholder="Enter secure password" />
+  </Form.Item>
+
 
           <Form.Item
             name="role"

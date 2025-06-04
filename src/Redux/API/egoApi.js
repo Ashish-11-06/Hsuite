@@ -51,9 +51,7 @@ const egoAPIs = {
   },
 
   GetEgoTestHistory: (userId) => {
-    // console.log("Fetching results for user:", userId); // Debug log
     return axiosInstance.get(`egogram/egogram-history/user-id/${userId}/`);
-    // console.log("API Response:", response.data); // Debug log
   },
 
   GetTestFor20Tests: () => {

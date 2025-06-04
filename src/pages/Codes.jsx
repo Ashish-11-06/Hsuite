@@ -140,11 +140,14 @@ const handleViewHistory = async (code) => {
         if (response.message) {
           message.success(response.message);
         }
+        const isLikeRemoved = response.message?.toLowerCase().includes("removed like");
+  const isDislikeRemoved = response.message?.toLowerCase().includes("removed dislike");
+
         dispatch(setUserReaction({
           descriptionId: description_id,
-          action,
-          liked: response.liked,
-          disliked: response.disliked,
+           action: isLikeRemoved || isDislikeRemoved ? null : action,
+    liked: isLikeRemoved ? false : response.liked,
+    disliked: isDislikeRemoved ? false : response.disliked,
           likeCount: response.like_count,
           dislikeCount: response.dislike_count
         }));

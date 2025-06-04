@@ -179,7 +179,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
                 <Checkbox.Group
                   onChange={handleCheckboxChange}
                   value={answers[currentQuestion.id]}
-                  style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px', marginBottom: 20 }}
                 >
                   <Checkbox value={currentQuestion.options_1}>{currentQuestion.options_1}</Checkbox>
                   <Checkbox value={currentQuestion.options_2}>{currentQuestion.options_2}</Checkbox>
@@ -191,13 +191,13 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
               {/* Render dots before the navigation buttons */}
               {renderDots()}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
-                {/* <Button
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
+                <Button
                   disabled={currentIndex === 0}
                   onClick={handlePrev}
                 >
                   Previous
-                </Button> */}
+                </Button>
 
                 {currentIndex === questions.length - 1 ? (
                   <Button type="primary" onClick={handleSubmit}>

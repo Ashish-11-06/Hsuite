@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Router } from "react-router-dom";
 import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Books from "../pages/Books.jsx";
@@ -15,15 +15,22 @@ import Assessment from "../pages/Assessment.jsx";
 import CreateEgogram from "../pages/CreateEgogram.jsx";
 import EgogramTest from "../pages/EgogramTest.jsx";
 import EgogramReport from "../pages/EgogramReport.jsx";
-// import CodingAutomation from "../pages/CodingAutomation.jsx";
-// import ClinicalNotes from "../pages/ClinicalNotes.jsx";
-// import WorkOrganisation from "../pages/WorkOrganisation.jsx";
+import CodingAutomation from "../pages/CodingAutomation.jsx";
+import ClinicalNotes from "../pages/ClinicalNotes.jsx";
+import WorkOrganisation from "../pages/WorkOrganisation.jsx";
 import Treatment from "../pages/Treatment.jsx";
-// import Counsellor from "../pages/Counsellor.jsx";
+import Counsellor from "../pages/Counsellor.jsx";
+import CounsellorTreatment from "../pages/CounsellorTreatment.jsx";
+import Therapies from "../pages/Therapies.jsx";
+import ViewResults from "../pages/ViewResults.jsx";
+import AddTreatment from "../pages/AddTreatment.jsx";
+import OngoingCounTreatment from "../pages/OngoingCounTreatment.jsx";
+import DemoMainContent from "../Demo/Components/DemoMainContent.jsx";
 
 const MainContent = () => {
   return (
     <Routes>
+      {/* <Route path="/login" element={<Login />}/> */}
       <Route path="/" element={<Home />} />
       <Route path="/books" element={<Books />} />
       <Route path="/about" element={<About />} />
@@ -40,12 +47,20 @@ const MainContent = () => {
       <Route path="/createegogram" element={<CreateEgogram />}/>
       <Route path="/testegogram" element={<EgogramTest />}/>
       <Route path="/egogramreport" element={<EgogramReport />}/>
-      {/* <Route path="/automation" element={<CodingAutomation />} /> */}
-      {/* <Route path="/clinical" element={<ClinicalNotes />} /> */}
-      {/* <Route path="/work" element={< WorkOrganisation />} /> */}
-     <Route path="/treatment" element={<Treatment />} />
-<Route path="/treatment/:treatmentId" element={<Treatment />} />
-{/* <Route path="/counsellor" element={<Counsellor />} /> */}
+      <Route path="/automation" element={<CodingAutomation />} />
+      <Route path="/clinical" element={<ClinicalNotes />} />
+      <Route path="/work" element={< WorkOrganisation />} />
+      <Route path="/treatment" element={<Treatment />} />
+      <Route path="/treatment/:treatmentId" element={<Treatment />} />
+      <Route path="/counsellor" element={<Counsellor />} />
+      <Route path="/counsellortreatment" element={<CounsellorTreatment />} />
+      <Route path="/therapy" element={<Therapies />} />
+      <Route path="/therapies/:counsellorId" element={<Therapies />} />
+      <Route path="/viewresult" element={<ViewResults />} />
+      <Route path="//view-results/:userId" element={<ViewResults />} />
+      <Route path="/addtreatment" element={<AddTreatment />} />
+      <Route path="/ongocountreatment" element={<OngoingCounTreatment />} />
+
     </Routes>
   );
 };

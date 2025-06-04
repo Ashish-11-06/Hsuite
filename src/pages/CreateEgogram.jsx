@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Select, Space, Divider, Input, Typography, Row, Col, Spin, Empty } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import AddEgoQuesModal from "../Modals/AddEgoQuesModal";
 import {
   fetchStatementsByTestId,
-  editStatement,
-  deleteStatement,
   fetchAllEgogramTests,
 } from "../Redux/Slices/egoSlice";
-import { PlusSquareOutlined, OrderedListOutlined, FileAddOutlined } from "@ant-design/icons";
+import { PlusSquareOutlined, OrderedListOutlined, ArrowLeftOutlined} from "@ant-design/icons";
 import EgogramTable from "./EgogramTable";
 import EgogramStepsModal from "../Modals/EgogramStepsModal";
 
@@ -23,6 +22,7 @@ const CreateEgogram = () => {
   const [searchText, setSearchText] = useState("");
 
   const dispatch = useDispatch();
+    const navigate = useNavigate();
   const { tests, statementsByTest, loading } = useSelector((state) => state.ego);
 
   const selectedTest = Array.isArray(tests)
@@ -60,9 +60,24 @@ const CreateEgogram = () => {
   const handleStepsModalClose = () => setIsStepsModalOpen(false);
 
   return (
+    <>
+   <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
     <div style={{ 
       maxWidth: "1200px", 
-      margin: "20px auto",
+      margin: "40px auto",
       padding: "0 20px",
       minHeight: "calc(100vh - 40px)"
     }}>
@@ -186,6 +201,7 @@ const CreateEgogram = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

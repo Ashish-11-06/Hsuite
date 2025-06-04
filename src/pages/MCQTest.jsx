@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import { getTestMcqQuiz } from '../Redux/Slices/mcqSlice'; 
 import { Card, Button, Row, Col, Spin, message, Tag } from 'antd';
-import { PlayCircleOutlined } from "@ant-design/icons"; 
+import { PlayCircleOutlined, ArrowLeftOutlined  } from "@ant-design/icons"; 
 import MCQTestQuestionModal from '../Modals/MCQTestQuestionModal';
 
 const MCQTest = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { quiz: quizzes, loading, error } = useSelector((state) => state.mcq);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,7 +42,22 @@ const MCQTest = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <>
+     <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+    <div style={{ padding: "50px" }}>
       {/* Instruction Card */}
       <Card
         title="MCQ Test Instructions"
@@ -152,6 +169,7 @@ const MCQTest = () => {
         quizData={selectedQuiz}
       />
     </div>
+    </>
   );
 };
 

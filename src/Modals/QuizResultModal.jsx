@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Table, Tag, Spin, Card, Typography, Button } from "antd";
+import { Line } from '@ant-design/charts';
 import { useDispatch, useSelector } from "react-redux";
 import { submitQuizResults, resetResultsState } from "../Redux/Slices/quizSlice";
-import AddPredefinedTreatModal from "./AddPredefinedTreatModal";
+import ActionModal from "./ActionModal";
 
 const { Title, Text } = Typography;
 
@@ -81,8 +82,34 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
       score: <Text strong>{questions.length}</Text>,
     });
 
+    const chartData = Object.entries(categoryScores).map(([key, value]) => ({
+  category: key,
+  score: value,
+}));
+
+const chartConfig = {
+  data: chartData,
+  xField: 'category',
+  yField: 'score',
+ height: 350,
+    smooth: true,
+    area: {
+      style: {
+        fill: 'rgb(230, 247, 255)',
+        fillOpacity: 1,
+      },
+    },
+};
+
+
     return (
       <div>
+         {/* Chart Section */}
+    <div style={{ marginBottom: 20 }}>
+      <Title level={4}>Category Scores Overview</Title>
+      <Line {...chartConfig} />
+    </div>
+
         <Card style={{ marginBottom: 20 }}>
           <Title level={4} style={{ color: "#1890ff" }}>
             Personality Type: {quizResults.result}
@@ -165,23 +192,23 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
               <Button 
                 type="primary" 
                 onClick={() => setPredefinedTreatModalVisible(true)}
-                disabled={!quizResults} // Disable button if no results
+                disabled={!quizResults}
               >
-                Predefined Treatment
+                Show Actions
               </Button>
+
             </div>
           </>
         )}
       </Modal>
       
-      <AddPredefinedTreatModal
-      // userId={someValidUserId}
-      
-        visible={predefinedTreatModalVisible}
-        onClose={() => setPredefinedTreatModalVisible(false)}
-        quizResult={quizResults}
-        userId={user?.id}
-      />
+      <ActionModal
+  visible={predefinedTreatModalVisible}
+  onClose={() => setPredefinedTreatModalVisible(false)}
+  quizResult={quizResults}
+  userId={user?.id}
+/>
+
     </>
   );
 };

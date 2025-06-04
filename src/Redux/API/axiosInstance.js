@@ -1,12 +1,17 @@
 import axios from 'axios';
 
+export const BASE_URL = 'https://hsuite.prushal.com/backend';
+// export const BASE_URL = 'http://192.168.1.33:8000';
+// export const BASE_URL = 'https://hsuite.prushal.com/test-backend';
+
 const axiosInstance = axios.create({
-  //  baseURL: 'http://192.168.1.34:8080/api',
-  // baseURL: 'http://192.168.1.62:8001/api', 
+      baseURL: `${BASE_URL}/api`,
+  // baseURL: 'http://192.168.1.40:8000/api', 
     //  baseURL: 'https://medical-backend-rxuk.onrender.com/api', // JSON Server URL
-    baseURL:'https://hsuite.prushal.com/backend/api/',
-    //  baseURL: 'https://hsuite.prushal.com/test-backend/api/',
-    // baseURL: 'https://8ced-103-211-60-165.ngrok-free.app/api/',
+    // baseURL: 'https://hsuite.prushal.com/backend/api/',
+    // baseURL: 'https://hsuite.prushal.com/test-backend/api/',
+    // baseURL: 'https://feb3-103-211-60-173.ngrok-free.app/api/',
+    //  baseURL: 'https://cannon-retained-it-forces.trycloudflare.com/api/',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -15,7 +20,7 @@ const axiosInstance = axios.create({
 // Automatically attach token to headers
 axiosInstance.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem("token"); // 💡 get token from localStorage
+      const token = localStorage.getItem("token"); 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
