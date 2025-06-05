@@ -39,12 +39,10 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
     );
   };
 
- useEffect(() => {
+useEffect(() => {
   if (!currentQuestion) return;
 
   setTimer(15); // reset timer
-
-  // clear any previous interval
   clearInterval(timerRef.current);
 
   timerRef.current = setInterval(() => {
@@ -52,7 +50,23 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
       if (prev === 1) {
         clearInterval(timerRef.current);
         if (currentIndex === questions.length - 1) {
-          handleSubmit(); // auto-submit
+          const totalQuestions = questions.length;
+          const answeredCount = Object.keys(answers).length;
+          const percentAnswered = (answeredCount / totalQuestions) * 100;
+
+          if (percentAnswered >= 80) {
+            handleSubmit();
+          } else {
+            Modal.warning({
+              title: "Test Not Completed",
+              content: `You have completed only ${percentAnswered.toFixed(1)}% of the test. A minimum of 80% completion is required to submit. Please retake the test.`,
+              onOk: () => {
+                // Close both modals
+                setResultModalOpen(false);
+                onClose();
+              }
+            });
+          }
         } else {
           setCurrentIndex((prevIndex) => prevIndex + 1);
         }
@@ -96,15 +110,25 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
     }
   };
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
+const handleSubmit = () => {
+  const totalQuestions = questions.length;
+  const answeredCount = Object.keys(answers).length;
+  const percentAnswered = (answeredCount / totalQuestions) * 100;
 
-  const handleSubmit = () => {
+  if (percentAnswered >= 80) {
     setResultModalOpen(true);
-  };
+  } else {
+   Modal.warning({
+  title: "Test Not Completed",
+  content: `You have completed only ${percentAnswered}% of the test. A minimum of 80% completion is required to submit. Please retake the test.`,
+  onOk: () => {
+    setResultModalOpen(false);
+    onClose();
+  }
+});
+
+  }
+};
 
   const handleCloseResultModal = () => {
     setResultModalOpen(false);
@@ -112,7 +136,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
   };
 
   const handleCancelWithConfirm = () => {
-  clearInterval(timerRef.current); // ⛔ Pause timer before showing modal
+  clearInterval(timerRef.current); // Pause timer before showing modal
 
   AntModal.confirm({
     title: "Exit Quiz?",
@@ -121,7 +145,7 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
     cancelText: "Cancel",
     onOk: onClose,
     onCancel: () => {
-      // 🟢 Resume timer if user cancels
+      //  Resume timer if user cancels
       timerRef.current = setInterval(() => {
         setTimer((prev) => {
           if (prev === 1) {
@@ -191,13 +215,13 @@ const MCQTestQuestionModal = ({ open, onClose, quizData }) => {
               {/* Render dots before the navigation buttons */}
               {renderDots()}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
-                <Button
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '30px' }}>
+                {/* <Button
                   disabled={currentIndex === 0}
                   onClick={handlePrev}
                 >
                   Previous
-                </Button>
+                </Button> */}
 
                 {currentIndex === questions.length - 1 ? (
                   <Button type="primary" onClick={handleSubmit}>

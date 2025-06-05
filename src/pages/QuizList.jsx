@@ -41,11 +41,9 @@ const QuizList = () => {
   };
 
 const goToNextQuestion = () => {
-  const totalQuestions = testQuestions.length;
-  const answeredCount = Object.keys(selectedAnswers).length;
-  const percentAnswered = (answeredCount / totalQuestions) * 100;
+  const percentCompleted = getCompletionPercentage();
 
-  if (currentQuestionIndex < totalQuestions - 1) {
+  if (currentQuestionIndex < testQuestions.length - 1) {
     setCurrentQuestionIndex((prev) => prev + 1);
     setSecondsLeft(15);
 
@@ -55,19 +53,24 @@ const goToNextQuestion = () => {
     }
   } else {
     clearInterval(timerRef.current);
-    setViewModalVisible(false);
-
-    if (percentAnswered >= 80) {
+    
+    if (percentCompleted >= 80) {
+      setViewModalVisible(false);
       setResultModalVisible(true);
     } else {
       Modal.warning({
-        title: "Incomplete Test",
-        content: `You have answered only ${percentAnswered.toFixed(0)}% of the questions. Please answer at least 80% to see the results.`,
+        title: "Test Not Completed",
+        content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+        onOk: () => {
+          setViewModalVisible(false);
+          setResultModalVisible(false);
+          setSelectedAnswers({});
+          setCurrentQuestionIndex(0);
+        }
       });
     }
   }
 };
-
   const getRandomTwoOptions = (question) => {
     if (!question) return [];
     const options = [];
@@ -80,30 +83,51 @@ const goToNextQuestion = () => {
     return shuffled.slice(0, 2);
   };
 
-  // Timer logic
-  useEffect(() => {
-    if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
-      setSecondsLeft(15);
-      clearInterval(timerRef.current);
+    const getCompletionPercentage = () => {
+    const totalQuestions = testQuestions.length;
+    const answeredCount = Object.keys(selectedAnswers).length;
+    return Math.round((answeredCount / totalQuestions) * 100);
+  };
 
-      timerRef.current = setInterval(() => {
-        setSecondsLeft((prev) => {
-          if (prev === 1) {
+useEffect(() => {
+  if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
+    setSecondsLeft(15);
+    clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev === 1) {
+          const percentCompleted = getCompletionPercentage();
+
+          if (percentCompleted >= 80) {
             clearInterval(timerRef.current);
             goToNextQuestion();
+          } else {
+            clearInterval(timerRef.current);
+            Modal.warning({
+              title: "Test Not Completed",
+              content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+              onOk: () => {
+                setViewModalVisible(false);
+                setResultModalVisible(false);
+                setSelectedAnswers({});
+                setCurrentQuestionIndex(0);
+              }
+            });
           }
-          return prev - 1;
-        });
-      }, 1500);
-      
-      if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
-        const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
-        setRandomOptions(twoOptions);
-      }
+        }
+        return prev - 1;
+      });
+    }, 1500);
+    
+    if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
+      const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
+      setRandomOptions(twoOptions);
     }
+  }
 
-    return () => clearInterval(timerRef.current);
-  }, [currentQuestionIndex, viewModalVisible, testQuestions]);
+  return () => clearInterval(timerRef.current);
+}, [currentQuestionIndex, viewModalVisible, testQuestions]);
 
   const currentQuestion = Array.isArray(testQuestions) ? testQuestions[currentQuestionIndex] : null;
 
@@ -235,59 +259,46 @@ const goToNextQuestion = () => {
             <div style={{ marginBottom: "12px", textAlign: "center" }}>
               {renderDots()}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              {/* previous btn  */}
-               <Button
-        type="default"
-        onClick={() => {
-          if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex((prev) => prev - 1);
-            setSecondsLeft(15);
-          }
-        }}
-        disabled={currentQuestionIndex === 0}
-        style={{ padding: "10px", width: 100 }}
-      >
-        Previous
-      </Button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
                {/* Next/Finish Button */}
-      <Button
-        icon={<ArrowRightOutlined />}
-        type="primary"
-        onClick={() => {
-          const totalQuestions = testQuestions.length;
-          const answeredCount = Object.keys(selectedAnswers).length;
-          const percentAnswered = (answeredCount / totalQuestions) * 100;
+              <Button
+  icon={<ArrowRightOutlined />}
+  type="primary"
+  onClick={() => {
+    const percentCompleted = getCompletionPercentage();
 
-          if (currentQuestionIndex === totalQuestions - 1) {
-            // On last question: check 80% completion before showing result
-            if (percentAnswered >= 80) {
-              clearInterval(timerRef.current);
-              setViewModalVisible(false);
-              setResultModalVisible(true);
-            } else {
-              // Show warning if less than 80% answered
-              Modal.warning({
-                title: "Incomplete Test",
-                content: `You have answered only ${percentAnswered.toFixed(0)}% of the questions. Please answer at least 80% to see the results.`,
-              });
-            }
-          } else {
-            // Move to next question normally
-            setCurrentQuestionIndex((prev) => prev + 1);
-            setSecondsLeft(15);
-
-            if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
-              const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
-              setRandomOptions(twoOptions);
-            }
+    if (currentQuestionIndex === testQuestions.length - 1) {
+      if (percentCompleted >= 80) {
+        clearInterval(timerRef.current);
+        setViewModalVisible(false);
+        setResultModalVisible(true);
+      } else {
+        Modal.warning({
+          title: "Test Not Completed",
+          content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+          onOk: () => {
+            setViewModalVisible(false);
+            setResultModalVisible(false);
+            setSelectedAnswers({});
+            setCurrentQuestionIndex(0);
           }
-        }}
-        style={{ backgroundColor: "#1890ff", padding: "10px", width: 100 }}
-        size="medium"
-      >
-        {currentQuestionIndex === testQuestions.length - 1 ? "Finish" : "Next"}
-      </Button>
+        });
+      }
+    } else {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setSecondsLeft(15);
+
+      if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
+        const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
+        setRandomOptions(twoOptions);
+      }
+    }
+  }}
+  style={{ backgroundColor: "#1890ff", padding: "10px", width: 100 }}
+  size="medium"
+>
+  {currentQuestionIndex === testQuestions.length - 1 ? "Finish" : "Next"}
+</Button>
             </div>
           </div>,
         ]}
@@ -299,6 +310,9 @@ const goToNextQuestion = () => {
             <p style={{ color: "red", fontWeight: "bold" }}>
               Time left: {secondsLeft} sec
             </p>
+            {/* <p style={{ color: "#1890ff", fontWeight: "bold", marginBottom: "16px" }}>
+  Completed: {getCompletionPercentage()}%
+</p> */}
             {selectedQuizType === "statement-based" ? (
               <div
                 style={{

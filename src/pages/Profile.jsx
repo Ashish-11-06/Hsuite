@@ -130,7 +130,7 @@ const Profile = () => {
               <Descriptions column={1} size="middle" labelStyle={{ fontWeight: "bold", width: "100px" }}>
                 <Descriptions.Item label="Email">
                   {isEditing ? (
-                    <Input name="email" value={profileData.email} onChange={handleChange} />
+                    <Input name="email" value={profileData.email} onChange={handleChange} disabled/>
                   ) : (
                     profileData.email
                   )}
