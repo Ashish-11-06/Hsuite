@@ -96,21 +96,6 @@ const AddEgoStateModal = ({ open, onClose }) => {
   };
 
   const handleCategoryChange = (id, value, categoryObj) => {
-    const newCategories = new Set(usedCategories);
-    const currentStatement = statements.find(s => s.id === id);
-    
-    if (currentStatement?.selectedCategory) {
-      newCategories.delete(currentStatement.selectedCategory);
-    }
-    
-    if (value && !newCategories.has(value)) {
-      if (newCategories.size >= 4) {
-        message.warning('Maximum of 4 different categories allowed');
-        return;
-      }
-      newCategories.add(value);
-    }
-    
     setStatements(statements.map(stat =>
       stat.id === id ? {
         ...stat,
@@ -196,9 +181,7 @@ const AddEgoStateModal = ({ open, onClose }) => {
         confirmLoading={loading}
       >
         <Title level={5}>Statements</Title>
-        <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-          Maximum 4 different categories allowed. Current: {usedCategories.size}/4
-        </Text>
+        
         {usedCategories.size > 0 && (
           <div style={{ marginBottom: 16 }}>
             {Array.from(usedCategories).map(catId => {
@@ -257,7 +240,7 @@ const AddEgoStateModal = ({ open, onClose }) => {
                         type="primary"
                         danger
                         onClick={() => handleNewCategoryClick(stat.id)}
-                        disabled={loading || usedCategories.size >= 4}
+                        disabled={loading}
                       >
                         New Category
                       </Button>
@@ -275,19 +258,11 @@ const AddEgoStateModal = ({ open, onClose }) => {
                           }}
                           disabled={loading}
                         >
-                          {existingCategories.map((cat) => {
-                            const isDisabled = !usedCategories.has(cat.id) && usedCategories.size >= 4;
-                            return (
-                              <Option 
-                                key={cat.id} 
-                                value={cat.id}
-                                disabled={isDisabled}
-                              >
-                                {cat.category}
-                                {isDisabled && " (limit reached)"}
-                              </Option>
-                            );
-                          })}
+                          {existingCategories.map((cat) => (
+                            <Option key={cat.id} value={cat.id}>
+                              {cat.category}
+                            </Option>
+                          ))}
                         </Select>
                       </Space>
                     </Col>

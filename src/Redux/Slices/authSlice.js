@@ -69,7 +69,9 @@ export const sendResetOTP = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "Failed to send OTP",
+        message: 
+        error.response?.data?.message || 
+        error.response?.data.error ||"Failed to send OTP",
         error: error.response?.data
       });
     }
@@ -89,7 +91,8 @@ export const verifyResetOTP = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "OTP verification failed",
+        message: error.response?.data?.message ||
+        error.response?.data.error || "OTP verification failed",
         error: error.response?.data
       });
     }
@@ -109,7 +112,8 @@ export const resetPassword = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "Password reset failed",
+        message: error.response?.data?.message || 
+        error.response?.data.error ||"Password reset failed",
         error: error.response?.data
       });
     }
@@ -237,6 +241,7 @@ const authSlice = createSlice({
     
         localStorage.setItem("token", action.payload.token); // 🛠 Ensure token is stored
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        // 🏥 Store hospital ID
         localStorage.setItem("role", action.payload.user.role);
     
         window.location.href = "/"; // 🔥 Force Redirect After Login

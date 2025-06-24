@@ -72,10 +72,10 @@ export const updateCurrentStep = createAsyncThunk(
   'treatment/updateCurrentStep',
   async ({ treatment_id, step_id }, { rejectWithValue }) => {
     try {
-      const response = await personaltreatmentApi.UpdateCurrentStep({ treatment_id, step_id });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Update step failed');
+      const res = await personaltreatmentApi.UpdateCurrentStep({ treatment_id, step_id });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.res?.data || err.message);
     }
   }
 );

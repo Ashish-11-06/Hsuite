@@ -151,9 +151,12 @@ const handleViewHistory = async (code) => {
           likeCount: response.like_count,
           dislikeCount: response.dislike_count
         }));
+
+        dispatch(fetchCodes());
+        
       })
       .catch((error) => {
-        console.error("Failed to react:", error);
+        // console.error("Failed to react:", error);
         message.error("Failed to react to code");
   
         dispatch(setUserReaction({ descriptionId: description_id, action: null }));

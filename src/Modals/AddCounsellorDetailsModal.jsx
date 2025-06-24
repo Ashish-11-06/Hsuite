@@ -11,64 +11,64 @@ const AddCounsellorDetailsModal = ({ visible, onClose }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-const userId = useSelector((state) => state.auth.userId);
+  const userId = useSelector((state) => state.auth.userId);
 
   const authState = useSelector((state) => state.auth);
-console.log("auth state:", authState);
+  console.log("auth state:", authState);
 
 
-const handleImageChange = (info) => {
-  console.log("Upload info received:", info);
+  const handleImageChange = (info) => {
+    console.log("Upload info received:", info);
 
-  if (info.file.status === 'removed') {
-    console.log("Image removed");
-    setImageFile(null);
-    setPreviewUrl(null);
-    return;
-  }
+    if (info.file.status === 'removed') {
+      console.log("Image removed");
+      setImageFile(null);
+      setPreviewUrl(null);
+      return;
+    }
 
-  // Access originFileObj from fileList
-  const fileList = info.fileList;
-  if (!fileList || fileList.length === 0) {
-    console.warn("No files in fileList");
-    return;
-  }
+    // Access originFileObj from fileList
+    const fileList = info.fileList;
+    if (!fileList || fileList.length === 0) {
+      console.warn("No files in fileList");
+      return;
+    }
 
-  const latestFile = fileList[fileList.length - 1].originFileObj;
-  console.log("Latest selected file object:", latestFile);
+    const latestFile = fileList[fileList.length - 1].originFileObj;
+    console.log("Latest selected file object:", latestFile);
 
-  if (!latestFile) {
-    console.error("No originFileObj found in fileList");
-    return;
-  }
+    if (!latestFile) {
+      console.error("No originFileObj found in fileList");
+      return;
+    }
 
-  if (!latestFile.type.startsWith("image/")) {
-    console.error("Invalid file type:", latestFile.type);
-    message.error("Only image files are allowed!");
-    return;
-  }
+    if (!latestFile.type.startsWith("image/")) {
+      console.error("Invalid file type:", latestFile.type);
+      message.error("Only image files are allowed!");
+      return;
+    }
 
-  if (latestFile.size > 5 * 1024 * 1024) {
-    console.error("File too large:", latestFile.size);
-    message.error("Image must be smaller than 5MB!");
-    return;
-  }
+    if (latestFile.size > 5 * 1024 * 1024) {
+      console.error("File too large:", latestFile.size);
+      message.error("Image must be smaller than 5MB!");
+      return;
+    }
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    console.log("Preview base64:", e.target.result.slice(0, 100));
-    setPreviewUrl(e.target.result);
-    setImageFile(latestFile);
-    message.success("Image uploaded successfully!");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      console.log("Preview base64:", e.target.result.slice(0, 100));
+      setPreviewUrl(e.target.result);
+      setImageFile(latestFile);
+      message.success("Image uploaded successfully!");
+    };
+
+    reader.onerror = (err) => {
+      console.error("Error reading file:", err);
+      message.error("Failed to load image preview.");
+    };
+
+    reader.readAsDataURL(latestFile);
   };
-
-  reader.onerror = (err) => {
-    console.error("Error reading file:", err);
-    message.error("Failed to load image preview.");
-  };
-
-  reader.readAsDataURL(latestFile);
-};
 
 
 
@@ -113,6 +113,9 @@ const handleImageChange = (info) => {
       footer={null}
       width={800}
       destroyOnClose
+      maskClosable={false}     // ✅ Prevent close on outside click
+      keyboard={false}
+      closable={false}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>

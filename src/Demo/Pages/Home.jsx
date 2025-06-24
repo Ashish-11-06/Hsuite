@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 
-const Home = ({}) => {
+const Home = ({ }) => {
 
 
   return (
     <>
-  <h1
-  style={{margin : "100px"}}
-  >hello from sejal</h1>
+      <h1
+        style={{ margin: "100px" }}
+      >hello from sejal</h1>
     </>
   );
 };

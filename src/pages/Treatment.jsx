@@ -101,7 +101,18 @@ const Treatment = () => {
       }, {})
   );
 
-  const completedTreatments = filteredTreatments?.filter(item => item.current_step >= 10);
+ const completedTreatments = Object.values(
+  filteredTreatments
+    ?.filter(item => item.current_step >= 10)
+    .reduce((acc, item) => {
+      const key = `${item.category_name}-${item.type}`;
+      if (!acc[key]) {
+        acc[key] = item;
+      }
+      return acc;
+    }, {})
+);
+
 
   if (treatmentLoading || treatmentsLoading || refreshing) return <Spin size="large" />;
   if (treatmentError || treatmentsError) return <Alert message="Error loading treatments" type="error" />;

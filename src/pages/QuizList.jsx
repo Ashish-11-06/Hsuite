@@ -97,29 +97,35 @@ useEffect(() => {
     timerRef.current = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev === 1) {
+          const isLastQuestion = currentQuestionIndex === testQuestions.length - 1;
           const percentCompleted = getCompletionPercentage();
 
-          if (percentCompleted >= 80) {
-            clearInterval(timerRef.current);
-            goToNextQuestion();
+          clearInterval(timerRef.current);
+
+          if (isLastQuestion) {
+            if (percentCompleted >= 80) {
+              setViewModalVisible(false);
+              setResultModalVisible(true);
+            } else {
+              Modal.warning({
+                title: "Test Not Completed",
+                content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+                onOk: () => {
+                  setViewModalVisible(false);
+                  setResultModalVisible(false);
+                  setSelectedAnswers({});
+                  setCurrentQuestionIndex(0);
+                }
+              });
+            }
           } else {
-            clearInterval(timerRef.current);
-            Modal.warning({
-              title: "Test Not Completed",
-              content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
-              onOk: () => {
-                setViewModalVisible(false);
-                setResultModalVisible(false);
-                setSelectedAnswers({});
-                setCurrentQuestionIndex(0);
-              }
-            });
+            goToNextQuestion();
           }
         }
         return prev - 1;
       });
-    }, 1500);
-    
+    }, 1000); // Usually, timer should be 1000ms (1s) instead of 1500ms unless intentional
+
     if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
       const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
       setRandomOptions(twoOptions);
@@ -128,6 +134,7 @@ useEffect(() => {
 
   return () => clearInterval(timerRef.current);
 }, [currentQuestionIndex, viewModalVisible, testQuestions]);
+
 
   const currentQuestion = Array.isArray(testQuestions) ? testQuestions[currentQuestionIndex] : null;
 

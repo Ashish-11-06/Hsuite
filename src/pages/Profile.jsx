@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Layout, Card, Typography, Button, Descriptions, Input, message, Avatar } from "antd";
+import { Layout, Card, Typography, Button, Descriptions, Input, message, Avatar, Form, Modal } from "antd";
 import { EditOutlined, SaveOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { loginSuccess, logout } from "../Redux/Slices/authSlice";
 import { updateProfile } from "../Redux/Slices/profileSlice";
@@ -64,12 +64,22 @@ const Profile = () => {
       });
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-     localStorage.setItem('isLoggedIn', 'false'); 
-    localStorage.clear(); 
-    navigate("/login");
-  };
+ const handleLogout = () => {
+  Modal.confirm({
+    title: "Are you sure you want to logout?",
+    content: "You will need to log in again to access your profile.",
+    okText: "Logout",
+    okType: "danger",
+    cancelText: "Cancel",
+    onOk: () => {
+      dispatch(logout());
+      localStorage.setItem('isLoggedIn', 'false');
+      localStorage.clear();
+      navigate("/login");
+    },
+  });
+};
+
 
   return (
     <Layout
@@ -136,12 +146,63 @@ const Profile = () => {
                   )}
                 </Descriptions.Item>
 
-                <Descriptions.Item label="Username">
+                <Descriptions.Item label="Username" >
                   {isEditing ? (
-                    <Input name="username" value={profileData.username} onChange={handleChange} />
-                  ) : (
-                    profileData.username
-                  )}
+  <Form
+    layout="vertical"
+    onFinish={handleSave}
+    initialValues={{ username: profileData.username }}
+    onValuesChange={(changedValues, allValues) =>
+      setProfileData((prev) => ({ ...prev, ...allValues }))
+    }
+  >
+    <Form.Item
+      // label="Username"
+      name="username"
+      rules={[
+        { required: true, message: "Please enter a username" },
+          { min: 5, message: "Username must be at least 5 characters" },
+        {
+          pattern: /^[a-zA-Z0-9_]+$/,
+          message:
+            "Only letters, numbers, and underscores are allowed.",
+        },
+      ]}
+    >
+      <Input />
+    </Form.Item>
+
+    {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <Button
+        type="primary"
+        htmlType="submit"
+        icon={<SaveOutlined />}
+        style={{ width: "48%" }}
+      >
+        Save
+      </Button>
+
+      <Button
+        danger
+        onClick={() => {
+          setProfileData({
+            email: user.email,
+            username: user.username,
+          });
+          setIsEditing(false);
+        }}
+        style={{ width: "48%" }}
+      >
+        Cancel
+      </Button>
+    </div> */}
+  </Form>
+) : (
+  <Descriptions.Item label="Username">
+    {profileData.username}
+  </Descriptions.Item>
+)}
+
                 </Descriptions.Item>
 
                 {user?.verified_at && (

@@ -12,24 +12,20 @@ const AddNewEgoNameModal = ({ open, onClose, onNewNameAdded }) => {
       .validateFields()
       .then(values => {
         dispatch(addEgogramTest(values)).then(action => {
-          const test = action.payload;
-          
-          if (action.payload && action.payload.data?.test_name) {
+          if (action.payload?.data?.test_name) {
             form.resetFields();
-            onNewNameAdded(action.payload.data.test_name);
+            onNewNameAdded(action.payload.data.id); // Pass the ID of the new test
             onClose();
           } else {
             console.error("Invalid payload:", action.payload);
           }
-          
         });
       })
       .catch(info => {
         console.log("Validation Failed:", info);
       });
   };
-  
-  
+
   return (
     <Modal
       title="Create New Egogram"

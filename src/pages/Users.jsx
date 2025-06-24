@@ -3,6 +3,7 @@ import { Table, Button, message, Modal, Form, Input, Select, Switch } from "antd
 import {EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers, updateUser, toggleUserActive, createUser } from "../Redux/Slices/userSlice";
+import GetDetailsCounsellorModal from "../Modals/GetDetailsCounsellorModal";
 
 const { Option } = Select;
 
@@ -14,6 +15,9 @@ const Users = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); 
   const [form] = Form.useForm();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [selectedCounsellor, setSelectedCounsellor] = useState(null);
+const [isCounsellorDetailsVisible, setIsCounsellorDetailsVisible] = useState(false);
+
   const [addForm] = Form.useForm();
 
   const roleDisplayMap = {
@@ -103,18 +107,38 @@ const toggleUserStatus = async (user) => {
         />
       ),
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Button icon={<EditOutlined />} type="primary" onClick={() => editUser(record)}>
-          Edit
+  {
+  title: "Actions",
+  key: "actions",
+  render: (_, record) => (
+    <div style={{ display: "flex", gap: "8px" }}>
+      <Button
+        icon={<EditOutlined />}
+        type="primary"
+        onClick={() => editUser(record)}
+      >
+        Edit
+      </Button>
+
+      {record.role === "Counsellor" && (
+        <Button
+          type="default"
+          onClick={() => {
+            setSelectedCounsellor(record);
+            setIsCounsellorDetailsVisible(true);
+          }}
+        >
+          Details
         </Button>
-      ),
-    },
+      )}
+    </div>
+  ),
+},
+
   ];
 
   return (
+    <>
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Users List</h2>
@@ -263,6 +287,16 @@ const toggleUserStatus = async (user) => {
         </Form>
       </Modal>
     </div>
+    <GetDetailsCounsellorModal
+  open={isCounsellorDetailsVisible}
+  onClose={() => {
+    setIsCounsellorDetailsVisible(false);
+    setSelectedCounsellor(null);
+  }}
+  counsellor={selectedCounsellor}
+/>
+
+    </>
   );
 };
 

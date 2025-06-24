@@ -18,7 +18,11 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
 
   const handleRegister = async (values) => {
     try {
-      const response = await dispatch(registerUser(values)).unwrap();
+      const updatedValues ={
+        ...values,
+        is_active: values.role === "Counsellor" ? false : true,
+      }
+      const response = await dispatch(registerUser(updatedValues)).unwrap();
       message.success(response.message || "OTP sent to your email!");
       setEmail(values.email);
     } catch (error) {
@@ -41,7 +45,7 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
       if (selectRole === "Counsellor") {
         setIsCounsellorModalVisible(true);
       } else {
-        setIsModalVisible(falase);
+        setIsModalVisible(false);
       }
         } catch (error) {
         message.error(error?.message || "Invalid OTP, or user already verified");
@@ -66,6 +70,7 @@ const RegisterModal = ({ isModalVisible, setIsModalVisible }) => {
           label="Username"
           name="username"
           rules={[{ required: true, message: "Please enter a username" },
+              { min: 5, message: "Username must be at least 5 characters" },
              {
                   pattern: /^[a-zA-Z0-9_]+$/,
                   message: "Username must not contain symbols or spaces. Only letters, numbers, and underscores are allowed.",

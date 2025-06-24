@@ -130,14 +130,14 @@ const getSelectedKey = () => {
         </Menu.Item>
        )}
 
-        <Menu.Item key="8" icon={<AuditOutlined />}>
+        {/* <Menu.Item key="8" icon={<AuditOutlined />}>
           <Link to="/clinical">Clinical Notes</Link>
         </Menu.Item>
 
         
         <Menu.Item key="9" icon={<AuditOutlined />}>
           <Link to="/work">Work Organisation</Link>
-        </Menu.Item>
+        </Menu.Item> */}
 
 
         {userRole === "Admin" && (

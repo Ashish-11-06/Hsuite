@@ -5,7 +5,6 @@ import { Table, Spin, Alert, Card, Tag, Button, Modal, Typography, Empty } from 
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Line } from '@ant-design/charts';
 import { fetchEgogramHistory, fetchAllEgogramCategories } from "../Redux/Slices/egoSlice";
-// import AddEgoPredefinedTreatModal from "../Modals/AddEgoPredefinedTreatModal";  // Adjust path as needed
 import ActionModal from "../Modals/ActionModal";
 
 
@@ -182,7 +181,6 @@ const chartData = selectedRecord?.statement_marks
       position: "absolute",
       top: 0,
       left: 0,
-      // fontSize: "40px",
       color: "white",
     }}
   >Back</Button>
@@ -220,13 +218,13 @@ const chartData = selectedRecord?.statement_marks
             open={isModalVisible}
             onCancel={handleModalClose}
             footer={[
-             <Button 
-                key="treatment" 
-                type="primary" 
-                onClick={() => setTreatmentModalVisible(true)}
-              >
-                Show actions
-              </Button>
+            //  <Button 
+            //     key="treatment" 
+            //     type="primary" 
+            //     onClick={() => setTreatmentModalVisible(true)}
+            //   >
+            //     Show actions
+            //   </Button>
             ]}
             width={800}
           >

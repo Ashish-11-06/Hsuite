@@ -98,6 +98,9 @@ useEffect(() => {
   };
 
   const handleCheckboxChange = (checkedValues) => {
+    if (checkedValues.length >3) {
+      return;
+    }
     setAnswers({
       ...answers,
       [currentQuestion.id]: checkedValues,

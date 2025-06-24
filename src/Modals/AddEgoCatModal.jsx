@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Typography, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { addEgogramCategory } from "../Redux/Slices/egoSlice";
+import { addEgogramCategory, fetchAllEgogramCategories } from "../Redux/Slices/egoSlice";
 
 const { Title } = Typography;
 
@@ -19,19 +19,39 @@ const AddEgoCatModal = ({ open, onClose, onNewCategoryAdded }) => {
     }
   }, [open]);
 
+  // useEffect(() => {
+  //   if (success) {
+  //     message.success(success);
+  //     onNewCategoryAdded?.({
+  //       category: categoryName.trim(),
+  //       category_description: categoryDesc.trim(),
+  //     });
+  //     handleCancel(); // Reset and close
+  //   }
+  //   if (error) {
+  //     message.error(error);
+  //   }
+  // }, [success, error]);
+
   useEffect(() => {
-    if (success) {
-      message.success(success);
-      onNewCategoryAdded?.({
-        category: categoryName.trim(),
-        category_description: categoryDesc.trim(),
-      });
-      handleCancel(); // Reset and close
-    }
-    if (error) {
-      message.error(error);
-    }
-  }, [success, error]);
+  if (success) {
+    message.success(success);
+
+    // Dispatch fetchAllEgogramCategories to refresh the list after adding
+    dispatch(fetchAllEgogramCategories());
+
+    onNewCategoryAdded?.({
+      category: categoryName.trim(),
+      category_description: categoryDesc.trim(),
+    });
+
+    handleCancel(); // Reset and close
+  }
+  if (error) {
+    message.error(error);
+  }
+}, [success, error]);
+
 
   const handleOk = async () => {
     if (!categoryName.trim() || !categoryDesc.trim()) {

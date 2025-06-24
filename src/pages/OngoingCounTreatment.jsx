@@ -50,7 +50,7 @@ const OngoingCounTreatment = () => {
   });
 
   const ongoingTreatments = filtered.filter(t => t.current_step < 10);
-  const completedTreatments = filtered.filter(t => t.current_step === 10 & 11 );
+  const completedTreatments = filtered.filter( t => t.current_step === 10 || t.current_step === 11);
 
   const handleContinue = (treatment) => {
     setSelectedTreatment(treatment);
