@@ -38,9 +38,9 @@ const AddAttachmentModal = ({ open, onClose, patientId, onAttachmentUploaded }) 
       // Optional: Debug actual form data
       for (let [key, val] of formData.entries()) {
         if (key === "file") {
-          console.log("Sending file:", val.name);
+          // console.log("Sending file:", val.name);
         } else {
-          console.log(`${key}:`, val);
+          // console.log(`${key}:`, val);
         }
       }
 

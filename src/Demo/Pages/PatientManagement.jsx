@@ -17,7 +17,6 @@ import {
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPatients, DeletePatient } from "../Redux/Slices/PatientSlice";
-
 import AddPatientModal from "../Modals/AddPatientModal";
 import PatientDetailsDrawer from "../Modals/PatientDetailsDrawer";
 import EditPatientDetailsModal from "../Modals/EditPatientDetailsModal";
@@ -35,16 +34,17 @@ const PatientManagement = () => {
   const [editingPatient, setEditingPatient] = useState(null);
   const [viewingPatient, setViewingPatient] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
 
   useEffect(() => {
     dispatch(fetchAllPatients());
   }, [dispatch]);
 
- const filteredPatients = Array.isArray(allPatients)
-  ? allPatients.filter((p) =>
+  const filteredPatients = Array.isArray(allPatients)
+    ? allPatients.filter((p) =>
       p.full_name?.toLowerCase().includes(searchText.toLowerCase())
     )
-  : [];
+    : [];
 
   const showViewDrawer = (patient) => {
     setViewingPatient(patient);
@@ -106,22 +106,33 @@ const PatientManagement = () => {
       key: "blood_group",
       render: (text) => <Tag color="geekblue">{text}</Tag>,
     },
-    {
+  ];
+  if (["admin", "receptionist", "doctor", "nurse", "lab-assistant"].includes(currentUser?.designation)) {
+    columns.push({
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <Space>
+          {/* ✅ View allowed for everyone */}
+          {["admin", "nurse", "doctor"].includes(currentUser?. designation)&& (
           <Button icon={<EyeOutlined />} onClick={() => showViewDrawer(record)} />
-          <Button icon={<EditOutlined />} onClick={() => handleEditPatient(record)} />
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeletePatient(record.id)}
-          />
+          )}
+
+          {/* ✅ Edit/Delete only for admin or receptionist */}
+          {["admin", "receptionist"].includes(currentUser?.designation) && (
+            <>
+              <Button icon={<EditOutlined />} onClick={() => handleEditPatient(record)} />
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeletePatient(record.id)}
+              />
+            </>
+          )}
         </Space>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <div style={{ padding: 24 }}>
@@ -132,13 +143,15 @@ const PatientManagement = () => {
           onChange={(e) => setSearchText(e.target.value)}
           style={{ width: 300 }}
         />
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-        >
-          Add Patient
-        </Button>
+        {["admin", "receptionist"].includes(currentUser?.designation) && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsModalVisible(true)}
+          >
+            Add Patient
+          </Button>
+        )}
       </Space>
 
       <Table
@@ -146,7 +159,7 @@ const PatientManagement = () => {
         dataSource={filteredPatients}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
       />
 
       <AddPatientModal

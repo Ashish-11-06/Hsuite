@@ -14,8 +14,7 @@ const DemoLogin = () => {
   const handleFinish = async (values) => {
     try {
       const res = await dispatch(postUserLogin(values)).unwrap();
-      // message.success("Login successful!");
-      console.log("User data:", res);
+      // console.log("User data:", res);
       const hospital = res?.hospital; // Assuming the response contains hospital data
       const hms_user = res?.hms_user; // Assuming the response contains user data
       if(res){
@@ -23,9 +22,9 @@ const DemoLogin = () => {
         localStorage.setItem("HMS-user", JSON.stringify(hms_user));
             }
 
-      navigate("/demo/demohome");
+      navigate("/demo");
     } catch (error) {
-      // message.error(error?.message || "Login failed");
+      message.error(error);
     }
   };
 

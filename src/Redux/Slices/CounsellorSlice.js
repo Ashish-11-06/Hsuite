@@ -70,9 +70,9 @@ export const fetchRequestsByCounsellorId = createAsyncThunk(
   'counsellor/fetchRequestsByCounsellorId',
   async (counsellorId, { rejectWithValue }) => {
     try {
-      console.log('Fetching requests for counsellor:', counsellorId); // Add this
+      // console.log('Fetching requests for counsellor:', counsellorId); // Add this
       const response = await CounsellorApi.GetCounsellingRequestByCounsellorid(counsellorId);
-      console.log('Response:', response); // Add this
+      // console.log('Response:', response); // Add this
       return response.data;
     } catch (error) {
       console.error('Error:', error); // Add this

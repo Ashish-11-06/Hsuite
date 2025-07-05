@@ -69,40 +69,41 @@ const ReportsAndAnalytics = () => {
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="OPD Reports" key="1">
-          <Space style={{ marginBottom: 16 }}>
-            <RangePicker />
-            <Button onClick={() => setIsFilterModalVisible(true)}>
-              More Filters
-            </Button>
-            <Button type="primary" onClick={() => setIsDrawerVisible(true)}>
-              View Summary
-            </Button>
-          </Space>
-          <Card title="Visits by Department">
-            <Bar {...barConfig} />
-          </Card>
-          <Card title="Gender Distribution" style={{ marginTop: 16 }}>
-            <Pie {...pieConfig} />
-          </Card>
-          <Card title="Visit Trends (Last 5 Days)" style={{ marginTop: 16 }}>
-            <Line {...lineConfig} />
-          </Card>
-        </TabPane>
-      </Tabs>
+    <>Page is under Construction</>
+    // <div style={{ padding: 24 }}>
+    //   <Tabs defaultActiveKey="1">
+    //     <TabPane tab="OPD Reports" key="1">
+    //       <Space style={{ marginBottom: 16 }}>
+    //         <RangePicker />
+    //         <Button onClick={() => setIsFilterModalVisible(true)}>
+    //           More Filters
+    //         </Button>
+    //         <Button type="primary" onClick={() => setIsDrawerVisible(true)}>
+    //           View Summary
+    //         </Button>
+    //       </Space>
+    //       <Card title="Visits by Department">
+    //         <Bar {...barConfig} />
+    //       </Card>
+    //       <Card title="Gender Distribution" style={{ marginTop: 16 }}>
+    //         <Pie {...pieConfig} />
+    //       </Card>
+    //       <Card title="Visit Trends (Last 5 Days)" style={{ marginTop: 16 }}>
+    //         <Line {...lineConfig} />
+    //       </Card>
+    //     </TabPane>
+    //   </Tabs>
 
-      <ReportsFilterModal
-        visible={isFilterModalVisible}
-        onClose={() => setIsFilterModalVisible(false)}
-      />
+    //   <ReportsFilterModal
+    //     visible={isFilterModalVisible}
+    //     onClose={() => setIsFilterModalVisible(false)}
+    //   />
 
-      <AnalyticsDrawer
-        visible={isDrawerVisible}
-        onClose={() => setIsDrawerVisible(false)}
-      />
-    </div>
+    //   <AnalyticsDrawer
+    //     visible={isDrawerVisible}
+    //     onClose={() => setIsDrawerVisible(false)}
+    //   />
+    // </div>
   );
 };
 

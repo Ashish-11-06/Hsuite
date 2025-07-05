@@ -1,4 +1,4 @@
-import React from "react";
+import React, { act } from "react";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import OpdApi from "../API/OpdApi";
 import { message } from "antd";
@@ -35,7 +35,7 @@ export const GetAllOPD = createAsyncThunk(
 //----async thunk to update OPD status------
 export const UpdateOPDStatus = createAsyncThunk(
     "opd/updateOpdStatus",
-    async ({id, body}, { rejectWithValue }) => {
+    async ({ id, body }, { rejectWithValue }) => {
         try {
             const response = await OpdApi.UpdateStatus(id, body);
             message.success("OPD status updated successfully!");
@@ -55,7 +55,73 @@ export const GetOpdByDoctorId = createAsyncThunk(
             const response = await OpdApi.GetOpdByDoctorId(doctorId);
             return response.data;
         } catch (error) {
-            message.error("Failed to fetch OPD records for the doctor");
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const PostPrescription = createAsyncThunk(
+    "opd/postprescription",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.PostPrescription(data);
+            message.success(response.data.message || "posted successfully");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+//----async thunk to get medicine names------
+export const GetMedicinesNames = createAsyncThunk(
+    "opd/getMedicinesNames",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.GetMedicinesNames();
+            return response.data.medicine_names;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+//---async thunk to get prescription by patient id----
+export const FetchPrescriptionByPatientId = createAsyncThunk(
+    "opd/getPrescriptionByPatientId",
+    async (patient_id, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.GetPrescriptionByPatientId(patient_id);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+//---async thunk to post new bill perticular---
+export const PostPerticulars = createAsyncThunk(
+    "opd/postBillPerticulars",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.PostBillPreticulars(data);
+            message.success(response.data.message || "posted successfully");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+//----async thunk to post bill ---
+export const PostBill = createAsyncThunk(
+    "opd/postBill",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.PostBill(data);
+            message.success(response.data.message || "posted successfully");
+            return response.data;
+        } catch (error) {
             return rejectWithValue(error.response.data);
         }
     }
@@ -67,6 +133,9 @@ const OpdSlice = createSlice({
     initialState: {
         opdData: [],
         opdByDoctor: [],
+        medicineNames: [],
+        prescriptions: [],
+        medicineNamesFetched: false,
         opdStatus: null,
         loading: false,
         error: null,
@@ -77,6 +146,10 @@ const OpdSlice = createSlice({
             state.loading = false;
             state.error = null;
         },
+        resetPrescriptions: (state) => {
+            state.prescriptions = [];
+            state.hospital = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -86,8 +159,13 @@ const OpdSlice = createSlice({
             })
             .addCase(PostOPD.fulfilled, (state, action) => {
                 state.loading = false;
-                state.opdData.push(action.payload);
+                if (Array.isArray(state.opdData?.data)) {
+                    state.opdData.data.push(action.payload);
+                } else {
+                    state.opdData = { data: [action.payload] };
+                }
             })
+
             .addCase(PostOPD.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
@@ -136,10 +214,79 @@ const OpdSlice = createSlice({
             .addCase(GetOpdByDoctorId.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
 
+            // Post Prescription
+            .addCase(PostPrescription.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(PostPrescription.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(PostPrescription.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Get medicine names
+            .addCase(GetMedicinesNames.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(GetMedicinesNames.fulfilled, (state, action) => {
+                // state.loading = false;
+                state.medicineNames = action.payload;
+                state.medicineNamesFetched = true;
+            })
+            .addCase(GetMedicinesNames.rejected, (state, action) => {
+                // state.loading = false;
+                // state.error = action.payload;
+                state.medicineNamesFetched = false;
+            })
+
+            //get prescription by patient id
+            .addCase(FetchPrescriptionByPatientId.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(FetchPrescriptionByPatientId.fulfilled, (state, action) => {
+                state.loading = false;
+                state.prescriptions = action.payload.data;
+                state.hospital = action.payload.hospital;
+            })
+            .addCase(FetchPrescriptionByPatientId.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Post Perticulars
+            .addCase(PostPerticulars.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(PostPerticulars.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(PostPerticulars.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            //post bill
+            .addCase(PostBill.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(PostBill.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(PostBill.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 });
 
-export const { resetOpdState } = OpdSlice.actions;
+export const { resetOpdState, resetPrescriptions } = OpdSlice.actions;
 export default OpdSlice.reducer;

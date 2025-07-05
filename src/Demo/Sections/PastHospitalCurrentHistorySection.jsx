@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Typography } from "antd";
+import { Card, Button, Typography, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAllUsers } from "../Redux/Slices/UsersSlice";
@@ -13,10 +13,13 @@ const PastHospitalCurrentHistorySection = ({
   pastHospitalCurrentHistory,
   setPastHospitalCurrentHistory,
   setLoading,
+  loading,
 }) => {
   const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
   const { users } = useSelector((state) => state.users);
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   useEffect(() => {
     dispatch(GetAllUsers());
@@ -44,13 +47,22 @@ const PastHospitalCurrentHistorySection = ({
       <Card
         title={<span style={{ color: "#1890ff" }}>Past Medical History</span>}
         extra={
+           canAdd && (
           <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => setVisible(true)}>
             Add
           </Button>
+           )
         }
         style={{ borderRadius: 8 }}
       >
-        {pastHospitalCurrentHistory?.length > 0 ? (
+        {loading ? (
+          <div style={{display:"flex", justifyContent: "center", padding:"20px"}}>
+            <Spin tip="Loading Past Current Hospital History..." spinning={loading}>
+              <div style={{height: 1}} />
+              </Spin> 
+          </div>
+        ):
+        pastHospitalCurrentHistory?.length > 0 ? (
           pastHospitalCurrentHistory.map((entry, idx) => (
             <Card
               key={idx}

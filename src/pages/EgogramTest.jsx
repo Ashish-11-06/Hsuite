@@ -23,7 +23,7 @@ const EgogramTest = () => {
     const fetchTests = async () => {
       try {
    const res=await dispatch(fetch20TestsFotTest());
-   console.log("Tests fetched:", res);
+  //  console.log("Tests fetched:", res);
       }
       catch (err) {
         console.error("Error fetching tests:", err);

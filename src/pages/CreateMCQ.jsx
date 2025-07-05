@@ -60,7 +60,7 @@ const CreateMCQ = () => {
   const handleCloseQuizModal = () => setIsQuizModalOpen(false);
 
   const handleQuestionSubmit = (data) => {
-    console.log("Received MCQ data:", data);
+    // console.log("Received MCQ data:", data);
     handleCloseModal();
     dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
   };

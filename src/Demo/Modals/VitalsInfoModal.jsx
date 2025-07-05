@@ -139,19 +139,37 @@ const columns = [
     title: "Low",
     dataIndex: "low",
     key: "low",
-    render: renderCell,
+    onCell: (record) => ({
+      style: {
+        backgroundColor: getColor(record.low),
+        color: getTextColor(record.low),
+        fontWeight: 500,
+      },
+    }),
   },
   {
     title: "Normal",
     dataIndex: "normalColor",
     key: "normalColor",
-    render: renderCell,
+    onCell: (record) => ({
+      style: {
+        backgroundColor: getColor(record.normalColor),
+        color: getTextColor(record.normalColor),
+        fontWeight: 500,
+      },
+    }),
   },
   {
     title: "High",
     dataIndex: "high",
     key: "high",
-    render: renderCell,
+    onCell: (record) => ({
+      style: {
+        backgroundColor: getColor(record.high),
+        color: getTextColor(record.high),
+        fontWeight: 500,
+      },
+    }),
   },
 ];
 

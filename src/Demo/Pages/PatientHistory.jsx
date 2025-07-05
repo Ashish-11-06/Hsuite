@@ -7,6 +7,7 @@ import FindingTab from "../Tabs/FindingTab";
 import ReportsTab from "../Tabs/ReportsTab";
 import AttachmentsTab from "../Tabs/AttachmentsTab";
 import EstimateTab from "../Tabs/EstimateTab";
+import PrescriptionTab from "../Tabs/PrescriptionTab";
 
 const { Title } = Typography;
 
@@ -16,13 +17,16 @@ const TABS = {
   FINDING: "Finding",
   REPORTS: "Certificates",
   ATTACHMENTS: "Attachments",
-  ESTIMATE: "Estimate",
+  PRESCRIPTION: "Prescription",
+  // ESTIMATE: "Estimate",
 };
 
 const PatientHistory = () => {
   const { state } = useLocation();
   const patient = state?.patient;
+  const patient_id = state?.patient_id;
   const [activeTab, setActiveTab] = useState(TABS.HISTORY);
+console.log('patienttt',patient_id);
 
   if (!patient) {
     return <p>No patient data available.</p>;
@@ -31,15 +35,17 @@ const PatientHistory = () => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case TABS.HISTORY:
-        return <HistoryTab patient={patient} />;
+return <HistoryTab patient={patient} patient_id={patient_id} />;
       case TABS.CLINICAL_NOTE:
-        return <ClinicalNoteTab patient={patient} />;
+        return <ClinicalNoteTab patient={patient} patient_id={patient_id} />;
       case TABS.FINDING:
-        return <FindingTab patient={patient} />;
+        return <FindingTab patient={patient} patient_id={patient_id} />;
       case TABS.REPORTS:
-        return <ReportsTab patient={patient} />;
+        return <ReportsTab patient={patient} patient_id={patient_id} />;
       case TABS.ATTACHMENTS:
-        return <AttachmentsTab patient={patient} />;
+        return <AttachmentsTab patient={patient} patient_id={patient_id} />;
+      case TABS.PRESCRIPTION: 
+        return <PrescriptionTab patient={patient} patient_id={patient_id} />;
       case TABS.ESTIMATE:
         return <EstimateTab patient={patient} />;
       default:

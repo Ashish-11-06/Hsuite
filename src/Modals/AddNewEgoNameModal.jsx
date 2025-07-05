@@ -22,7 +22,7 @@ const AddNewEgoNameModal = ({ open, onClose, onNewNameAdded }) => {
         });
       })
       .catch(info => {
-        console.log("Validation Failed:", info);
+        // console.log("Validation Failed:", info);
       });
   };
 

@@ -15,6 +15,8 @@ const AllergiesSection = ({ patientId, allergies, setAllergies, setLoading, load
     allergen: "",
     reaction: "",
   });
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   // ✅ Re-fetch after add success
   const handleSuccess = async () => {
@@ -34,6 +36,7 @@ const AllergiesSection = ({ patientId, allergies, setAllergies, setLoading, load
       <Card
         title={<span style={{ color: "#1890ff" }}>Allergies</span>}
         extra={
+           canAdd && (
           <Button
             icon={<PlusOutlined />}
             onClick={() => setIsModalVisible(true)}
@@ -42,12 +45,15 @@ const AllergiesSection = ({ patientId, allergies, setAllergies, setLoading, load
           >
             Add
           </Button>
+           )
         }
         style={{ borderRadius: 8 }}
       >
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-            <Spin tip="Loading allergies..." />
+            <Spin tip="Loading allergies..." spinning={loading} >
+              <div style={{height: 100}}></div>
+            </Spin>
           </div>
         ) : allergies?.length === 0 ? (
           <Text type="secondary">No allergies added yet.</Text>

@@ -124,11 +124,11 @@ const getSelectedKey = () => {
           </Menu.Item>
         </SubMenu>
 
-       {userRole === "Admin" && (
+       {/* {userRole === "Admin" && (
          <Menu.Item key="7" icon={<RobotOutlined />} title="Coding Automation">
           <Link to="/automation">Coding Automation</Link>
         </Menu.Item>
-       )}
+       )} */}
 
         {/* <Menu.Item key="8" icon={<AuditOutlined />}>
           <Link to="/clinical">Clinical Notes</Link>

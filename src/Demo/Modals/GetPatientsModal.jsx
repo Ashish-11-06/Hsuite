@@ -19,7 +19,7 @@ import { PostOPD } from "../Redux/Slices/OpdSlice";
 const { TextArea } = Input;
 const { Option } = Select;
 
-const GetPatientsModal = ({ visible, onClose }) => {
+const GetPatientsModal = ({ visible, onClose, onSelect }) => {
   const dispatch = useDispatch();
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -59,13 +59,12 @@ const GetPatientsModal = ({ visible, onClose }) => {
       description: description.trim(),
     };
 
-    dispatch(PostOPD(data))
-      .unwrap()
-      .then(() => {
-        onClose();
-      })
-      .catch(() => {
-      });
+    dispatch(PostOPD(data)).then((res) => {
+      onSelect?.();
+    }).catch((err) => {
+       message.error(err);
+    });
+
   };
 
   const doctorOptions = users?.filter((u) => u.designation === "doctor") || [];
@@ -94,11 +93,11 @@ const GetPatientsModal = ({ visible, onClose }) => {
                     option?.children?.toLowerCase().includes(input.toLowerCase())
                   }
                 >
-                 {allPatients?.map((patient) => (
-                      <Option key={patient.id} value={patient.id}>
-                        {patient.full_name} - {patient.age} yrs
-                      </Option>
-                    ))}
+                  {allPatients?.map((patient) => (
+                    <Option key={patient.id} value={patient.id}>
+                      {patient.full_name} - {patient.age} yrs
+                    </Option>
+                  ))}
                 </Select>
               </Col>
               <Col>
@@ -131,10 +130,10 @@ const GetPatientsModal = ({ visible, onClose }) => {
               }
             >
               {doctorOptions?.map((doc) => (
-                  <Option key={doc.id} value={doc.id}>
-                    {doc.name}
-                  </Option>
-                ))}
+                <Option key={doc.id} value={doc.id}>
+                  {doc.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 

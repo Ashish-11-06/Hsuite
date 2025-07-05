@@ -24,7 +24,10 @@ export const postUserLogin = createAsyncThunk(
       message.success(response.data.message || "Login successful!");
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Error during login");
+       const backendError =
+        error?.response?.data?.error ||
+        "Login failed. Please try again.";
+      return rejectWithValue(backendError);
     }
   }
 );
@@ -54,10 +57,10 @@ const AuthSlice = createSlice({
   },
   reducers: {
     logout: (state) => {
-      state.user = null;
+      state.hms_user = null;
       state.token = null;
       state.error = null;
-      state.hospital = null; // Reset hospital state on logout
+      state.hospital = null; 
     },
   },
   extraReducers: (builder) => {
@@ -84,7 +87,7 @@ const AuthSlice = createSlice({
       })
       .addCase(postUserLogin.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload?.user || null;
+        state.hms_user = action.payload?.user || null;
         state.token = action.payload?.token || null;
         state.hospital = action.payload?.hospital || null;
       })

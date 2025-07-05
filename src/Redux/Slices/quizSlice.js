@@ -82,7 +82,7 @@ export const updateTestQuestion = createAsyncThunk(
   "quiz/updateTestQuestion",
   async ({ quizId, questionId, updatedData }, { rejectWithValue }) => {
     try {
-      console.log(updatedData);
+      // console.log(updatedData);
       await quizAPI.updateTestQuestion(quizId, questionId, updatedData);
       return { questionId, updatedData };
     } catch (err) {
@@ -237,7 +237,7 @@ const quizSlice = createSlice({
         state.message = ""; // Clear message during loading
       })
       .addCase(postQuizName.fulfilled, (state, action) => {
-        console.log("✅ postQuizName.fulfilled payload:", action.payload);
+        // console.log("✅ postQuizName.fulfilled payload:", action.payload);
         state.loading = false;
         state.success = true;
         state.message = action.payload.message; // Set success message from backend
@@ -307,7 +307,7 @@ const quizSlice = createSlice({
         state.loading = true;
       })
       .addCase(updateTestQuestion.fulfilled, (state, action) => {
-        console.log("✅ Updated Question Payload in Slice:", action.payload); // Log the action payload to verify it
+        // console.log("✅ Updated Question Payload in Slice:", action.payload); // Log the action payload to verify it
         state.loading = false;
         const index = state.testQuestions.findIndex((q) => q.id === action.payload.questionId);
         if (index !== -1) {
@@ -321,7 +321,7 @@ const quizSlice = createSlice({
       .addCase(updateTestQuestion.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        console.error("❌ Error during update:", action.payload); // Log error message to debug
+        // console.error("❌ Error during update:", action.payload); // Log error message to debug
       })
       
       .addCase(deleteTestQuestion.pending, (state) => {
@@ -345,7 +345,7 @@ const quizSlice = createSlice({
         state.quizResults = action.payload;
       })
       .addCase(submitQuizResults.rejected, (state, action) => {
-        console.error("❌ submitQuizResults error:", action.payload);
+        // console.error("❌ submitQuizResults error:", action.payload);
         state.resultsLoading = false;
         state.resultsError = action.payload;
       })

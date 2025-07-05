@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { Layout } from "antd";
+import { Navigate } from "react-router-dom";
 import HeaderComponent from "./Components/HeaderComponent.jsx";
 import FooterComponent from "./Components/FooterComponent.jsx";
 import MainContent from "./Components/MainContent.jsx";
@@ -7,6 +8,7 @@ import "./App.css";
 import Login from "./pages/Login.jsx";
 import Sidebar from "./Components/Sidebar.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import ProtectedRouteDemo from "./Demo/Components/ProtectedRouteDemo.jsx";
 import { useEffect } from "react";
 import DemoMainContent from "./Demo/Components/DemoMainContent.jsx";
 import DemoSidebar from "./Demo/Components/DemoSidebar.jsx";
@@ -110,7 +112,7 @@ function App() {
           path="/demo/*"
           element={
             <Provider store={storedemo}>
-              {/* // <ProtectedRoute> */}
+              <ProtectedRouteDemo>
               <Layout style={{ minHeight: "100vh", display: "flex" }}>
                 {/*demo Sidebar */}
                 <DemoSidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
@@ -132,7 +134,7 @@ function App() {
                 </Footer> */}
                 </Layout>
               </Layout>
-              {/* // </ProtectedRoute> */}
+               </ProtectedRouteDemo>
             </Provider>
           }
         />

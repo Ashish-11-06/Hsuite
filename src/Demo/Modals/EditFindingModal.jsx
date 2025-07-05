@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, InputNumber, Button } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { useDispatch } from "react-redux";
 import { UpdateFinding, GetFinding } from "../Redux/Slices/PatientHistorySlice";
 
@@ -23,48 +23,58 @@ const EditFindingModal = ({ open, onClose, finding, patientId }) => {
     });
   };
 
-
   return (
     <Modal
       open={open}
       title="Edit Finding"
       onCancel={onClose}
-      footer={[
-        <Button onClick={onClose}>Cancel</Button>,
-        <Button type="primary" onClick={handleSubmit}>Save</Button>,
-      ]}
+      onOk={handleSubmit}
+      okText="Save"
+      width={800}
+      styles={{
+        body: {
+          maxHeight: "70vh",
+          overflowY: "auto",
+          paddingRight: 12,
+        },
+        content: {
+          overflow: "hidden",
+        },
+      }}
     >
       <Form layout="vertical" form={form}>
-        <Form.Item label="Temperature" name="temperature">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Pulse" name="pulse">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Blood Pressure" name="blood_pressure">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Weight" name="weight">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Height" name="height">
-          <Input />
-        </Form.Item>
-        <Form.Item label="CNS" name="cns">
-          <Input />
-        </Form.Item>
-        <Form.Item label="RS" name="rs">
-          <Input />
-        </Form.Item>
-        <Form.Item label="PA" name="pa">
-          <Input />
-        </Form.Item>
-        <Form.Item label="WBC" name="wbc">
-          <Input />
-        </Form.Item>
-        <Form.Item label="RBC" name="rbc">
-          <Input />
-        </Form.Item>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          <Form.Item label="Temperature" name="temperature" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Pulse" name="pulse" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Blood Pressure" name="blood_pressure" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Weight" name="weight" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Height" name="height" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="CNS" name="cns" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="RS" name="rs" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="PA" name="pa" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="WBC" name="wbc" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="RBC" name="rbc" style={{ flex: "1 1 48%" }}>
+            <Input />
+          </Form.Item>
+        </div>
       </Form>
     </Modal>
   );

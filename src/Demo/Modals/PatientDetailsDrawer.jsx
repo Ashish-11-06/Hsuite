@@ -6,7 +6,7 @@ const PatientDetailsDrawer = ({ visible, onClose, patient }) => {
   const navigate = useNavigate();
 
   const handleViewHistory = () => {
-    navigate("/demo/patient-history", { state: { patient } });
+    navigate("/demo/patient-history", { state: { patient_id:patient.id,patient } });
 
   };
 

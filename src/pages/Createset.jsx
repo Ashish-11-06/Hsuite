@@ -46,7 +46,7 @@ const Createset = () => {
   };
 
   const handleQuizSelect = (value) => {
-    console.log("Selected Quiz ID:", value);
+    // console.log("Selected Quiz ID:", value);
     setSelectedQuizId(value);
   };
 

@@ -24,18 +24,18 @@ const HeaderComponent = () => {
         }}
       >
         <h2
-  style={{
-    margin: 0,
-    fontSize: "20px",
-    whiteSpace: "nowrap",
-    paddingRight: "20px",
-  }}
->
-  Welcome,{" "}
-  <Link to="/profile" style={{ textDecoration: "none" }}>
-    <span style={{ color: "blue" }}>{user?.username || "Guest"}</span>
-  </Link>
-</h2>
+          style={{
+            margin: 0,
+            fontSize: "20px",
+            whiteSpace: "nowrap",
+            paddingRight: "20px",
+          }}
+        >
+          Welcome, {" "}
+          <Link to="/profile" style={{ textDecoration: "none" }}>
+            <span style={{ color: "blue" }}>{user?.username || "Guest"}</span>
+          </Link>
+        </h2>
 
         <Link to="/profile">
           <UserOutlined style={{ fontSize: "28px" }} />

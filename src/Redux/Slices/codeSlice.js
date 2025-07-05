@@ -73,7 +73,7 @@ export const addReaction = createAsyncThunk(
   async ({ user_id, description_id, action }, { rejectWithValue }) => {
     try {
       const response = await codesAPI.addReaction({ user_id, description_id, action });
-      console.log('API RESPONSE DATA:', response); // Verify this logs
+      // console.log('API RESPONSE DATA:', response); // Verify this logs
       return response; // Should contain {message, like_count, dislike_count}
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -201,7 +201,7 @@ setUserReaction: (state, action) => {
     state.codes = state.codes.map(code => 
         code.id === updatedCode.id ? updatedCode : code);
 
-        console.log("✅ Updated Redux State:", state.codes); // Debug log
+        // console.log("✅ Updated Redux State:", state.codes); // Debug log
       })
       .addCase(editCode.rejected, (state, action) => {
         state.status = "failed";

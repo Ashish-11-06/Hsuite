@@ -42,7 +42,7 @@ const handleAddStep = () => {
           ...values
         };
 
-        console.log('Submitting therapy data:', therapyData); // Debug log
+        // console.log('Submitting therapy data:', therapyData); // Debug log
 
         dispatch(createTherapy(therapyData))
           .unwrap()

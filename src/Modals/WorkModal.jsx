@@ -15,7 +15,7 @@ const WorkModal = ({ visible, onCancel, onCreate }) => {
         onCreate(values);
       })
       .catch(info => {
-        console.log("Validate Failed:", info);
+        // console.log("Validate Failed:", info);
       });
   };
 

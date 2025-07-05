@@ -21,9 +21,9 @@ const EgoTestResultModal = ({ visible, onClose, result }) => {
     const fetchCategories = async () => {
       try {
         const res = await dispatch(fetchAllEgogramCategories());
-        console.log("Statement Categories fetched:", res);
+        // console.log("Statement Categories fetched:", res);
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        // console.error("Error fetching categories:", err);
         message.error("Failed to fetch categories. Please try again later.");
       }
     }

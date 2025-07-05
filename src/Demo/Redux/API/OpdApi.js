@@ -16,6 +16,26 @@ const OpdApi = {
     
     GetOpdByDoctorId: (doctorId) => {
         return demoaxiosInstance.get(`hospital/opd/doctor/${doctorId}/`);
+    },
+
+    PostPrescription: (data) => {
+        return demoaxiosInstance.post(`hospital/prescription/`, data);
+    },
+    
+    GetMedicinesNames: () => {
+        return demoaxiosInstance.get(`hospital/prescription/medicine-names/`);
+    },
+
+    GetPrescriptionByPatientId: (patient_id) => {
+        return demoaxiosInstance.get(`hospital/prescription/patient/${patient_id}/`);
+    },
+
+    PostBillPreticulars: (data) => {
+        return demoaxiosInstance.post(`hospital/bill-perticulars/`,data);
+    },
+
+    PostBill: (data) => {
+        return demoaxiosInstance.post(`hospital/bill/`, data);
     }
 }
 

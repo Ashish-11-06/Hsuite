@@ -20,7 +20,10 @@ export const fetchAllPatients = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await PatientApi.GetAllPatients();
-      return res.data.patients;// Ensure we return an empty array if no data is found
+       return {
+        hospital: res.data.hospital,
+        patients: res.data.patients
+      };// Ensure we return an empty array if no data is found
     } catch (err) {
       return rejectWithValue(err.res?.data.message || "error fetching all the patients");
     }
@@ -72,6 +75,7 @@ const patientSlice = createSlice({
     data: null,
     historyData: [],
     allPatients: [],
+    hospital: {},
     error: null,
   },
   reducers: {
@@ -103,7 +107,8 @@ const patientSlice = createSlice({
       })
       .addCase(fetchAllPatients.fulfilled, (state, action) => {
         state.loading = false;
-        state.allPatients = action.payload;
+        state.allPatients = action.payload.patients;
+        state.hospital = action.payload.hospital; 
       })
       .addCase(fetchAllPatients.rejected, (state, action) => {
         state.loading = false;

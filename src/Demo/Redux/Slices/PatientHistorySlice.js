@@ -309,7 +309,7 @@ export const GetCertificates = createAsyncThunk(
 // ---------- ATTACHMENTS ----------
 export const PostAttachment = createAsyncThunk(
   "patienthistory/postAttachment",
-  async (formData, { rejectWithValue }) => { 
+  async (formData, { rejectWithValue }) => {
     try {
       const response = await PatientHistoryApi.PostAttachment(formData);
       message.success(response.data.message || "Attachment added successfully");
@@ -376,7 +376,7 @@ const patientHistorySlice = createSlice({
       })
       .addCase(GetFinding.fulfilled, (state, action) => {
         state.loading = false;
-        state.findings = action.payload;
+        state.findings = action.payload.data;
       })
       .addCase(GetFinding.rejected, (state, action) => {
         state.loading = false;
@@ -658,7 +658,7 @@ const patientHistorySlice = createSlice({
       // Post Attachment
       .addCase(PostAttachment.pending, (state) => {
         state.loading = true;
-      })    
+      })
       .addCase(PostAttachment.fulfilled, (state, action) => {
         state.loading = false;
         state.message = action.payload.message;

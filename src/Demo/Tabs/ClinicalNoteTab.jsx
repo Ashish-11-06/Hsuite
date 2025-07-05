@@ -2,25 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography, Table, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AddClinicalNotesModal from "../Modals/AddClinicalNotesModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GetClinicalNotes } from "../Redux/Slices/PatientHistorySlice";
-import { data } from "react-router-dom";
+import { DownloadOutlined } from "@ant-design/icons";
+import generateClinicalNotePDF from "../Pages/generateClinicalNotePDF";
+import { GetAllUsers } from "../Redux/Slices/UsersSlice";
+import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
 
 const { Title } = Typography;
 
-const ClinicalNoteTab = ({ patient }) => {
+const ClinicalNoteTab = ({ patient, patient_id }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clinicalNotes, setClinicalNotes] = useState([]);
+  const patients = useSelector((state) => state.patient.allPatients || []);
+  const users = useSelector((state) => state.users.users || []);
+  const hospital = useSelector((state) => state.patient.hospital || {});
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+  const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   const fetchClinicalNotes = async () => {
     try {
       setLoading(true);
-      const response = await dispatch(GetClinicalNotes(patient.id)).unwrap();
+      const response = await dispatch(GetClinicalNotes(patient_id)).unwrap();
       setClinicalNotes(response.data || []);
     } catch (error) {
-      // message.error("Failed to fetch clinical notes.");
     } finally {
       setLoading(false);
     }
@@ -28,6 +35,8 @@ const ClinicalNoteTab = ({ patient }) => {
 
   useEffect(() => {
     fetchClinicalNotes();
+    dispatch(fetchAllPatients());
+    dispatch(GetAllUsers());
   }, [patient.id]);
 
   const handleModalClose = () => {
@@ -60,20 +69,55 @@ const ClinicalNoteTab = ({ patient }) => {
     },
     { title: "Advice", dataIndex: "advice", key: "advice" },
     { title: "Follow-up Date", dataIndex: "next_followup_date", key: "next_followup_date" },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Button
+          type="text"
+          icon={<DownloadOutlined />}
+          onClick={() => {
+            const addedByDoctor = users.find(
+              (u) => u.id === record.medicines?.[0]?.added_by
+            );
+
+            const updatedRecord = {
+              ...record,
+              medicines: record.medicines.map((med) => ({
+                ...med,
+                added_by_name: users.find((u) => u.id === med.added_by)?.name || "Unknown",
+              })),
+            };
+
+            generateClinicalNotePDF({
+              record: updatedRecord,
+              patient,
+              doctor: addedByDoctor, // ✅ Pass added_by doctor here
+              hospital,
+            });
+          }}
+        />
+      ),
+    }
   ];
 
   return (
     <div style={{ padding: 12 }}>
-      <Title level={4}>Clinical Notes for {patient.name}</Title>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <Title level={4} style={{ margin: 0 }}>
+          Clinical Notes for {patient.full_name}
+        </Title>
 
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setIsModalOpen(true)}
-        style={{ marginBottom: 16 }}
-      >
-        Add
-      </Button>
+        {canAdd && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Add
+          </Button>
+        )}
+      </div>
 
       <Table
         dataSource={clinicalNotes}
@@ -87,7 +131,7 @@ const ClinicalNoteTab = ({ patient }) => {
       <AddClinicalNotesModal
         open={isModalOpen}
         onClose={handleModalClose}
-        patientId={patient.id}
+        patientId={patient_id}
         onClinicalNoteAdded={fetchClinicalNotes}
       />
     </div>

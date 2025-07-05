@@ -5,6 +5,7 @@ import {
   Space,
   Card,
   message,
+  Spin,
 } from "antd";
 import {
   UploadOutlined,
@@ -20,14 +21,18 @@ import { BASE_URL } from '../Redux/API/demoaxiosInstance'
 
 const { Title } = Typography;
 
-const AttachmentsTab = ({ patient }) => {
+const AttachmentsTab = ({ patient, patient_id }) => {
   const dispatch = useDispatch();
   const [attachments, setAttachments] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setloading] = useState([]);const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+
 
   const fetchAttachments = async () => {
     try {
-      const response = await dispatch(GetAttachmentsByPatientId(patient.id)).unwrap();
+      setloading(true);
+      const response = await dispatch(GetAttachmentsByPatientId(patient_id)).unwrap();
       const processed = (response?.data || []).map((file) => ({
         ...file,
         fullUrl: `${BASE_URL}${file.file}`,
@@ -35,22 +40,29 @@ const AttachmentsTab = ({ patient }) => {
       setAttachments(processed);
     } catch (err) {
       message.error("Failed to load attachments");
+    } finally {
+      setloading(false);
     }
   };
 
   useEffect(() => {
     fetchAttachments();
-  }, [patient.id]);
+  }, [patient_id]);
 
   return (
+
+    // <>aaskldjflja</>
     <div style={{ padding: 16 }}>
       <Space style={{ justifyContent: "space-between", width: "100%" }}>
-        <Title level={4}>Attachments for {patient.name}</Title>
+        <Title level={4}>Attachments for {patient.full_name}</Title>
+        {canAdd && (
         <Button type="primary" icon={<UploadOutlined />} onClick={() => setModalOpen(true)}>
           Upload File
         </Button>
+        )}
       </Space>
 
+      <Spin spinning={loading} />
       <div
         style={{
           display: "flex",
@@ -62,6 +74,7 @@ const AttachmentsTab = ({ patient }) => {
         {attachments.map((file) => (
           <Card
             key={file.id}
+            
             title={file.attachment_name}
             style={{ width: 240, cursor: "pointer" }}
             hoverable
@@ -122,6 +135,7 @@ const AttachmentsTab = ({ patient }) => {
           >
             <p><strong>Type:</strong> {file.file.endsWith(".pdf") ? "PDF" : "Image"}</p>
             <p><strong>Date:</strong> {dayjs(file.date).format("YYYY-MM-DD")}</p>
+            <p><strong>Description:</strong>{file.description}</p>
           </Card>
         ))}
       </div>
@@ -132,7 +146,7 @@ const AttachmentsTab = ({ patient }) => {
           setModalOpen(false);
           fetchAttachments(); // Refresh list after upload
         }}
-        patientId={patient.id}
+        patientId={patient_id}
       />
     </div>
   );

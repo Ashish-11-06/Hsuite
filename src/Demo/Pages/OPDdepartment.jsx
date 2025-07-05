@@ -1,192 +1,268 @@
 import React, { useState, useEffect } from "react";
-import { Button,  Input, Space,Typography,Row, Col,Card,Progress,Form,Spin,message,Empty,} from "antd";
+import { Button, Input, Space, Typography, Row, Col, Card, Progress, Form, Spin, message, Empty, } from "antd";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import DoctorNotesDrawer from "../Modals/DoctorNotesDrawer";
 import GetPatientsModal from "../Modals/GetPatientsModal";
 import OPDCard from "./OPDCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
-import { GetAllOPD, UpdateOPDStatus } from "../Redux/Slices/OpdSlice"; // Adjust the import path as necessary
+import { GetAllUsers } from "../Redux/Slices/UsersSlice";
+import { GetAllOPD, UpdateOPDStatus, GetOpdByDoctorId } from "../Redux/Slices/OpdSlice"; // Adjust the import path as necessary
 
 const { Title } = Typography;
 
 const OPDdepartment = () => {
   const dispatch = useDispatch();
-  const { opdData, loading, error } = useSelector((state) => state.opd);
-  const {patients} = useSelector((state) => state.patient);
+  const { opdData, opdByDoctor, loading, error } = useSelector((state) => state.opd);
+  const patients = useSelector((state) => state.patient.allPatients);
+  const allUsers = useSelector((state) => state.users.users);
   const [viewingRecord, setViewingRecord] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
   const [isPatientModalVisible, setIsPatientModalVisible] = useState(false);
   const [patientDetails, setPatientDetails] = useState({});
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
 
   useEffect(() => {
-    dispatch(GetAllOPD());
     dispatch(fetchAllPatients());
-  }, [dispatch]);
+    dispatch(GetAllUsers());
+
+    const fetch =async () => {
+      if (currentUser?.designation === "doctor") {
+        dispatch(GetOpdByDoctorId(currentUser.id));
+      } else {
+       const res=await dispatch(GetAllOPD());
+       console.log('res',res);
+      }
+    }
+    fetch()
+  }, []);
 
   // Safely access the data array from the API response
-  const records = opdData?.data || [];
+  const records = currentUser?.designation === "doctor"
+    ? opdByDoctor?.data || []
+    : opdData?.data || [];
 
   // You would need to fetch patient details based on the patient IDs in the OPD records
   useEffect(() => {
-  if (records?.length > 0 && patients?.length > 0) {
-    const mappedPatients = {};
+    if (records?.length > 0 && patients?.length > 0) {
+      const mappedPatients = {};
 
-    records.forEach((record) => {
-      const matchedPatient = patients.find((p) => p.id === record.patient);
-      if (matchedPatient) {
-        mappedPatients[record.patient] = {
-          full_name: matchedPatient.full_name,
-          age: matchedPatient.age,
-          gender: matchedPatient.gender,
-          address: matchedPatient.address,
-          contact: matchedPatient.contact_number,
-        };
+      records.forEach((record) => {
+        const matchedPatient = patients.find((p) => p.id === record.patient);
+        // console.log("Matched Patient:", matchedPatient);
+        if (matchedPatient) {
+          mappedPatients[record.patient] = {
+            full_name: matchedPatient.full_name,
+            age: matchedPatient.age,
+            gender: matchedPatient.gender,
+            address: matchedPatient.address,
+            contact: matchedPatient.contact_number,
+            patient_id: matchedPatient.patient_id,
+          };
+        }
+      });
+
+      setPatientDetails(mappedPatients);
+    }
+  }, [records, patients]);
+
+
+  const filteredData = records.filter((record) => {
+    const patient = patientDetails[record.patient] || {};
+    const lowerSearch = searchText.toLowerCase();
+
+    const matchesSearch =
+      patient.full_name?.toLowerCase().includes(lowerSearch) ||
+      patient.address?.toLowerCase().includes(lowerSearch) ||
+      patient.contact?.toLowerCase().includes(lowerSearch);
+
+    const matchesStatus = selectedStatus === "all" || record.status === selectedStatus;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleEdit = async (updateData) => {
+    try {
+      await dispatch(UpdateOPDStatus(updateData)).unwrap();
+      if (currentUser?.designation === "doctor") {
+        dispatch(GetOpdByDoctorId(currentUser.id));
+      } else {
+        dispatch(GetAllOPD());
       }
-    });
+    } catch (error) {
+    }
+  };
 
-    setPatientDetails(mappedPatients);
-  }
-}, [records, patients]);
-
-const filteredData = searchText
-  ? records.filter((record) => {
-      const patient = patientDetails[record.patient] || {};
-      return patient.full_name?.toLowerCase().includes(searchText.toLowerCase());
-    })
-  : records;
-
-  
-const handleEdit = async (updateData) => {
-  try {
-    await dispatch(UpdateOPDStatus(updateData)).unwrap();
-    // message.success("Record updated successfully!");
-    dispatch(GetAllOPD()); // Refresh the data
-  } catch (error) {
-    // message.error("Failed to update record");
-  }
-};
 
   const handleDelete = (id) => {
     // Dispatch an action to delete the record in the backend
     message.success("Record deleted successfully!");
   };
 
- const waitingCount = records.filter((item) => item.status === "waiting").length;
-const outCount = records.filter((item) => item.status === "out").length;
-const newCount = records.filter((item) => item.visitType === "New").length; // Add this line
-const followUpCount = records.filter((item) => item.visitType === "Follow-Up").length; // Add this line
-const totalCount = records.length; // Add this line
+  const waitingCount = records.filter((item) => item.status === "waiting").length;
+  const outCount = records.filter((item) => item.status === "out").length;
+  const newCount = records.filter((item) => item.visitType === "New").length; // Add this line
+  const followUpCount = records.filter((item) => item.visitType === "Follow-Up").length; // Add this line
+  const totalCount = records.length; // Add this line
 
   // Mock doctors data - replace with actual doctors data from your backend
-  const doctorsList = [
-    { id: 16, name: "Dr. Smith" },
-    { id: 17, name: "Dr. Johnson" },
-    { id: 18, name: "Dr. Lee" },
-  ];
+  const doctorsList = allUsers?.filter(user => user.designation === "doctor") || [];
 
-  if (loading) return <Spin size="large" />;
+  // if (loading) return <Spin size="large" />;
   if (error) return <div>Error: {error.message || "Failed to load OPD data"}</div>;
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={3}>OPD Department</Title>
+    <div style={{ padding: 24, height: "100vh", overflowY: "hidden", display: "flex", flexDirection: "column" }}>
 
-        <Row gutter={16} style={{ marginBottom: 24 }}>
+      <Row gutter={16} style={{ marginBottom: 5 }}>
         <Col span={6}>
-          <Card title="Today's Summary" bordered style={{ borderRadius: 8 }}>
-            <div style={{ marginBottom: 12 }}>
-              <p>
-                🕒 Waiting: <strong>{waitingCount}</strong>
-              </p>
-              <Progress
-                percent={totalCount > 0 ? Math.round((waitingCount / totalCount) * 100) : 0}
-                status="active"
-                strokeColor="orange"
-              />
-            </div>
+          <div style={{
+            position: "sticky",
+            top: 15,
+            zIndex: 10
+          }}>
+            <Title level={3}>OPD Department</Title>
+            <Card title="Today's Summary" variant="default" style={{ borderRadius: 8 }}>
+              <div style={{ marginBottom: 12 }}>
+                <p>
+                  🕒 Waiting: <strong>{waitingCount}</strong>
+                </p>
+                <Progress
+                  percent={totalCount > 0 ? Math.round((waitingCount / totalCount) * 100) : 0}
+                  status="active"
+                  strokeColor="orange"
+                />
+              </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <p>
-                ✅ Out: <strong>{outCount}</strong>
-              </p>
-              <Progress
-                percent={Math.round((outCount / opdData.length) * 100)}
-                status="active"
-                strokeColor="green"
-              />
-            </div>
+              <div style={{ marginBottom: 12 }}>
+                <p>
+                  ✅ Out: <strong>{outCount}</strong>
+                </p>
+                <Progress
+                  percent={Math.round((outCount / opdData.length) * 100)}
+                  status="active"
+                  strokeColor="green"
+                />
+              </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <p>
-                🆕 New: <strong>{newCount}</strong>
-              </p>
-              <Progress
-                percent={Math.round((newCount / opdData.length) * 100)}
-                status="active"
-                strokeColor="blue"
-              />
-            </div>
+              <div style={{ marginBottom: 12 }}>
+                <p>
+                  🆕 New: <strong>{newCount}</strong>
+                </p>
+                <Progress
+                  percent={Math.round((newCount / opdData.length) * 100)}
+                  status="active"
+                  strokeColor="blue"
+                />
+              </div>
 
-            <div>
-              <p>
-                🔁 Follow-Up: <strong>{followUpCount}</strong>
-              </p>
-              <Progress
-                percent={Math.round((followUpCount / opdData.length) * 100)}
-                status="active"
-                strokeColor="purple"
-              />
-            </div>
-          </Card>
+              <div>
+                <p>
+                  🔁 Follow-Up: <strong>{followUpCount}</strong>
+                </p>
+                <Progress
+                  percent={Math.round((followUpCount / opdData.length) * 100)}
+                  status="active"
+                  strokeColor="purple"
+                />
+              </div>
+            </Card>
+          </div>
         </Col>
 
         <Col span={18}>
-          <Space
+          <div
             style={{
-              width: "100%",
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+              padding: "8px 0 16px 0",
+              display: "flex",
               justifyContent: "space-between",
-              marginBottom: 16,
+              alignItems: "center",
             }}
           >
-            <Input.Search
-              placeholder="Search patient by name"
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 300 }}
-            />
             <Space>
+              <Input
+                placeholder="Search patient by name, contact no, address"
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 300 }}
+              />
+
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  border: "1px solid #d9d9d9",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="all">All</option>
+                <option value="waiting">Waiting</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="out">Out</option>
+              </select>
+            </Space>
+
+            {["receptionist", "admin"].includes(currentUser?.designation) && (
               <Button
                 icon={<UserAddOutlined />}
                 onClick={() => setIsPatientModalVisible(true)}
+                type="primary"
               >
                 Add OPD
               </Button>
-            </Space>
-          </Space>
-
-          <Space direction="vertical" style={{ width: "100%" }}>
-            {filteredData.length > 0 ? (
-              filteredData.map((record) => (
-                <OPDCard
-                  key={record.id}
-                  record={record}
-                  doctors={doctorsList}
-                  patientDetails={patientDetails}
-                  onView={(rec) => {
-                    setViewingRecord(rec);
-                    setIsDrawerVisible(true);
-                  }}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))
-            ) : (
-              <Empty description="No OPD records found" />
             )}
-          </Space>
+          </div>
+
+          <Card
+            variant="outlined"
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              borderRadius: 8,
+              padding: 12,
+              backgroundColor: "#fff",
+              height: "calc(100vh - 160px)",
+            }}
+          >
+            {loading && records.length === 0 ? (
+              <div style={{ display: "flex", justifyContent: "center", paddingTop: 100 }}>
+                <Spin size="large" />
+              </div>
+            ) : (
+              <Space direction="vertical" style={{ width: "100%" }}>
+                {filteredData.length > 0 ? (
+                  filteredData.map((record) => (
+                    <OPDCard
+                      key={record.id}
+                      record={record}
+                      doctors={doctorsList}
+                      patientDetails={patientDetails}
+                      onView={(rec) => {
+                        setViewingRecord(rec);
+                        setIsDrawerVisible(true);
+                      }}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  ))
+                ) : (
+                  <Empty description="No OPD records found" />
+                )}
+              </Space>
+            )}
+          </Card>
+
         </Col>
+
       </Row>
       <DoctorNotesDrawer
         visible={isDrawerVisible}
@@ -197,10 +273,15 @@ const totalCount = records.length; // Add this line
       <GetPatientsModal
         visible={isPatientModalVisible}
         onClose={() => setIsPatientModalVisible(false)}
-        onSelect={(patient) => {
-          // Handle adding new OPD record
-          message.success("Patient added to OPD successfully!");
+        onSelect={() => {
+          console.log("onslecet from parent called")
           setIsPatientModalVisible(false);
+
+          if (currentUser?.designation === "doctor") {
+            dispatch(GetOpdByDoctorId(currentUser.id));
+          } else {
+            dispatch(GetAllOPD());
+          }
         }}
       />
     </div>

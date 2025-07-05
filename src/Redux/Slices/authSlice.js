@@ -138,12 +138,12 @@ export const UpdateCounsellorProfile = createAsyncThunk(
   "auth/updateCounsellorProfile",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      console.log('Sending to API - ID:', id);
-      console.log('Sending to API - Data:', data);
+      // console.log('Sending to API - ID:', id);
+      // console.log('Sending to API - Data:', data);
       
       const response = await authAPI.UpdateCounsellorProfile(id, data);
       
-      console.log('API response:', response.data);
+      // console.log('API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('API error:', error.response?.data || error.message);

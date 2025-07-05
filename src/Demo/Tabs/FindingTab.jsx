@@ -6,6 +6,9 @@ import { GetFinding } from "../Redux/Slices/PatientHistorySlice";
 import AddFindingModal from "../Modals/AddFindingModal";
 import VitalsInfoModal from "../Modals/VitalsInfoModal";
 import EditFindingModal from "../Modals/EditFindingModal";
+import { DownloadOutlined } from "@ant-design/icons";
+import generateVitalsPDF from "../Pages/generateVitalsPDF";
+import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
 
 const { Title } = Typography;
 
@@ -64,8 +67,7 @@ const renderVitalTag = (field) => (text) => {
   return <Tag color={color}>{label}</Tag>;
 };
 
-
-const FindingTab = ({ patient }) => {
+const FindingTab = ({ patient, patient_id }) => {
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState(false);
   const [infoModalVisible, setInfoModalVisible] = useState(false);
@@ -73,11 +75,16 @@ const FindingTab = ({ patient }) => {
   const [selectedFinding, setSelectedFinding] = useState(null);
 
   const { findings, loading, message } = useSelector((state) => state.patienthistory);
+  const hospital = useSelector((state) => state.patient.hospital || {});
+
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+  const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   useEffect(() => {
     if (patient?.id) {
-      dispatch(GetFinding(patient.id));
+      dispatch(GetFinding(patient_id));
     }
+    dispatch(fetchAllPatients());
   }, [dispatch, patient?.id]);
 
   const columns = [
@@ -102,36 +109,48 @@ const FindingTab = ({ patient }) => {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <Button
-          icon={<EditOutlined />}
-          onClick={() => {
-            setSelectedFinding(record);
-            setEditModalVisible(true);
-          }}
-        >
-          Edit
-        </Button>
+        <Space>
+          {canAdd && (
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => {
+                setSelectedFinding(record);
+                setEditModalVisible(true);
+              }}
+            >
+              Edit
+            </Button>
+          )}
+          <Button
+            type="text"
+            icon={<DownloadOutlined />}
+            onClick={() => generateVitalsPDF({ record, patient, hospital })}
+          />
+        </Space>
       ),
-    },
+    }
   ];
 
   return (
     <div style={{ padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Title level={4}>Findings for {patient?.name || "Patient"}</Title>
+        <Title level={4}>Findings for {patient?.full_name || "Patient"}</Title>
         <Space>
           <Button icon={<QuestionCircleOutlined />} onClick={() => setInfoModalVisible(true)} type="default">
             Vitals Info
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalVisible(true)}>
-            New Record
-          </Button>
+
+          {canAdd && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalVisible(true)}>
+              New Record
+            </Button>
+          )}
         </Space>
       </div>
 
       <Table
         columns={columns}
-        dataSource={findings?.map((item, index) => ({ ...item, key: index }))}
+        dataSource={Array.isArray(findings) ? findings.map((item, index) => ({ ...item, key: index })) : []}
         loading={loading}
         bordered
         style={{ marginTop: 24 }}
@@ -144,14 +163,14 @@ const FindingTab = ({ patient }) => {
       <AddFindingModal
         open={modalVisible}
         onClose={() => setModalVisible(false)}
-        patientId={patient.id}
+        patientId={patient_id}
       />
 
       <EditFindingModal
         open={editModalVisible}
         onClose={() => setEditModalVisible(false)}
         finding={selectedFinding}
-        patientId={patient.id}
+        patientId={patient_id}
       />
 
       <VitalsInfoModal

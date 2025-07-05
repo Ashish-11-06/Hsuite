@@ -14,14 +14,14 @@ const AddCounsellorDetailsModal = ({ visible, onClose }) => {
   const userId = useSelector((state) => state.auth.userId);
 
   const authState = useSelector((state) => state.auth);
-  console.log("auth state:", authState);
+  // console.log("auth state:", authState);
 
 
   const handleImageChange = (info) => {
-    console.log("Upload info received:", info);
+    // console.log("Upload info received:", info);
 
     if (info.file.status === 'removed') {
-      console.log("Image removed");
+      // console.log("Image removed");
       setImageFile(null);
       setPreviewUrl(null);
       return;
@@ -35,7 +35,7 @@ const AddCounsellorDetailsModal = ({ visible, onClose }) => {
     }
 
     const latestFile = fileList[fileList.length - 1].originFileObj;
-    console.log("Latest selected file object:", latestFile);
+    // console.log("Latest selected file object:", latestFile);
 
     if (!latestFile) {
       console.error("No originFileObj found in fileList");
@@ -56,7 +56,7 @@ const AddCounsellorDetailsModal = ({ visible, onClose }) => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      console.log("Preview base64:", e.target.result.slice(0, 100));
+      // console.log("Preview base64:", e.target.result.slice(0, 100));
       setPreviewUrl(e.target.result);
       setImageFile(latestFile);
       message.success("Image uploaded successfully!");

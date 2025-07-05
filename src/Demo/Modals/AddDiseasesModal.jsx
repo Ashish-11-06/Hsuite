@@ -32,6 +32,8 @@ const AddDiseasesModal = ({
   const { loading } = useSelector((state) => state.patienthistory);
 
   useEffect(() => {
+    if (!visible) return;
+    
     if (editMode && disease) {
       form.setFieldsValue({
         severity: disease.severity,
@@ -63,12 +65,13 @@ const AddDiseasesModal = ({
   return (
     <Modal
       title={editMode ? "Update Disease Status" : "Add Disease"}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       onOk={handleSubmit}
       confirmLoading={loading}
       okText={editMode ? "Update" : "Add"}
       centered
+      destroyOnClose
     >
       <Form layout="vertical" form={form}>
         {!editMode && (

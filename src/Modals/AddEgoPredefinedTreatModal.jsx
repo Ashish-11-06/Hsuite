@@ -20,7 +20,7 @@ const AddEgoPredefinedTreatModal = ({
 
   const [stepsModalVisible, setStepsModalVisible] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
-   const [stepsData, setStepsData] = useState(null);
+  const [stepsData, setStepsData] = useState(null);
 
   useEffect(() => {
     if (visible && resultCategories) {
@@ -31,7 +31,7 @@ const AddEgoPredefinedTreatModal = ({
           id,
           name
         }));
-      
+
       setAvailableCategories(filteredCategories);
     }
   }, [visible, statementCategories, resultCategories]);
@@ -51,15 +51,15 @@ const AddEgoPredefinedTreatModal = ({
         .unwrap()
         .then((response) => {
           setSubmittedData({
-  categoryName: response.treatment.category_name,
-  type: response.treatment.type,
-  quizId: response.steps.id,
-  treatmentId: response.treatment.id 
-});
-console.log(response.steps);
+            categoryName: response.treatment.category_name,
+            type: response.treatment.type,
+            quizId: response.steps.id,
+            treatmentId: response.treatment.id
+          });
+          // console.log(response.steps);
           setStepsData(response.steps);
           setStepsModalVisible(true);
-   setStepsModalVisible(true);
+          setStepsModalVisible(true);
           form.resetFields();
         })
         .catch((error) => {
@@ -79,69 +79,69 @@ console.log(response.steps);
 
   return (
     <>
-    <Modal
-      title="Add Predefined Treatment"
-      visible={visible}
-      onCancel={onClose}
-      footer={null}
-      destroyOnClose
-    >
-      <Form form={form} layout="vertical"
-      onFinish={handleSubmit}>
-        <Form.Item
-          name="action"
-          label="type"
-          rules={[{ required: true, message: "Please select an action" }]}
-        >
-          <Radio.Group>
-            <Radio value="increase">Increase</Radio>
-            <Radio value="decrease">Decrease</Radio>
-          </Radio.Group>
-        </Form.Item>
-
-        <Form.Item
-          name="category"
-          label="Category"
-          rules={[{ required: true, message: "Please select a category" }]}
-        >
-          <Select 
-            placeholder="Select a category"
-            showSearch
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
+      <Modal
+        title="Add Predefined Treatment"
+        visible={visible}
+        onCancel={onClose}
+        footer={null}
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical"
+          onFinish={handleSubmit}>
+          <Form.Item
+            name="action"
+            label="type"
+            rules={[{ required: true, message: "Please select an action" }]}
           >
-            {availableCategories.map((category) => (
-              <Option key={category.id} value={category.id}>
-                {category.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Radio.Group>
+              <Radio value="increase">Increase</Radio>
+              <Radio value="decrease">Decrease</Radio>
+            </Radio.Group>
+          </Form.Item>
 
-        <Form.Item>
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select
+              placeholder="Select a category"
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {availableCategories.map((category) => (
+                <Option key={category.id} value={category.id}>
+                  {category.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
             <Button type="primary" htmlType="submit">
-            Treatment
+              Treatment
             </Button>
           </Form.Item>
-      </Form>
-    </Modal>
+        </Form>
+      </Modal>
 
-    {submittedData && (
-  <GetPersonalityStepsModal
-    visible={stepsModalVisible}
-    onClose={() => {
-      setStepsModalVisible(false);
-      onClose();
-    }}
-    quizId={submittedData.quizId}
-    categoryName={submittedData.categoryName}
-    type={submittedData.type}
-    treatmentId={submittedData.treatmentId}
-    stepsData = {stepsData}
-  />
-)}
+      {submittedData && (
+        <GetPersonalityStepsModal
+          visible={stepsModalVisible}
+          onClose={() => {
+            setStepsModalVisible(false);
+            onClose();
+          }}
+          quizId={submittedData.quizId}
+          categoryName={submittedData.categoryName}
+          type={submittedData.type}
+          treatmentId={submittedData.treatmentId}
+          stepsData={stepsData}
+        />
+      )}
     </>
   );
 };

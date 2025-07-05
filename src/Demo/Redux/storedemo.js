@@ -4,6 +4,7 @@ import  patienthistoryReducer from "../Redux/Slices/PatientHistorySlice";
 import authReducer from "../Redux/Slices/AuthSlice";
 import usersReducer from "../Redux/Slices/UsersSlice";
 import opdReducer from "../Redux/Slices/OpdSlice";
+import billingReducer from "../Redux/Slices/BillingSlice";
 
 const storedemo = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const storedemo = configureStore({
     auth:authReducer,
     users:usersReducer,
     opd: opdReducer,
+    billing: billingReducer,
     // other reducers
   },
 });

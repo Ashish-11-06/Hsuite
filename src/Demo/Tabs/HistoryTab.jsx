@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 
 const { Title, Text } = Typography;
 
-const HistoryTab = ({ patient }) => {
+const HistoryTab = ({ patient,patient_id }) => {
   const [isCustomModalVisible, setIsCustomModalVisible] = useState(false);
   const [customRecords, setCustomRecords] = useState([]);
   const [familyHistory, setFamilyHistory] = useState([]);
@@ -36,7 +36,8 @@ const HistoryTab = ({ patient }) => {
     setCustomRecords([...customRecords, { title, record }]);
     setIsCustomModalVisible(false);
   };
-  const patient_id = patient?.id;
+  // const patient_id = patient?.id;
+  console.log("patient", patient);
 
   useEffect(() => {
     const getAllHistory = async () => {
@@ -69,10 +70,10 @@ const HistoryTab = ({ patient }) => {
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <FamilyHistorySection familyHistory={familyHistory} loading={loading} patientId={patient_id} setFamilyHistory={setFamilyHistory} setLoading={setLoading} />
         <AllergiesSection allergies={allergies} setAllergies={setAllergies} setLoading={setLoading} patientId={patient_id} loading={loading} />
-        <PastHospitalHistorySection pastHospitalHistory={pastHospitalHistory} patientId={patient_id} setLoading={setLoading} setPastHospitalHistory={setPastHospitalHistory} />
-        <DiseasesSection diseases={diseases} patientId={patient_id} setDiseases={setDiseases} setLoading={setLoading} />
-        <PastHospitalCurrentHistorySection pastHospitalCurrentHistory={pastHospitalCurrentHistory} setPastHospitalCurrentHistory={setPastHospitalCurrentHistory} setLoading={setLoading} patientId={patient_id} />
-        <OngoingMedicationSection ongoingMedication={ongoingMedication} patientId={patient_id} diseases={diseases} setOngoingMedication={setOngoingMedication} setLoading={setLoading} />
+        <PastHospitalHistorySection pastHospitalHistory={pastHospitalHistory} patientId={patient_id} setLoading={setLoading} setPastHospitalHistory={setPastHospitalHistory} loading={loading} />
+        <DiseasesSection diseases={diseases} patientId={patient_id} setDiseases={setDiseases} setLoading={setLoading} loading={loading} />
+        <PastHospitalCurrentHistorySection pastHospitalCurrentHistory={pastHospitalCurrentHistory} setPastHospitalCurrentHistory={setPastHospitalCurrentHistory} setLoading={setLoading} patientId={patient_id} loading={loading} />
+        <OngoingMedicationSection ongoingMedication={ongoingMedication} patientId={patient_id} diseases={diseases} setOngoingMedication={setOngoingMedication} setLoading={setLoading} loading={loading} />
 
         <Divider />
 

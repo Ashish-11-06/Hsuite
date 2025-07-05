@@ -57,7 +57,7 @@ getCodes: (user_id) => {
       action
     })
     .then(response => {
-      console.log('RAW RESPONSE:', response); // Check this in browser console
+      // console.log('RAW RESPONSE:', response); // Check this in browser console
       return response.data; // This is what you're missing
     });
   },

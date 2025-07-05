@@ -96,7 +96,7 @@ const AddMCQQuestionModal = ({ open, onClose }) => {
           };
         });
     
-        console.log("Final Payload ===>", payload); // Check the final payload
+        // console.log("Final Payload ===>", payload); // Check the final payload
     
         await dispatch(addMCQQuestion(payload));
         message.success("Questions added successfully!");

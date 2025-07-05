@@ -18,6 +18,8 @@ const FamilyHistorySection = ({ familyHistory, patientId, setFamilyHistory, setL
     description: "",
     period: "",
   });
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   const handleSubmit = async () => {
     const payload = {
@@ -53,16 +55,20 @@ const FamilyHistorySection = ({ familyHistory, patientId, setFamilyHistory, setL
     <Card
       title={<span style={{ color: "#1890ff" }}>Family History</span>}
       extra={
+        canAdd && (
         <Button icon={<PlusOutlined />} type="primary" size="small" onClick={() => setVisible(true)}>
           Add
         </Button>
+        )
       }
       style={{ borderRadius: 8 }}
     >
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "20px" }}>
-          <Spin tip="Loading family history" />
+          <Spin tip="Loading family history" spinning={loading}>
+            <div style={{height: 1}}></div>
+          </Spin> 
         </div>
       ) : Array.isArray(familyHistory) && familyHistory.length > 0 ? (
         familyHistory.map((entry, idx) => (

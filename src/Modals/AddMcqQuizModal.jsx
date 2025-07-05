@@ -27,38 +27,13 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
     }
   }, [error]);
 
-  useEffect (()=> {
-    console.log(questions)
+  useEffect(() => {
+    // console.log(questions)
   }, [questions]);
-
-  // const handleFinish = (values) => {
-  //   // Get the full question objects for selected IDs
-  //   const selectedQuestions = Array.isArray(questions)
-  // ? questions.filter(q => values.questions?.includes(q.id))
-  // : [].map(q => ({
-  //     question: q.question,
-  //     options_1: q.options_1,
-  //     options_2: q.options_2,
-  //     options_3: q.options_3,
-  //     options_4: q.options_4,
-  //     correct_ans: q.correct_ans
-  //   }));
-
-  //   const payload = {
-  //     type,
-  //     name: values.name,
-  //     description: values.description,
-  //     questions: selectedQuestions,
-  //   };
-
-  //   // console.log("Submitting payload:", payload);
-  //   onSubmit(payload);
-  //   form.resetFields();
-  // };
 
   const handleFinish = (values) => {
     let selectedQuestions = [];
-  
+
     if (Array.isArray(questions) && Array.isArray(values.questions) && values.questions.length > 0) {
       selectedQuestions = questions
         .filter(q => values.questions.includes(q.id))
@@ -71,18 +46,18 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
           correct_ans: q.correct_ans
         }));
     }
-  
+
     const payload = {
       type,
       name: values.name,
       description: values.description,
       ...(selectedQuestions.length > 0 && { questions: selectedQuestions })
     };
-  
+
     onSubmit(payload);
     form.resetFields();
   };
-  
+
 
   const handleQuizTypeChange = (e) => {
     const newType = e.target.value;
@@ -101,10 +76,10 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
 
   return (
     <>
-      <Modal 
-        title="Add New Quiz" 
-        open={open} 
-        onCancel={onClose} 
+      <Modal
+        title="Add New Quiz"
+        open={open}
+        onCancel={onClose}
         footer={null}
         width={800}
         destroyOnClose
@@ -116,8 +91,8 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
           initialValues={{ questions: [] }}
         >
           <Form.Item label="Quiz Type">
-            <Radio.Group 
-              value={type} 
+            <Radio.Group
+              value={type}
               onChange={handleQuizTypeChange}
               buttonStyle="solid"
             >
@@ -139,9 +114,9 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
             label="Description"
             rules={[{ required: true, message: "Please enter a description" }]}
           >
-            <Input.TextArea 
-              rows={4} 
-              placeholder="e.g. A basic quiz to test programming fundamentals." 
+            <Input.TextArea
+              rows={4}
+              placeholder="e.g. A basic quiz to test programming fundamentals."
             />
           </Form.Item>
 
@@ -170,8 +145,8 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
                   </Option>
                 ))}
               </Select>
-              <Button 
-                type="dashed" 
+              <Button
+                type="dashed"
                 onClick={handleAddQuestion}
                 style={{ width: 150 }}
               >
@@ -181,9 +156,9 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
           </Form.Item>
 
           <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
+            <Button
+              type="primary"
+              htmlType="submit"
               block
               size="large"
             >
@@ -193,9 +168,9 @@ const AddMcqQuizModal = ({ open, onClose, onSubmit }) => {
         </Form>
       </Modal>
 
-      <AddMCQQuestionModal 
-        open={isQuestionModalOpen} 
-        onClose={handleQuestionModalClose} 
+      <AddMCQQuestionModal
+        open={isQuestionModalOpen}
+        onClose={handleQuestionModalClose}
       />
     </>
   );

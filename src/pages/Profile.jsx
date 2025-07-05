@@ -33,9 +33,9 @@ const Profile = () => {
         email: user.email,
         username: user.username,
       });
-      
-      const userPhotoUrl = user.photo ? 
-        (user.photo.startsWith('http') ? user.photo : `${BASE_URL}${user.photo}`) : 
+
+      const userPhotoUrl = user.photo ?
+        (user.photo.startsWith('http') ? user.photo : `${BASE_URL}${user.photo}`) :
         null;
       setUserImageUrl(userPhotoUrl);
     }
@@ -64,21 +64,21 @@ const Profile = () => {
       });
   };
 
- const handleLogout = () => {
-  Modal.confirm({
-    title: "Are you sure you want to logout?",
-    content: "You will need to log in again to access your profile.",
-    okText: "Logout",
-    okType: "danger",
-    cancelText: "Cancel",
-    onOk: () => {
-      dispatch(logout());
-      localStorage.setItem('isLoggedIn', 'false');
-      localStorage.clear();
-      navigate("/login");
-    },
-  });
-};
+  const handleLogout = () => {
+    Modal.confirm({
+      title: "Are you sure you want to logout?",
+      content: "You will need to log in again to access your profile.",
+      okText: "Logout",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: () => {
+        dispatch(logout());
+        localStorage.setItem('isLoggedIn', 'false');
+        localStorage.clear();
+        navigate("/login");
+      },
+    });
+  };
 
 
   return (
@@ -97,7 +97,7 @@ const Profile = () => {
           Profile
         </Title>
 
-        
+
 
         {isAuthenticated && user ? (
           <div
@@ -115,17 +115,17 @@ const Profile = () => {
             )}
             {/* User Avatar on Left Side */}
             {!isCounsellor && (
-            <div style={{ textAlign: "center", paddingRight: "100px", marginLeft: "0px" }}>
-              <Avatar
-                size={250}
-                src={userImageUrl || User_img}
-                icon={!userImageUrl && <UserOutlined />}
-                style={{ border: "2px solid #ddd" }}
-              />
-              <Text strong style={{ display: "block", marginTop: "10px", fontSize: "18px" }}>
-                {profileData.username}
-              </Text>
-            </div>
+              <div style={{ textAlign: "center", paddingRight: "100px", marginLeft: "0px" }}>
+                <Avatar
+                  size={250}
+                  src={userImageUrl || User_img}
+                  icon={!userImageUrl && <UserOutlined />}
+                  style={{ border: "2px solid #ddd" }}
+                />
+                <Text strong style={{ display: "block", marginTop: "10px", fontSize: "18px" }}>
+                  {profileData.username}
+                </Text>
+              </div>
             )}
 
             {/* Profile Card */}
@@ -140,7 +140,7 @@ const Profile = () => {
               <Descriptions column={1} size="middle" labelStyle={{ fontWeight: "bold", width: "100px" }}>
                 <Descriptions.Item label="Email">
                   {isEditing ? (
-                    <Input name="email" value={profileData.email} onChange={handleChange} disabled/>
+                    <Input name="email" value={profileData.email} onChange={handleChange} disabled />
                   ) : (
                     profileData.email
                   )}
@@ -148,31 +148,31 @@ const Profile = () => {
 
                 <Descriptions.Item label="Username" >
                   {isEditing ? (
-  <Form
-    layout="vertical"
-    onFinish={handleSave}
-    initialValues={{ username: profileData.username }}
-    onValuesChange={(changedValues, allValues) =>
-      setProfileData((prev) => ({ ...prev, ...allValues }))
-    }
-  >
-    <Form.Item
-      // label="Username"
-      name="username"
-      rules={[
-        { required: true, message: "Please enter a username" },
-          { min: 5, message: "Username must be at least 5 characters" },
-        {
-          pattern: /^[a-zA-Z0-9_]+$/,
-          message:
-            "Only letters, numbers, and underscores are allowed.",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
+                    <Form
+                      layout="vertical"
+                      onFinish={handleSave}
+                      initialValues={{ username: profileData.username }}
+                      onValuesChange={(changedValues, allValues) =>
+                        setProfileData((prev) => ({ ...prev, ...allValues }))
+                      }
+                    >
+                      <Form.Item
+                        // label="Username"
+                        name="username"
+                        rules={[
+                          { required: true, message: "Please enter a username" },
+                          { min: 5, message: "Username must be at least 5 characters" },
+                          {
+                            pattern: /^[a-zA-Z0-9_]+$/,
+                            message:
+                              "Only letters, numbers, and underscores are allowed.",
+                          },
+                        ]}
+                      >
+                        <Input />
+                      </Form.Item>
 
-    {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
       <Button
         type="primary"
         htmlType="submit"
@@ -196,12 +196,12 @@ const Profile = () => {
         Cancel
       </Button>
     </div> */}
-  </Form>
-) : (
-  <Descriptions.Item label="Username">
-    {profileData.username}
-  </Descriptions.Item>
-)}
+                    </Form>
+                  ) : (
+                    <Descriptions.Item label="Username">
+                      {profileData.username}
+                    </Descriptions.Item>
+                  )}
 
                 </Descriptions.Item>
 
@@ -269,7 +269,7 @@ const Profile = () => {
             </Card>
 
             {/* Counsellor Profile Section */}
-            
+
           </div>
         ) : (
           <Text style={{ textAlign: "center", fontSize: "16px", fontWeight: 500 }}>

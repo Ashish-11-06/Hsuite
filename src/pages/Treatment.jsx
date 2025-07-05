@@ -66,11 +66,11 @@ const Treatment = () => {
       setModalVisible(true);
 
       const stepId = treatmentData.data.steps;
-      console.log(stepId);
+      // console.log(stepId);
 
       const stepResult = await dispatch(getStepByStepsId(stepId));
       if (getStepByStepsId.fulfilled.match(stepResult)) {
-        console.log(stepResult.payload);
+        // console.log(stepResult.payload);
         setStepsData(stepResult.payload);
       } else {
         console.error("Failed to fetch step data");

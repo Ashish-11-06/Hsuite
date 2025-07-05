@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, DatePicker, message, Select, Button, Typography } from "antd";
-import dayjs from "dayjs";
+import {
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  message,
+  Select,
+  Typography
+} from "antd";
 import { useDispatch } from "react-redux";
 import { PostClinicalNotes } from "../Redux/Slices/PatientHistorySlice";
 import AddMedicineModal from "./AddMedicineModal";
@@ -34,7 +41,7 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
       };
 
       const result = await dispatch(PostClinicalNotes(payload)).unwrap();
-      setClinicalNoteId(result.data.id); // Store the clinical note ID for medicine modal
+      setClinicalNoteId(result.data.id);
       form.resetFields();
       onClose();
       setIsMedicineModalOpen(true);
@@ -51,44 +58,115 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
         onCancel={onClose}
         onOk={handleSubmit}
         okText="Submit"
+        width={800}
+        styles={{
+          body: {
+            maxHeight: "70vh",
+            overflowY: "auto",
+            paddingRight: 12,
+          },
+          content: {
+            overflow: "hidden",
+          },
+        }}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="pain" label="Pain" rules={[{ required: true }]}>
-            <Input placeholder="e.g., Headache" />
-          </Form.Item>
-          <Form.Item name="pain_start_date" label="Pain Start Date" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="pain_severity" label="Pain Severity" rules={[{ required: true }]}>
-            <Select placeholder="Select severity">
-              <Option value="mild">Mild</Option>
-              <Option value="moderate">Moderate</Option>
-              <Option value="severe">Severe</Option>
-              <Option value="unbearable">Unbearable</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="observation" label="Observation" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="diagnosis" label="Diagnosis" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <Form.Item
+              name="pain"
+              label="Pain"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 48%" }}
+            >
+              <Input placeholder="e.g., Headache" />
+            </Form.Item>
 
-          <Form.Item name="evidence" label="Evidence" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="treatment_plan" label="Treatment Plan" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="advice" label="Doctor Advice" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="remark" label="Personal Remark" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="next_followup_date" label="Next Follow-up Date" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
+            <Form.Item
+              name="pain_start_date"
+              label="Pain Start Date"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 48%" }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              name="pain_severity"
+              label="Pain Severity"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 48%" }}
+            >
+              <Select placeholder="Select severity">
+                <Option value="mild">Mild</Option>
+                <Option value="moderate">Moderate</Option>
+                <Option value="severe">Severe</Option>
+                <Option value="unbearable">Unbearable</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="diagnosis"
+              label="Diagnosis"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 48%" }}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="observation"
+              label="Observation"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 100%" }}
+            >
+              <Input.TextArea rows={2} />
+            </Form.Item>
+
+            <Form.Item
+              name="evidence"
+              label="Evidence"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 100%" }}
+            >
+              <Input.TextArea rows={2} />
+            </Form.Item>
+
+            <Form.Item
+              name="treatment_plan"
+              label="Treatment Plan"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 100%" }}
+            >
+              <Input.TextArea rows={2} />
+            </Form.Item>
+
+            <Form.Item
+              name="advice"
+              label="Doctor Advice"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 100%" }}
+            >
+              <Input.TextArea rows={2} />
+            </Form.Item>
+
+            <Form.Item
+              name="remark"
+              label="Personal Remark"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 100%" }}
+            >
+              <Input.TextArea rows={2} />
+            </Form.Item>
+
+            <Form.Item
+              name="next_followup_date"
+              label="Next Follow-up Date"
+              rules={[{ required: true }]}
+              style={{ flex: "1 1 48%" }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
 

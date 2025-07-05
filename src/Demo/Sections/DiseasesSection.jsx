@@ -6,6 +6,7 @@ import {
   Table,
   Tag,
   Select,
+  Spin,
 } from "antd";
 import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
@@ -36,11 +37,14 @@ const DiseasesSection = ({
   diseases,
   setDiseases,
   setLoading,
+  loading,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [statusValue, setStatusValue] = useState("");
   const [severityValue, setSeverityValue] = useState("");
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   const dispatch = useDispatch();
 
@@ -144,6 +148,7 @@ const DiseasesSection = ({
       title: "Actions",
       key: "actions",
       render: (_, record) => (
+         canAdd && (
         <Button
           type="primary"
           size="small"
@@ -151,7 +156,7 @@ const DiseasesSection = ({
           onClick={() => handleEditClick(record)}
         >
           Edit
-        </Button>
+        </Button>)
       ),
     },
   ];
@@ -161,6 +166,7 @@ const DiseasesSection = ({
       <Card
         title={<span style={{ color: "#1890ff" }}>Diseases</span>}
         extra={
+           canAdd && (
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -169,10 +175,17 @@ const DiseasesSection = ({
           >
             Add
           </Button>
+           )
         }
         style={{ borderRadius: 8 }}
       >
-        {diseases && diseases.length > 0 ? (
+        {loading ? (
+          <div style={{display:"flex", justifyContent: "center", padding:"20px"}}>
+            <Spin tip="Loading Diseases..." spinning={loading}>
+              <div style={{height: 1}}></div>
+              </Spin> 
+          </div>
+        ):diseases && diseases.length > 0 ? (
           <Table
             columns={columns}
             dataSource={diseases}

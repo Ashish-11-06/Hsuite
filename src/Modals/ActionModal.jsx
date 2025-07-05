@@ -9,7 +9,7 @@ const ActionModal = ({ visible, onClose, quizResult, userId }) => {
 
   const handlePredefinedClick = () => {
     setPredefinedModalVisible(true);
-    console.log("Predefined button clicked");
+    // console.log("Predefined button clicked");
   };
 
   const handleCounsellorClick = () => {
@@ -103,7 +103,7 @@ const ActionModal = ({ visible, onClose, quizResult, userId }) => {
         visible={predefinedModalVisible}
         onClose={() => {
           setPredefinedModalVisible(false);
-          console.log("Closing AddPredefinedTreatModal");
+          // console.log("Closing AddPredefinedTreatModal");
           onClose();
         }}
         quizResult={quizResult}

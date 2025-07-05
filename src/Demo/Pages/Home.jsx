@@ -5,11 +5,12 @@ const Home = ({ }) => {
 
 
   return (
-    <>
-      <h1
-        style={{ margin: "100px" }}
-      >hello from sejal</h1>
-    </>
+    <>Page is under Construction</>
+    // <>
+    //   <h1
+    //     style={{ margin: "100px" }}
+    //   >hello from sejal</h1>
+    // </>
   );
 };
 

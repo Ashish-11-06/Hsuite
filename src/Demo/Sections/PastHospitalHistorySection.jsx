@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Button, Typography } from "antd";
+import { Card, Button, Typography, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AddHospitalHistoryModal from "../Modals/AddHospitalHistoryModal";
 import { useDispatch } from "react-redux";
@@ -7,9 +7,11 @@ import { GetAllDetailHistoryyy } from "../Redux/Slices/PatientSlice";
 
 const { Text } = Typography;
 
-const PastHospitalHistorySection = ({ patientId, pastHospitalHistory, setPastHospitalHistory, setLoading }) => {
+const PastHospitalHistorySection = ({ patientId, pastHospitalHistory, setPastHospitalHistory, setLoading, loading }) => {
   const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
+const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
 
   const handleSuccess = async () => {
     try {
@@ -28,6 +30,7 @@ const PastHospitalHistorySection = ({ patientId, pastHospitalHistory, setPastHos
       <Card
         title={<span style={{ color: "#1890ff" }}>Past Hospital History</span>}
         extra={
+           canAdd && (
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -36,10 +39,17 @@ const PastHospitalHistorySection = ({ patientId, pastHospitalHistory, setPastHos
           >
             Add
           </Button>
+           )
         }
         style={{ borderRadius: 8 }}
       >
-        {!pastHospitalHistory.length ? (
+        {loading ? (
+          <div style={{ display:"flex", justifyContent: "center", padding: "20px"}}>
+            <Spin tip="Loading past hospital history..." spinning={loading}>
+              <div style={{height: 1}}></div>
+            </Spin>
+          </div>
+        ): !pastHospitalHistory.length ? (
           <Text type="secondary">No past history found for this patient</Text>
         ) : (
           pastHospitalHistory.map((entry, idx) => (
