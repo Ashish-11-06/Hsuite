@@ -29,12 +29,12 @@ const OPDdepartment = () => {
     dispatch(fetchAllPatients());
     dispatch(GetAllUsers());
 
-    const fetch =async () => {
+    const fetch = async () => {
       if (currentUser?.designation === "doctor") {
         dispatch(GetOpdByDoctorId(currentUser.id));
       } else {
-       const res=await dispatch(GetAllOPD());
-       console.log('res',res);
+        const res = await dispatch(GetAllOPD());
+        //  console.log('res',res);
       }
     }
     fetch()
@@ -106,7 +106,8 @@ const OPDdepartment = () => {
   const outCount = records.filter((item) => item.status === "out").length;
   const newCount = records.filter((item) => item.visitType === "New").length; // Add this line
   const followUpCount = records.filter((item) => item.visitType === "Follow-Up").length; // Add this line
-  const totalCount = records.length; // Add this line
+  const totalCount = records.length;
+  const completedCount = records.filter((item) => item.status === "completed").length;
 
   // Mock doctors data - replace with actual doctors data from your backend
   const doctorsList = allUsers?.filter(user => user.designation === "doctor") || [];
@@ -138,37 +139,32 @@ const OPDdepartment = () => {
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <p>
-                  ✅ Out: <strong>{outCount}</strong>
-                </p>
+                <p>✅ Out: <strong>{outCount}</strong></p>
                 <Progress
-                  percent={Math.round((outCount / opdData.length) * 100)}
+                  percent={totalCount > 0 ? Math.round((outCount / totalCount) * 100) : 0}
                   status="active"
                   strokeColor="green"
                 />
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <p>
-                  🆕 New: <strong>{newCount}</strong>
-                </p>
+                <p>✔️ Completed: <strong>{completedCount}</strong></p>
                 <Progress
-                  percent={Math.round((newCount / opdData.length) * 100)}
+                  percent={totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}
+                  status="active"
+                  strokeColor="#00b96b"
+                />
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <p>🆕 New: <strong>{newCount}</strong></p>
+                <Progress
+                  percent={totalCount > 0 ? Math.round((newCount / totalCount) * 100) : 0}
                   status="active"
                   strokeColor="blue"
                 />
               </div>
 
-              <div>
-                <p>
-                  🔁 Follow-Up: <strong>{followUpCount}</strong>
-                </p>
-                <Progress
-                  percent={Math.round((followUpCount / opdData.length) * 100)}
-                  status="active"
-                  strokeColor="purple"
-                />
-              </div>
             </Card>
           </div>
         </Col>
@@ -247,10 +243,12 @@ const OPDdepartment = () => {
                       doctors={doctorsList}
                       patientDetails={patientDetails}
                       onView={(rec) => {
+                        if (rec.status !=="out") {
                         setViewingRecord(rec);
                         setIsDrawerVisible(true);
                       }}
-                      onEdit={handleEdit}
+                    }
+                      onEdit={record.status === "out" ? null : handleEdit}
                       onDelete={handleDelete}
                     />
                   ))
@@ -274,7 +272,7 @@ const OPDdepartment = () => {
         visible={isPatientModalVisible}
         onClose={() => setIsPatientModalVisible(false)}
         onSelect={() => {
-          console.log("onslecet from parent called")
+          // console.log("onslecet from parent called")
           setIsPatientModalVisible(false);
 
           if (currentUser?.designation === "doctor") {

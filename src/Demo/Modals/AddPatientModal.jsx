@@ -22,7 +22,9 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
       emergency_contact_number: values.emergencyContact,
       address: values.address,
       blood_group: values.bloodGroup,
-      known_allergies: values.allergies,
+      known_allergies: values.allergies
+      ? values.allergies.split(",").map(item => item.trim()) 
+    : [],
       medical_history: values.medicalHistory,
       dob: values.dob?.format("YYYY-MM-DD"),
       relative_name: values.relativeName,
@@ -116,7 +118,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
 
           <Form.Item
             name="email"
-            label="Email"
+            label="Email (optional)"
             style={{ flex: "1 1 48%" }}
             rules={[
               { type: "email", message: "Enter a valid email" },
@@ -127,7 +129,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
 
           <Form.Item
             name="emergencyContact"
-            label="Emergency Contact Number"
+            label="Emergency Contact Number (optional)"
             style={{ flex: "1 1 48%" }}
             rules={[
               { pattern: /^\d{10}$/, message: "Enter a valid 10-digit number" },
@@ -138,7 +140,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
 
           <Form.Item
             name="relativeName"
-            label="Relative Name"
+            label="Relative Name (optional)"
             style={{ flex: "1 1 48%" }}
           >
             <Input />
@@ -157,6 +159,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
             name="bloodGroup"
             label="Blood Group"
             style={{ flex: "1 1 48%" }}
+            rules={[{ required: true, message: "Please enter Blood Group" }]}
           >
             <Select placeholder="Select blood group">
               {BLOOD_GROUP_CHOICES.map((group) => (

@@ -37,7 +37,7 @@ const HistoryTab = ({ patient,patient_id }) => {
     setIsCustomModalVisible(false);
   };
   // const patient_id = patient?.id;
-  console.log("patient", patient);
+  // console.log("patient", patient);
 
   useEffect(() => {
     const getAllHistory = async () => {
@@ -54,7 +54,7 @@ const HistoryTab = ({ patient,patient_id }) => {
         setPastHospitalCurrentHistory(res.current_hospital_history || []);
         setOngoingMedication(res.ongoing_medications || []);
       } catch (error) {
-        console.error("Failed to fetch history:", error);
+        // console.error("Failed to fetch history:", error);
       }
     };
 

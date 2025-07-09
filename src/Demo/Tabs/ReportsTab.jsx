@@ -53,9 +53,9 @@ const ReportsTab = ({ patient, patient_id }) => {
       // console.log(response)
       setReports(response.data || []);
       setHospital(response.hospital || {});
-      console.log(response.hospital);
+      // console.log(response.hospital);
     } catch (error) {
-      console.error("Failed to fetch certificates:", error);
+      // console.error("Failed to fetch certificates:", error);
     } finally {
       setloading(false);
     }

@@ -53,7 +53,7 @@ const AddAttachmentModal = ({ open, onClose, patientId, onAttachmentUploaded }) 
       onClose();
       if (onAttachmentUploaded) onAttachmentUploaded();
     } catch (err) {
-      console.error("Upload failed:", err);
+      // console.error("Upload failed:", err);
       message.error("Failed to upload attachment");
     } finally {
       setLoading(false);

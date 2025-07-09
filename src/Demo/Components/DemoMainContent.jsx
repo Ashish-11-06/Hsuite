@@ -10,6 +10,7 @@ import Users from "../Pages/Users";
 import DemoLogin from "../Pages/DemoLogin";
 import HospitalRegister from "../Pages/HospitalRegister";
 import Finance from "../Pages/Finance";
+import IPDdepartment from "../Pages/IPDdepartment";
 
 const DemoMainContent = () => {
     return (
@@ -25,6 +26,7 @@ const DemoMainContent = () => {
             <Route path="/users" element={<Users />} />
             <Route path="/logindemo" element={<DemoLogin />} />
             <Route path="/demoHospitalRegister" element={<HospitalRegister />} />
+            {/* <Route path="/ipd" element={<IPDdepartment />} /> */}
 
         </Routes>
     )

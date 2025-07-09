@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Space, Spin } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import jsPDF from "jspdf";
@@ -10,29 +10,33 @@ import { PrescriptionPdfGenerator } from "../Pages/PrescriptionPdfGenerator";
 
 const PrescriptionTab = ({ patient, patient_id }) => {
   const dispatch = useDispatch();
-  const { prescriptions = [], hospital, loading } = useSelector((state) => state.opd);
-   const users = useSelector((state) => state.users.users || []);
+  const { prescriptions = [], hospital } = useSelector((state) => state.opd);
+  const [loading, setloading] = useState(false);
+  const users = useSelector((state) => state.users.users || []);
   // const doctorData = users.find((u) => u.id === Number(userId));
 
- useEffect(() => {
   const GetPrescriptions = async () => {
     try {
-      // Clear old data before fetching new
-      dispatch(resetPrescriptions());
-      await dispatch(FetchPrescriptionByPatientId(patient_id)).unwrap();
+      setloading(true);
+      const response = await dispatch(FetchPrescriptionByPatientId(patient_id)).unwrap();
+      // console.log("Fetched prescriptions:", response);
     } catch (error) {
-      console.error("Failed to fetch prescriptions", error);
+      // console.error("Failed to fetch prescriptions:", error);
+    } finally {
+      setloading(false);
     }
   };
 
-  if (patient?.id) {
-    GetPrescriptions();
-  }
-}, [dispatch, patient?.id]);
+  useEffect(() => {
+    if (patient_id) {
+      GetPrescriptions();
+    }
+  }, [patient_id]); // run only when patient ID changes
 
-useEffect(() => {
-  dispatch(GetAllUsers());
-}, [dispatch]);
+
+  useEffect(() => {
+    dispatch(GetAllUsers());
+  }, [dispatch]);
 
   const columns = [
     {
@@ -59,7 +63,7 @@ useEffect(() => {
           <Button
             type="primary"
             icon={<DownloadOutlined />}
-            onClick={() =>{
+            onClick={() => {
               const doctorData = users.find((u) => u.id === record.user);
               PrescriptionPdfGenerator({
                 patient_info: patient,

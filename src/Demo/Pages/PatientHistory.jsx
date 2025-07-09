@@ -26,7 +26,7 @@ const PatientHistory = () => {
   const patient = state?.patient;
   const patient_id = state?.patient_id;
   const [activeTab, setActiveTab] = useState(TABS.HISTORY);
-console.log('patienttt',patient_id);
+// console.log('patienttt',patient_id);
 
   if (!patient) {
     return <p>No patient data available.</p>;

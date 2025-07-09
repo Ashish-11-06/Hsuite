@@ -17,7 +17,7 @@ const OngoingMedicationSection = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   const getDiseaseName = (id) => {
     const disease = diseases?.find((d) => d.id === id);

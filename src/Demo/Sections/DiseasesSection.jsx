@@ -44,7 +44,7 @@ const DiseasesSection = ({
   const [statusValue, setStatusValue] = useState("");
   const [severityValue, setSeverityValue] = useState("");
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   const dispatch = useDispatch();
 
@@ -54,7 +54,7 @@ const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
       const res = await dispatch(GetAllDetailHistoryyy(patientId)).unwrap();
       setDiseases(res.diseases || []);
     } catch (err) {
-      console.error("Failed to refetch diseases", err);
+      // console.error("Failed to refetch diseases", err);
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
       setEditingId(null);
       fetchAll(); // ✅ re-fetch on update
     } catch (err) {
-      console.error("Failed to update disease");
+      // console.error("Failed to update disease");
     }
   };
 

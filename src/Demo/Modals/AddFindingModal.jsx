@@ -17,7 +17,7 @@ const AddFindingModal = ({ open, onClose, patientId }) => {
       dispatch(PostFinding(payload))
         .unwrap()
         .then((res) => {
-          message.success(res?.message || "Finding added successfully");
+          message.success(res?.message);
           form.resetFields();
           dispatch(GetFinding(patientId));
           onClose();

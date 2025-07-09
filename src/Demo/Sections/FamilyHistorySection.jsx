@@ -19,7 +19,7 @@ const FamilyHistorySection = ({ familyHistory, patientId, setFamilyHistory, setL
     period: "",
   });
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   const handleSubmit = async () => {
     const payload = {

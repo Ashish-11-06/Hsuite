@@ -16,6 +16,10 @@ const BillingApi ={
 
     DeletePerticulars: (perticular_id) => {
         return demoaxiosInstance.delete(`hospital/bill-particulars/delete/${perticular_id}/`);
+    },
+
+    UpdatePerticulars: (perticular_id, data) => {
+        return demoaxiosInstance.put(`hospital/bill-perticulars/update/${perticular_id}/`, data);
     }
 }
 export default BillingApi;

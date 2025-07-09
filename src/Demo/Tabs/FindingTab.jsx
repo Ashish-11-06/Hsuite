@@ -78,7 +78,7 @@ const FindingTab = ({ patient, patient_id }) => {
   const hospital = useSelector((state) => state.patient.hospital || {});
 
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-  const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+  const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   useEffect(() => {
     if (patient?.id) {
@@ -156,7 +156,7 @@ const FindingTab = ({ patient, patient_id }) => {
         style={{ marginTop: 24 }}
         scroll={{ x: true }}
         locale={{
-          emptyText: message || "No findings found for this patient",
+          emptyText: "No findings found for this patient",
         }}
       />
 

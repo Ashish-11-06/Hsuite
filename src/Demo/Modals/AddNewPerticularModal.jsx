@@ -1,8 +1,9 @@
 // AddNewPerticularModal.jsx
 import React, { useState } from "react";
-import { Modal, Input, Button, Space, message } from "antd";
+import { Modal, Input, Button, Space, message, Form } from "antd";
 import { useDispatch } from "react-redux";
 import { PostPerticulars } from "../Redux/Slices/OpdSlice";
+import { getBillParticulars } from "../Redux/Slices/BillingSlice";
 
 const AddNewPerticularModal = ({ open, onClose, onAddSuccess }) => {
   const dispatch = useDispatch();
@@ -28,41 +29,53 @@ const AddNewPerticularModal = ({ open, onClose, onAddSuccess }) => {
 
     try {
       await dispatch(PostPerticulars(body)).unwrap();
-    //   message.success("Perticular added");
+      // await dispatch(getBillParticulars());
       onAddSuccess(trimmed, amountValue, trimmedDesc); // callback to parent
       onClose();
       setName("");
       setAmount("");
       setDescription("");
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       message.error("Failed to add perticular");
     }
   };
 
   return (
     <Modal title="Add New Perticular" open={open} onCancel={onClose} footer={null} destroyOnClose>
-      <Space direction="vertical" style={{ width: "100%" }}>
-        <Input
-          placeholder="Perticular Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Input
-          placeholder="Amount"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <Input
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Button type="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </Space>
+
+      <Form layout="vertical">
+        <Form.Item label="Perticular Name" required>
+          <Input
+            placeholder="Paracetamol"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item label="Amount" required>
+          <Input
+            placeholder="2"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item label="Description" required>
+          <Input
+            placeholder="Used for fever and mild pain"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" onClick={handleSubmit} block>
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };

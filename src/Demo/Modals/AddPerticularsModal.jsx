@@ -30,8 +30,13 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
     }
   }, [open, dispatch]);
 
-  const handlePerticularAddSuccess = (name, amount, description) => {
-    setPerticularOptions((prev) => [...prev, name]);
+ const handlePerticularAddSuccess = async (name, amount, description) => {
+  try {
+    const res = await dispatch(getBillParticulars()).unwrap();
+    const all = res.data || [];
+    const unbilled = all.filter((item) => item.bill === null);
+    setPerticularOptions(unbilled);
+
     setPerticularList((prev) => [
       ...prev,
       {
@@ -42,7 +47,10 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
         description,
       },
     ]);
-  };
+  } catch (err) {
+    message.error("Failed to update dropdown");
+  }
+};
 
   const handleSelectPerticular = (id) => {
     const selected = perticularOptions.find((item) => item.id === id);

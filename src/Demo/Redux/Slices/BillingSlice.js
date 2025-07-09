@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import BillingApi from "../API/BillingApi";
 import { message } from "antd";
+import { act } from "react";
 
 // Thunk to get bill by patient ID
 export const fetchBillByPatientId = createAsyncThunk(
@@ -67,11 +68,31 @@ export const DeletePerticular = createAsyncThunk(
   }
 );
 
+export const updatePerticular = createAsyncThunk(
+  "billing/updatePerticular",
+  async ({ id, name, amount, description }, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.UpdatePerticulars(id, {
+        name,
+        amount,
+        description,
+      });
+      message.success(response.data.message || "Updated successfully");
+      return { updatedPerticular: response.data.data };
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to update particular"
+      );
+    }
+  }
+);
+
 const billingSlice = createSlice({
   name: "billing",
   initialState: {
     billData: [],
     billParticulars: [],
+    hospital: [],
     loading: false,
     error: null,
   },
@@ -91,6 +112,7 @@ const billingSlice = createSlice({
       .addCase(fetchBillByPatientId.fulfilled, (state, action) => {
         state.loading = false;
         state.billData = action.payload.data;
+        state.hospital = action.payload.hospital;
       })
       .addCase(fetchBillByPatientId.rejected, (state, action) => {
         state.loading = false;
@@ -139,7 +161,25 @@ const billingSlice = createSlice({
       .addCase(DeletePerticular.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to delete bill particular";
+      })
+
+      // updatePerticular
+      .addCase(updatePerticular.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePerticular.fulfilled, (state, action) => {
+        state.loading = false;
+        const updated = action.payload.updatedPerticular;
+        state.billParticulars = state.billParticulars.map((item) =>
+          item.id === updated.id ? updated : item
+        );
+      })
+      .addCase(updatePerticular.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update bill particular";
       });
+
 
   },
 });

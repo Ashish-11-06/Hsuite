@@ -3,6 +3,7 @@ import { Card, Typography, Row, Col, Table, Button, Space, Select, Tag, Modal, I
 import { DownloadOutlined, EditOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBillByPatientId, clearBillData, updatePayment } from "../Redux/Slices/BillingSlice";
+import { generateBillPDF } from "./generateBillPDF";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -10,7 +11,7 @@ const { Panel } = Collapse;
 
 const PatientBill = ({ patient }) => {
   const dispatch = useDispatch();
-  const { billData } = useSelector((state) => state.billing);
+  const { billData, hospital } = useSelector((state) => state.billing);
   const [paymentData, setPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -88,7 +89,7 @@ const PatientBill = ({ patient }) => {
       dataIndex: "totalAmount",
       render: (amt) => `₹${amt}`,
     },
-    
+
     {
       title: "Payment Method",
       dataIndex: "method",
@@ -129,32 +130,58 @@ const PatientBill = ({ patient }) => {
         ),
     },
     {
-      title: "Actions",
-      render: (_, record) => (
-        <Button
-          icon={<EditOutlined />}
-          type="primary"
-          disabled={record.status?.toLowerCase() === "paid"}
-          onClick={async () => {
-            if (record.isEditing) {
-              await dispatch(
-                updatePayment({
-                  bill_id: record.key,
-                  payment_mode: record.method?.toLowerCase() || "cash",
-                  status: record.status?.toLowerCase() || "unpaid",
-                })
-              );
-              dispatch(fetchBillByPatientId(patient.id));
-            }
-            toggleEdit(record.key); // Toggle edit mode either way
-          }}
+  title: "Actions",
+  render: (_, record) => {
+    const handleSave = async () => {
+      // Dispatch update
+      await dispatch(
+        updatePayment({
+          bill_id: record.key,
+          payment_mode: record.method?.toLowerCase() || "cash",
+          status: record.status?.toLowerCase() || "unpaid",
+        })
+      );
 
-          size="small"
-        >
-          {record.isEditing ? "Save" : "Edit"}
-        </Button>
-      ),
-    },
+      // Refetch data and update local paymentData
+      const res = await dispatch(fetchBillByPatientId(patient.id)).unwrap();
+      const bills = res?.data || [];
+
+      const updatedPayments = bills.map((b, index) => ({
+        key: b.bill_id || index,
+        date: b.payment_date_time
+          ? new Date(b.payment_date_time).toLocaleDateString()
+          : "—",
+        amount: b.paid_amount || 0,
+        totalAmount: b.total_amount || 0,
+        status: b.status || "Unpaid",
+        method: b.payment_mode || "Cash",
+        isEditing: false, // Ensure edit mode is reset
+      }));
+
+      setPaymentData(updatedPayments);
+    };
+
+    const handleEditToggle = () => {
+      toggleEdit(record.key);
+    };
+
+    const isEditing = record.isEditing;
+    const isPaidAndNotEditing = record.status?.toLowerCase() === "paid" && !isEditing;
+
+    return (
+      <Button
+        icon={<EditOutlined />}
+        type="primary"
+        size="small"
+        disabled={isPaidAndNotEditing}
+        onClick={isEditing ? handleSave : handleEditToggle}
+      >
+        {isEditing ? "Save" : "Edit"}
+      </Button>
+    );
+  },
+}
+
   ];
 
   if (!patient) return null;
@@ -201,7 +228,19 @@ const PatientBill = ({ patient }) => {
             const paymentsForBill = paymentData.filter((p) => p.key === bill.bill_id);
 
             return (
-              <Panel header={`Bill ID: ${bill.bill_id}`} key={bill.bill_id}>
+              <Panel
+                key={bill.bill_id}
+                header={
+                  <Row justify="space-between" style={{ width: "100%" }}>
+                    <Col>Bill ID: {bill.bill_id}</Col>
+                    <Col>
+                      <Tag color={bill.status?.toLowerCase() === "paid" ? "green" : "red"}>
+                        {bill.status?.toUpperCase() || "UNPAID"}
+                      </Tag>
+                    </Col>
+                  </Row>
+                }
+              >
                 <Card bordered>
                   <Row justify="space-between" align="middle">
                     <Col>
@@ -233,10 +272,17 @@ const PatientBill = ({ patient }) => {
                     <Col />
                     <Col>
                       <Space>
-                        <Button type="primary" icon={<DownloadOutlined />}>Download</Button>
+                        {bill.status?.toLowerCase() === "paid" && (
+                          <Button
+                            type="primary"
+                            icon={<DownloadOutlined />}
+                            onClick={() => generateBillPDF(patient, bill, billingData, paymentsForBill, hospital)}
+                          ></Button>
+                        )}
                         <Tag color={bill.status?.toLowerCase() === "paid" ? "green" : "red"}>
                           {bill.status?.toUpperCase() || "UNPAID"}
                         </Tag>
+
                       </Space>
                     </Col>
                   </Row>

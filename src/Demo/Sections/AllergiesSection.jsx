@@ -16,7 +16,7 @@ const AllergiesSection = ({ patientId, allergies, setAllergies, setLoading, load
     reaction: "",
   });
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   // ✅ Re-fetch after add success
   const handleSuccess = async () => {
@@ -25,7 +25,7 @@ const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
       const res = await dispatch(GetAllDetailHistoryyy(patientId)).unwrap();
       setAllergies(res.allergies || []);
     } catch (error) {
-      console.error("Failed to update allergies:", error);
+      // console.error("Failed to update allergies:", error);
     } finally {
       setLoading(false);
     }

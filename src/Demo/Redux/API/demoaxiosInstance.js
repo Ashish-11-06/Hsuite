@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // export const BASE_URL = 'https://hospitals-discrimination-reader-national.trycloudflare.com';
-// export const BASE_URL = 'http://192.168.1.80:8000';
-export const BASE_URL= 'https://hsuite.prushal.com/main-backend';
+export const BASE_URL = 'http://192.168.1.38:8000';
+// export const BASE_URL= 'https://hsuite.prushal.com/main-backend';
 
 const demoaxiosInstance = axios.create({
   baseURL: `${BASE_URL}/api`,

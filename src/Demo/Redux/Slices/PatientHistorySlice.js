@@ -8,7 +8,7 @@ export const PostFinding = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await PatientHistoryApi.PostFinding(payload);
-      message.success("Finding added successfully");
+      // message.success("Finding added successfully");
       return response.data;
     } catch (error) {
       message.error("Error adding finding");
@@ -34,7 +34,7 @@ export const UpdateFinding = createAsyncThunk(
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const response = await PatientHistoryApi.UpdateFinding(id, payload);
-      message.success("Finding updated successfully");
+      message.success(response.data.message);
       return response.data;
     } catch (error) {
       message.error("Error updating finding");
@@ -49,7 +49,7 @@ export const PostAllergies = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await PatientHistoryApi.PostAllergies(payload);
-      message.success("Allergies submitted successfully");
+      message.success(response.data.message);
       return response.data;
     } catch (error) {
       message.error("Error submitting allergies");
@@ -76,7 +76,7 @@ export const PostFamilyHistory = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await PatientHistoryApi.PostFamilyHistory(payload);
-      message.success("Family history submitted successfully");
+      message.success(response.data.message);
       return response.data;
     } catch (error) {
       message.error("Error submitting family history");

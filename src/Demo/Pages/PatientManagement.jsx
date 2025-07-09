@@ -77,7 +77,7 @@ const PatientManagement = () => {
   };
 
   const columns = [
-    { title: "#", dataIndex: "id", key: "id" },
+    { title: "Sr. No.", dataIndex: "srno", render:(_text, _record, index) => index+1, },
     { title: "Name", dataIndex: "full_name", key: "full_name" },
     { title: "Age", dataIndex: "age", key: "age" },
     {

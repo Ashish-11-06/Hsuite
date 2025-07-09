@@ -26,7 +26,7 @@ const AttachmentsTab = ({ patient, patient_id }) => {
   const [attachments, setAttachments] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setloading] = useState([]);const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
 
   const fetchAttachments = async () => {

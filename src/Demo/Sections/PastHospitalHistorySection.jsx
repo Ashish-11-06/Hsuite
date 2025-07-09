@@ -11,7 +11,7 @@ const PastHospitalHistorySection = ({ patientId, pastHospitalHistory, setPastHos
   const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("HMS-user"));
-const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
+const canAdd = ["admin", "nurse", "doctor"].includes(currentUser?.designation);
 
   const handleSuccess = async () => {
     try {
@@ -19,7 +19,7 @@ const canAdd = ["admin", "nurse"].includes(currentUser?.designation);
       const res = await dispatch(GetAllDetailHistoryyy(patientId)).unwrap();
       setPastHospitalHistory(res.past_hospital_history || []);
     } catch (err) {
-      console.error("Failed to refresh hospital history", err);
+      // console.error("Failed to refresh hospital history", err);
     } finally {
       setLoading(false);
     }

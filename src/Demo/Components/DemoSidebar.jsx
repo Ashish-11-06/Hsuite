@@ -29,6 +29,8 @@ const DemoSidebar = () => {
     const user = JSON.parse(localStorage.getItem("HMS-user"));
     const isAdmin = user?.designation === "admin";
     const isNurse = user?.designation === "nurse";
+    const isDoctor = user?.designation === "doctor";
+    const isReceptionist = user?.designation === "receptionist";
 
     const getSelectedKey = () => {
         if (location.pathname === "/demo") return "1";
@@ -38,6 +40,7 @@ const DemoSidebar = () => {
         if (location.pathname === "/demo/billing") return "5-1";
         if (location.pathname === "/demo/finance") return "5-2";
         if (location.pathname === "/demo/users") return "6";
+        // if (location.pathname === "/demo/ipd") return "7";
     }
 
     const menuItems = [
@@ -49,30 +52,37 @@ const DemoSidebar = () => {
             key: "2",
             label: <Link to="/demo/patient">Patient Management</Link>,
         },
-        ...(!isNurse
-            ? [{
-                key: "3",
-                label: <Link to="/demo/opd">OPD Department</Link>,
-            }]
+        {
+            key: "3",
+            label: <Link to="/demo/opd">OPD Department</Link>,
+        },
+        // {
+        //     key: "7",
+        //     label: <Link to="/demo/ipd">IPD Department</Link>,
+        // },
+        ...(isAdmin || isReceptionist
+            ? [
+                {
+                    key: "5",
+                    label: "Billing & Finance",
+                    children: [
+                        {
+                            key: "5-1",
+                            label: <Link to="/demo/billing">Billing</Link>,
+                        },
+                        ...(isAdmin
+                            ? [
+                                {
+                                    key: "5-2",
+                                    label: <Link to="/demo/finance">Finance</Link>,
+                                },
+                            ]
+                            : []),
+                    ],
+                },
+            ]
             : []),
-        {
-            key: "4",
-            label: <Link to="/demo/reports">Reports and Analytics</Link>,
-        },
-        {
-            key: "5",
-            label: "Billing & Finance",
-            children: [
-            {
-                key : "5-1",
-                label: <Link to="/demo/billing">Billing</Link>,
-            },
-            {
-                key: "5-2",
-                label: <Link to="/demo/finance">Finance</Link>,
-            },
-        ],
-        },
+
         ...(isAdmin
             ? [{
                 key: "6",
@@ -86,7 +96,6 @@ const DemoSidebar = () => {
             onClick: handleLogout,
         },
     ];
-
 
     return (
         <Sider>

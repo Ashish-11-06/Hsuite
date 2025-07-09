@@ -1,7 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, Typography, Spin, Table, Button, Popconfirm, message } from "antd";
-import { getBillParticulars, DeletePerticular } from "../Redux/Slices/BillingSlice";
+import {
+    Card,
+    Typography,
+    Spin,
+    Table,
+    Button,
+    Popconfirm,
+    message,
+    Modal,
+    Form,
+    Input,
+    Space,
+} from "antd";
+import {
+    getBillParticulars,
+    DeletePerticular,
+    updatePerticular,
+} from "../Redux/Slices/BillingSlice";
 import { DeleteOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
@@ -9,14 +25,41 @@ const { Title } = Typography;
 const Finance = () => {
     const dispatch = useDispatch();
     const { billParticulars, loading } = useSelector((state) => state.billing);
+    const [form] = Form.useForm();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentRecord, setCurrentRecord] = useState(null);
+
+    const openEditModal = (record) => {
+        setCurrentRecord(record);
+        form.setFieldsValue({
+            name: record.name,
+            amount: record.amount,
+            description: record.description,
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleUpdate = async () => {
+        try {
+            const values = await form.validateFields();
+            await dispatch(
+                updatePerticular({ id: currentRecord.id, ...values })
+            ).unwrap();
+            setIsModalOpen(false);
+        } catch (err) {
+        }
+    };
 
     const handleDelete = async (id) => {
         try {
             await dispatch(DeletePerticular(id)).unwrap();
+            // message.success("Deleted successfully");
             dispatch(getBillParticulars());
         } catch (err) {
+            message.error("Failed to delete");
         }
-    }
+    };
+
     useEffect(() => {
         dispatch(getBillParticulars());
     }, [dispatch]);
@@ -45,25 +88,24 @@ const Finance = () => {
             dataIndex: "date_time",
             render: (date) => new Date(date).toLocaleString(),
         },
-        // {
-        //   title: "Bill ID",
-        //   dataIndex: "bill",
-        //   render: (bill) => bill ?? "Not Assigned",
-        // },
         {
             title: "Actions",
-            dataIndex: "actions",
             render: (_, record) => (
-                <Popconfirm
-                    title="Are you sure you want to delete this?"
-                    onConfirm={() => handleDelete(record.id)}
-                    okText="Yes"
-                    cancelText="No"
-                >
-                    <Button type="primary" danger icon={<DeleteOutlined />} size="small">
-                        Delete
+                <Space>
+                    <Button type="primary" size="small" onClick={() => openEditModal(record)}>
+                        Edit
                     </Button>
-                </Popconfirm>
+                    <Popconfirm
+                        title="Are you sure you want to delete this?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="primary" danger icon={<DeleteOutlined />} size="small">
+                            Delete
+                        </Button>
+                    </Popconfirm>
+                </Space>
             ),
         },
     ];
@@ -88,6 +130,27 @@ const Finance = () => {
                     />
                 </Card>
             )}
+
+            {/* Modal for Editing Particular */}
+            <Modal
+                title="Edit Bill Particular"
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                onOk={handleUpdate}
+                okText="Update"
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="amount" label="Amount (₹)" rules={[{ required: true }]}>
+                        <Input type="number" />
+                    </Form.Item>
+                    <Form.Item name="description" label="Description">
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
