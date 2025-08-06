@@ -10,7 +10,7 @@ export const AddUsersByAdmin = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await UsersApi.AddUsersByAdmin(payload);
-      message.success("User added successfully");
+      message.success(response.data.message || "user added Successfull");
       return response.data;
     } catch (error) {
       message.error("Failed to add user");
@@ -68,24 +68,103 @@ export const UpdateUsersStatus = createAsyncThunk(
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await UsersApi.UpdateUsersStatus(id, data); // ✅ Pass both
-    //   message.success("User status updated");
+      message.success(response.data.message || "user status updated");
       return response.data;
     } catch (error) {
-    //   message.error("Failed to update status");
+      return rejectWithValue(
+        error?.response?.data?.message || "Error"
+      );
+    }
+  }
+);
+
+//update doctor avaliability
+export const UpdateDoctorAvaliability = createAsyncThunk(
+  "users/updateDoctorAvaliability",
+  async ({ doctor_id, is_doctor_available }, { rejectWithValue }) => {
+    try {
+      const response = await UsersApi.UpdateDoctorAvaliability(doctor_id, is_doctor_available);
+      message.success(response.data.message || "doctor avaliablity done")
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "error"
+      )
+    }
+  }
+);
+
+//get availaiable doctors
+export const GetAvaliableDoctors = createAsyncThunk(
+  "users/getAvaliableDoctors",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await UsersApi.GetAvaliableDoctors();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "error"
+      )
+    }
+  }
+);
+
+// get hms user by id and hospital
+export const GetHMSUserByIdAndHospital = createAsyncThunk(
+  "users/getHMSUserByIdAndHospital",
+  async (user_id, { rejectWithValue }) => {
+    try {
+      const response = await UsersApi.GetHMSUserByIdAndHospital(user_id);
+      return response.data;
+    } catch (error) {
+      message.error("Failed to fetch user by ID and hospital");
       return rejectWithValue(error.response?.data || "Error");
     }
   }
 );
 
+//post doctor profile
+export const PostDoctorProfile = createAsyncThunk(
+  "users/postdoctorprofile",
+  async (data, {rejectWithValue}) => {
+    try{
+      const response = await UsersApi.PostDoctorProfile(data);
+       message.success(response.data.message || " added Successfull");
+      return response.data;
+    } catch (error) {
+      message.error(error.response?.data?.messgae ||
+        error.response?.data?.photo|| "Failed to post");
+      return rejectWithValue(error.response?.data || "Error");
+    }
+  }
+);
+
+//update doctor profile
+export const UpdateDoctorProfile = createAsyncThunk(
+  "users/updatedoctorprofile",
+  async ({user_id, data}, {rejectWithValue}) => {
+    try{
+      const response = await UsersApi.UpdateDoctorProfile(user_id, data);
+      message.success(response.data.message || "added successfully");
+      return response.data;
+    } catch (error) {
+      message.error(error.response?.data?.messgae ||
+        error.response?.data?.photo|| "Failed to post");
+      return rejectWithValue(error.response?.data || "error");
+    }
+  }
+);
 
 // ----------- Slice -----------
 const UsersSlice = createSlice({
   name: "users",
   initialState: {
+    doctorData: null,
     loading: false,
     error: null,
     users: [],
-    
+    hmsUser: null,
+
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -160,7 +239,75 @@ const UsersSlice = createSlice({
       .addCase(UpdateUsersStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(UpdateDoctorAvaliability.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(UpdateDoctorAvaliability.fulfilled, (state, action) => {
+        state.loading = false;
+        state.doctorData = action.payload;
+      })
+      .addCase(UpdateDoctorAvaliability.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(GetAvaliableDoctors.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(GetAvaliableDoctors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(GetAvaliableDoctors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      //get hms user by id and hospital
+      .addCase(GetHMSUserByIdAndHospital.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(GetHMSUserByIdAndHospital.fulfilled, (state, action) => {
+        state.loading = false;
+        state.hmsUser = action.payload;
+      })
+      .addCase(GetHMSUserByIdAndHospital.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Post doctor profile
+      .addCase(PostDoctorProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(PostDoctorProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.doctorData = action.payload;
+      })
+      .addCase(PostDoctorProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Update doctor profile
+      .addCase(UpdateDoctorProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(UpdateDoctorProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.doctorData = action.payload;
+      })
+      .addCase(UpdateDoctorProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+
   },
 });
 

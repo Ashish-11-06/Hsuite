@@ -63,7 +63,7 @@ export const generateBillPDF = (patient, bill, billingData, paymentsForBill, hos
   doc.line(20, y, 190, y);
   y += 6;
 
-   // Billing Details
+  // Billing Details
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Billing Details", 20, y);
@@ -132,8 +132,15 @@ export const generateBillPDF = (patient, bill, billingData, paymentsForBill, hos
 
   y += 4;
   doc.setFont("helvetica", "bold");
-  doc.text(`Bill Status: ${bill.status?.toUpperCase() || "UNPAID"}`, 20, y);
-// c.text(`Bill Status: ${bill.status?.toUpperCase() || "UNPAID"}`, 20, y);
+  // First part: label in black
+  doc.setTextColor(0, 0, 0);
+  doc.text("Bill Status:", 20, y);
+
+  // Second part: status in green or red
+  const statusText = bill.status?.toUpperCase() || "UNPAID";
+  const isPaid = statusText === "PAID";
+  doc.setTextColor(isPaid ? 0 : 255, isPaid ? 128 : 0, isPaid ? 0 : 0); // Green if PAID, Red if UNPAID
+  doc.text(statusText, 60, y); // Adjust X to align next to label
 
   // FOOTER - Blue Strip
   doc.setFillColor(13, 54, 93);

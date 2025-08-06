@@ -14,19 +14,21 @@ import {
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
+  DownloadOutlined
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPatients, DeletePatient } from "../Redux/Slices/PatientSlice";
 import AddPatientModal from "../Modals/AddPatientModal";
 import PatientDetailsDrawer from "../Modals/PatientDetailsDrawer";
 import EditPatientDetailsModal from "../Modals/EditPatientDetailsModal";
+import IdCard from "./IDCard";
 
 const { Title } = Typography;
 const { confirm } = Modal;
 
 const PatientManagement = () => {
   const dispatch = useDispatch();
-  const { allPatients, loading } = useSelector((state) => state.patient);
+  const { allPatients, loading, hospital } = useSelector((state) => state.patient);
 
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -42,7 +44,8 @@ const PatientManagement = () => {
 
   const filteredPatients = Array.isArray(allPatients)
     ? allPatients.filter((p) =>
-      p.full_name?.toLowerCase().includes(searchText.toLowerCase())
+      p.full_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+      p.contact_number?.toLowerCase().includes(searchText.toLowerCase())
     )
     : [];
 
@@ -77,7 +80,7 @@ const PatientManagement = () => {
   };
 
   const columns = [
-    { title: "Sr. No.", dataIndex: "srno", render:(_text, _record, index) => index+1, },
+    { title: "Sr. No.", dataIndex: "srno", render: (_text, _record, index) => index + 1, },
     { title: "Name", dataIndex: "full_name", key: "full_name" },
     { title: "Age", dataIndex: "age", key: "age" },
     {
@@ -90,7 +93,7 @@ const PatientManagement = () => {
             text === "Male"
               ? "blue"
               : text === "Female"
-                ? "pink" // light pink (hex code)
+                ? "pink"
                 : "green"
           }
         >
@@ -114,20 +117,31 @@ const PatientManagement = () => {
       render: (_, record) => (
         <Space>
           {/* ✅ View allowed for everyone */}
-          {["admin", "nurse", "doctor"].includes(currentUser?. designation)&& (
-          <Button icon={<EyeOutlined />} onClick={() => showViewDrawer(record)} />
+          {["admin", "nurse", "doctor"].includes(currentUser?.designation) && (
+            <Button icon={<EyeOutlined />} onClick={() => showViewDrawer(record)} />
           )}
 
           {/* ✅ Edit/Delete only for admin or receptionist */}
           {["admin", "receptionist"].includes(currentUser?.designation) && (
             <>
               <Button icon={<EditOutlined />} onClick={() => handleEditPatient(record)} />
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeletePatient(record.id)}
-              />
+              {["admin"].includes(currentUser?.designation) && (
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDeletePatient(record.id)}
+                />
+              )}
             </>
+          )}
+
+          {["admin", "receptionist"].includes(currentUser?.designation) && (
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={() => IdCard(record, hospital)}
+            >
+              ID Card
+            </Button>
           )}
         </Space>
       ),
@@ -137,12 +151,20 @@ const PatientManagement = () => {
   return (
     <div style={{ padding: 24 }}>
       <Title level={3}>Patient Management Dashboard</Title>
-      <Space style={{ marginBottom: 16 }}>
-        <Input.Search
-          placeholder="Search by name"
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
+        <Input
+          placeholder="Search by name and contact number"
           onChange={(e) => setSearchText(e.target.value)}
           style={{ width: 300 }}
         />
+
         {["admin", "receptionist"].includes(currentUser?.designation) && (
           <Button
             type="primary"
@@ -152,7 +174,7 @@ const PatientManagement = () => {
             Add Patient
           </Button>
         )}
-      </Space>
+      </div>
 
       <Table
         columns={columns}

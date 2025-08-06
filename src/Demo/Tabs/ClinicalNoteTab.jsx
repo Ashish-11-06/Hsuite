@@ -59,7 +59,7 @@ const ClinicalNoteTab = ({ patient, patient_id }) => {
           <ul style={{ paddingLeft: 20 }}>
             {medicines.map((med) => (
               <li key={med.id}>
-                {med.medicine_name} - {med.dosage_amount}{med.dosage_unit} ({med.frequency.replace(/_/g, " ")})
+                {med.pharmacy_medicine_detail?.medicine_name} - {med.dosage_amount}{med.dosage_unit} ({med.frequency.replace(/_/g, " ")})
               </li>
             ))}
           </ul>

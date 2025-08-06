@@ -85,7 +85,7 @@ const CreateQuizModal = ({ visible, onCancel, onSuccess }) => {
     }}
   >
       <div style={{ marginBottom: "20px" }}>
-        {/* <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Type:</label>
+        <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Type:</label>
         <Radio.Group 
           onChange={(e) => setQuizType(e.target.value)} 
           value={quizType}
@@ -93,7 +93,7 @@ const CreateQuizModal = ({ visible, onCancel, onSuccess }) => {
         >
           <Radio value="question">Question-Based</Radio>
           <Radio value="statement">Statement-Based</Radio>
-        </Radio.Group> */}
+        </Radio.Group>
       </div>
 
       <div style={{ marginBottom: "20px" }}>

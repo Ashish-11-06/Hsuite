@@ -1,35 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, Table, Space, Select, } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  message,
+  Table,
+  Space,
+  Select,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { PostPrescription, GetMedicinesNames, } from "../Redux/Slices/OpdSlice";
+import { PostPrescription } from "../Redux/Slices/OpdSlice";
+import { getPharmacyMedicine } from "../Redux/Slices/StockSlice";
 import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
 import { GetAllUsers } from "../Redux/Slices/UsersSlice";
 import AddPresMedicineModal from "./AddPresMedicineModal";
+import AddStockMedicineModal from "../Modals/AddStockMedicineModal";
 import { PrescriptionPdfGenerator } from "../Pages/PrescriptionPdfGenerator";
 
 const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const [medicineList, setMedicineList] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedMedicineName, setSelectedMedicineName] = useState("");
-  const [editingIndex, setEditingIndex] = useState(null);
 
-  const medicineNames = useSelector((state) => state.opd.medicineNames || []);
-  const medicineNamesFetched = useSelector((state) => state.opd.medicineNamesFetched);
+  const [medicineList, setMedicineList] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [selectedMedicineName, setSelectedMedicineName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const [isPresEditModalOpen, setIsPresEditModalOpen] = useState(false); // For editing prescription
+  const [isAddToStockModalOpen, setIsAddToStockModalOpen] = useState(false); // For adding new stock
+
+  const pharmacyMedicines = useSelector((state) => state.stock.pharmacyMedicines || []);
+  const medicineLoading = useSelector((state) => state.stock.loading);
   const patients = useSelector((state) => state.patient.allPatients || []);
-  const hospital= useSelector((state) => state.patient.hospital || {});
+  const hospital = useSelector((state) => state.patient.hospital || {});
   const users = useSelector((state) => state.users.users || []);
 
   useEffect(() => {
     if (open) {
-      if (!medicineNamesFetched) dispatch(GetMedicinesNames());
+      if (!pharmacyMedicines.length) dispatch(getPharmacyMedicine());
       if (!patients.length) dispatch(fetchAllPatients());
       if (!users.length) dispatch(GetAllUsers());
     }
-  }, [open, dispatch, medicineNamesFetched]);
-
-  // console.log("hospital data" ,hospital)
+  }, [open, dispatch, pharmacyMedicines]);
 
   useEffect(() => {
     if (!open) {
@@ -45,91 +58,109 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
     }
 
     const incomplete = medicineList.some(
-      (item) =>
-        !item.dosage || !item.duration_days || !item.instruction
+      (item) => !item.dosage || !item.duration_days || !item.instruction
     );
     if (incomplete) {
-      return message.warning(
-        "Please complete all medicine details before submitting."
-      );
+      return message.warning("Please complete all medicine details before submitting.");
     }
 
-    const patientData = patients.find(
-      (p) => p.id === Number(patientId)
-    );
+    const patientData = patients.find((p) => String(p.id) === String(patientId));
     const doctorData = users.find((u) => u.id === Number(userId));
-
-    if (!patientData) {
-      message.error("Patient details not found.");
-      return;
-    }
-    if (!doctorData) {
-      message.error("Doctor details not found.");
-      return;
-    }
+    
+if (!patients.length) {
+  message.error("Patient list is still loading.");
+  return;
+}
+    if (!doctorData) return message.error("Doctor details not found.");
 
     const payload = {
       patient: patientId,
       user: userId,
       notes: values.notes,
-      items: medicineList,
+      items: medicineList.map((item) => ({
+        pharmacy_medicine_id: item.pharmacy_medicine_id,
+        dosage: item.dosage,
+        duration_days: item.duration_days,
+        instruction: item.instruction,
+        quantity: item.quantity,
+      })),
+
     };
 
-    dispatch(PostPrescription(payload)).then((res) => {
-      if (!res.error) {
-        PrescriptionPdfGenerator({
-          ...payload,
-          patient_info: patientData,
-          doctor_info: doctorData,
-          hospital_info: hospital,
-        });
-        onClose();
-      } else {
-        message.error("Failed to submit prescription.");
-      }
-    });
+    setSubmitting(true);
+    dispatch(PostPrescription(payload))
+      .then((res) => {
+        if (!res.error) {
+          PrescriptionPdfGenerator({
+            ...payload,
+            items: medicineList.map((item) => ({
+              ...item,
+              pharmacy_medicine: pharmacyMedicines.find(
+                (med) => med.id === item.pharmacy_medicine_id
+              ) || { medicine_name: "Unknown" },
+            })),
+            patient_info: patientData,
+            doctor_info: doctorData,
+            hospital_info: hospital,
+          });
+
+          onClose();
+        } else {
+          message.error("Failed to submit prescription.");
+        }
+      })
+      .catch(() => message.error("An unexpected error occurred."))
+      .finally(() => setSubmitting(false));
   };
 
   const handleAddMedicine = (medicine) => {
     if (editingIndex !== null) {
+      const existing = medicineList[editingIndex];
+      const updated = {
+        ...existing,
+        ...medicine,
+      };
       const updatedList = [...medicineList];
-      updatedList[editingIndex] = medicine;
+      updatedList[editingIndex] = updated;
       setMedicineList(updatedList);
       setEditingIndex(null);
     } else {
       setMedicineList((prev) => [...prev, medicine]);
     }
-    setIsAddModalOpen(false);
+    setIsPresEditModalOpen(false);
   };
 
   const handleEdit = (index) => {
     setEditingIndex(index);
-    setIsAddModalOpen(true);
+    setIsPresEditModalOpen(true);
   };
 
   const handleRemoveMedicine = (index) => {
-    setMedicineList((prev) =>
-      prev.filter((_, i) => i !== index)
-    );
+    setMedicineList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleMedicineSelect = (value) => {
-    setSelectedMedicineName(value);
+  const handleMedicineSelect = (medicine) => {
+    setSelectedMedicineName(medicine);
+
     const alreadyExists = medicineList.some(
-      (item) => item.medicine_name === value
+      (item) => item.pharmacy_medicine_id === medicine.id
     );
+
     if (!alreadyExists) {
       const newMedicine = {
-        medicine_name: value,
+        pharmacy_medicine_id: medicine.id,
+        medicine_name: medicine.medicine_name,
         dosage: "",
         duration_days: null,
         instruction: "",
+        quantity: "",
       };
       setMedicineList((prev) => [...prev, newMedicine]);
     } else {
       message.info("Medicine already added.");
     }
   };
+
 
   const columns = [
     {
@@ -148,6 +179,11 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
       key: "duration_days",
     },
     {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
       title: "Instruction",
       dataIndex: "instruction",
       key: "instruction",
@@ -160,11 +196,7 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
           <Button type="link" onClick={() => handleEdit(index)}>
             Edit
           </Button>
-          <Button
-            danger
-            size="small"
-            onClick={() => handleRemoveMedicine(index)}
-          >
+          <Button danger size="small" onClick={() => handleRemoveMedicine(index)}>
             Remove
           </Button>
         </Space>
@@ -182,31 +214,33 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
         width={800}
         destroyOnClose={false}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-        >
+        <Form form={form} layout="vertical" onFinish={handleFinish}>
           <Form.Item name="notes" label="Doctor's Notes">
-            <Input.TextArea
-              rows={3}
-              placeholder="Add follow-up or special instructions..."
-            />
+            <Input.TextArea rows={3} placeholder="Add follow-up or special instructions..." />
           </Form.Item>
 
-          <div style={{ marginBottom: 12, display: "flex", gap: 12, }}>
+          <div style={{ marginBottom: 12, display: "flex", gap: 12 }}>
             <Select
+              showSearch
               style={{ flex: 1 }}
               placeholder="Select medicine name"
-              value={selectedMedicineName || undefined}
-              onChange={handleMedicineSelect}
-              options={medicineNames.map((name) => ({
-                label: name,
-                value: name,
+              value={selectedMedicineName?.id || undefined}
+              onChange={(id) => {
+                const selectedMedicine = pharmacyMedicines.find((med) => med.id === id);
+                if (selectedMedicine) {
+                  handleMedicineSelect(selectedMedicine);
+                }
+              }}
+
+              options={pharmacyMedicines.map((item) => ({
+                label: item.medicine_name,
+                value: item.id,
               }))}
               allowClear
+              loading={medicineLoading}
             />
-            <Button type="primary" onClick={() => setIsAddModalOpen(true)}>
+
+            <Button type="primary" onClick={() => setIsAddToStockModalOpen(true)}>
               + Add Medicine
             </Button>
           </div>
@@ -223,28 +257,32 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
           />
 
           <Form.Item style={{ marginTop: 20 }}>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" block loading={submitting}>
               Submit Prescription
             </Button>
           </Form.Item>
         </Form>
       </Modal>
 
+      {/* ➕ Add new medicine to stock */}
+      <AddStockMedicineModal
+        open={isAddToStockModalOpen}
+        onCancel={() => {
+          setIsAddToStockModalOpen(false);
+          dispatch(getPharmacyMedicine()); // refresh list
+        }}
+      />
+
+      {/* ✏️ Edit existing prescription item */}
       <AddPresMedicineModal
-        open={isAddModalOpen}
+        open={isPresEditModalOpen}
         onClose={() => {
-          setIsAddModalOpen(false);
+          setIsPresEditModalOpen(false);
           setEditingIndex(null);
         }}
         onAdd={handleAddMedicine}
-        defaultData={
-          editingIndex !== null
-            ? medicineList[editingIndex]
-            : null
-        }
-        prefillName={
-          editingIndex === null ? selectedMedicineName : null
-        }
+        defaultData={editingIndex !== null ? medicineList[editingIndex] : null}
+        prefillName={editingIndex === null ? selectedMedicineName : null}
       />
     </>
   );

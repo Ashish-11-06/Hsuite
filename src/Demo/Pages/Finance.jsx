@@ -18,7 +18,8 @@ import {
     DeletePerticular,
     updatePerticular,
 } from "../Redux/Slices/BillingSlice";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import AddNewPerticularModal from "../Modals/AddNewPerticularModal";
 
 const { Title } = Typography;
 
@@ -27,19 +28,24 @@ const Finance = () => {
     const { billParticulars, loading } = useSelector((state) => state.billing);
     const [form] = Form.useForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSetloading, setLoading] = useState(false);
     const [currentRecord, setCurrentRecord] = useState(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const openEditModal = (record) => {
         setCurrentRecord(record);
+        setLoading(true);
         form.setFieldsValue({
             name: record.name,
             amount: record.amount,
             description: record.description,
         });
         setIsModalOpen(true);
+        setLoading(false);
     };
 
     const handleUpdate = async () => {
+        setLoading(true);
         try {
             const values = await form.validateFields();
             await dispatch(
@@ -47,16 +53,21 @@ const Finance = () => {
             ).unwrap();
             setIsModalOpen(false);
         } catch (err) {
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
+        setLoading(true);
         try {
             await dispatch(DeletePerticular(id)).unwrap();
             // message.success("Deleted successfully");
             dispatch(getBillParticulars());
         } catch (err) {
             message.error("Failed to delete");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -69,6 +80,11 @@ const Finance = () => {
             title: "Sr. No.",
             dataIndex: "serial",
             render: (_, __, index) => index + 1,
+        },
+        {
+            title: "Type",
+            dataIndex: "type",
+            render: (type) => type?.toUpperCase() || "-",
         },
         {
             title: "Name",
@@ -100,6 +116,7 @@ const Finance = () => {
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes"
                         cancelText="No"
+                        loading={isSetloading}
                     >
                         <Button type="primary" danger icon={<DeleteOutlined />} size="small">
                             Delete
@@ -110,12 +127,24 @@ const Finance = () => {
         },
     ];
 
+    const handleAddSuccess = () => {
+        dispatch(getBillParticulars());
+    };
+
+
     return (
         <div style={{ padding: 24 }}>
-            <Title level={3}>Finance - Bill Particulars</Title>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Title level={3}>Finance - Bill Particulars</Title>
+                <Button type="primary" onClick={() => setIsAddModalOpen(true)} icon={<PlusOutlined />}>
+                    Add Particular
+                </Button>
+            </div>
 
             {loading ? (
-                <Spin tip="Loading..." size="large" />
+                <Spin tip="Loading..." size="large">
+                    <div style={{ height: 100 }}></div>
+                </Spin>
             ) : (
                 <Card>
                     <Table
@@ -137,6 +166,7 @@ const Finance = () => {
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onOk={handleUpdate}
+                confirmLoading={isSetloading}
                 okText="Update"
             >
                 <Form form={form} layout="vertical">
@@ -151,6 +181,13 @@ const Finance = () => {
                     </Form.Item>
                 </Form>
             </Modal>
+
+            <AddNewPerticularModal
+                open={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onAddSuccess={handleAddSuccess}
+            />
+
         </div>
     );
 };

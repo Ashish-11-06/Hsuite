@@ -21,14 +21,7 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [isPerticularModalOpen, setIsPerticularModalOpen] = useState(false);
 
-  const patient = patientDetails[record.patient] || {};
-
-  // const getCardBackgroundColor = () => {
-  //   if (status === "out" && paymentStatus === "paid") return "#d9f7be";
-  //   if (status === "out" && paymentStatus === "unpaid") return "#ffa39e";
-  //   return "#fff";
-  // };
-
+  const patient = record.patient || {};
   const formatStatus = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
   const getDoctorName = (doctorId) => {
@@ -64,6 +57,12 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
           padding: 5,
           marginBottom: 5,
           // backgroundColor: getCardBackgroundColor(),
+          border:
+            record.opd_type === "emergency" &&
+              status !== "completed" &&
+              status !== "out"
+              ? "2px solid red"
+              : "1px solid #f0f0f0",
           transition: "background-color 0.3s ease",
         }}
       >
@@ -71,8 +70,8 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
           <Button
             type="link"
             onClick={() => {
-              const patientId = record.patient;
-              const patient = patientDetails[patientId];
+              const patientId = record.patient?.id;
+              const patient = record.patient;
               navigate("/demo/patient-history", {
                 state: {
                   patient_id: patientId,  // used for all API calls
@@ -100,10 +99,11 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
             </div>
 
             <Text style={{ fontSize: 13 }}>
-              <strong>{record.date_time ? dayjs(record.date_time).format("YYYY-MM-DD") : "-"}</strong>
+              <strong>{record.date_time ? dayjs(record.date_time).format("hh:mm A") : "-"}</strong>
             </Text>
 
-            {["doctor", "nurse", "admin"].includes(currentUser?.designation) && status === "active" && (
+
+            {["doctor"].includes(currentUser?.designation) && status === "active" && (
               <Button size="small" type="primary" onClick={() => setIsPrescriptionModalOpen(true)} icon={<PlusOutlined />}>
                 Prescription
               </Button>
@@ -159,14 +159,14 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
             {patient.age || "-"} | {patient.gender || "-"} | {patient.address || "-"}
           </div>
           <div>
-            {patient.contact || "-"} | ID: {patient.patient_id}
+            {patient.contact_number || "-"} | <b>ID: </b>{patient.patient_id}
           </div>
           <div style={{ marginTop: 4 }}>
-            Doctor: <Text>{getDoctorName(record.doctor)}</Text>
+            <b>Doctor:</b><Text>{getDoctorName(record.doctor)}</Text>
           </div>
           {description && (
             <div style={{ marginTop: 4 }}>
-              Description: <Text>{description}</Text>
+              <b>Description: </b><Text>{description}</Text>
             </div>
           )}
         </div>
@@ -183,7 +183,7 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
             }}
           >
             <Button size="small" onClick={() => setIsPerticularModalOpen(true)} disabled={status === "out"}>
-              + Perticulars
+              + Particulars
             </Button>
           </div>
         )}
@@ -192,7 +192,7 @@ const OPDCard = ({ record, onEdit, doctors = [], patientDetails = {} }) => {
       <AddPrescriptionModal
         open={isPrescriptionModalOpen}
         onClose={() => setIsPrescriptionModalOpen(false)}
-        patientId={record.patient}
+        patientId={record.patient.id}
         userId={currentUser?.id}
       />
       <AddPerticularsModal

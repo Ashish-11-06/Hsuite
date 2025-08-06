@@ -20,6 +20,34 @@ const UsersApi = {
 
     UpdateUsersStatus: (id, data) => {
         return demoaxiosInstance.patch(`hospital/hmsuser/status/${id}/`, data);
+    },
+
+    UpdateDoctorAvaliability: (doctor_id, is_doctor_available) => {
+        return demoaxiosInstance.patch(`hospital/hmsuser/doctor/${doctor_id}/availability/`, {is_doctor_available});
+    },
+
+    GetAvaliableDoctors: () => {
+        return demoaxiosInstance.get(`hospital/hmsuser/doctors/available/`);
+    },
+
+    GetHMSUserByIdAndHospital: (user_id) => {
+        return demoaxiosInstance.get(`hospital/hospital-hms-user/${user_id}/`);
+    },
+
+    PostDoctorProfile: (data) => {
+        return demoaxiosInstance.post(`hospital/hmsuser/doctor-profile/create/`, data,{
+            headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+        });
+    },
+
+    UpdateDoctorProfile: (user_id, data) => {
+        return demoaxiosInstance.patch(`hospital/hmsuser/doctor-profile/update/${user_id}/`,data,{
+            headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+        });
     }
 }
 

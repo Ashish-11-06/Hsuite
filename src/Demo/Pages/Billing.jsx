@@ -33,7 +33,9 @@ const Billing = () => {
             <Title level={3}>Billing</Title>
 
             {loading ? (
-                <Spin tip="Loading Patients..." />
+                <Spin tip="Loading Patients...">
+                    <div style={{height: 100}}></div>
+                </Spin>
             ) : (
                 <Select
                     placeholder="Select a Patient name, contact and patient-Id"
@@ -50,7 +52,7 @@ const Billing = () => {
                         <Option
                             key={patient.id}
                             value={patient.id}
-                            label={`${patient.full_name} (${patient.patient_id}) (${patient.contact_number})`}
+                            label={`${patient.full_name} (${patient.patient_id})`}
                         >
                             {patient.patient_id} - {patient.full_name} ({patient.contact_number})
                         </Option>

@@ -18,8 +18,8 @@ const OpdApi = {
         return demoaxiosInstance.get(`hospital/opd/doctor/${doctorId}/`);
     },
 
-    PostPrescription: (data) => {
-        return demoaxiosInstance.post(`hospital/prescription/`, data);
+    PostPrescription: (payload) => {
+        return demoaxiosInstance.post(`hospital/prescription/`, payload);
     },
     
     GetMedicinesNames: () => {
@@ -36,6 +36,14 @@ const OpdApi = {
 
     PostBill: (data) => {
         return demoaxiosInstance.post(`hospital/bill/`, data);
+    },
+
+    GetPastOPD: (doctorId) => {
+        return demoaxiosInstance.get(`hospital/opd/past/doctor/${doctorId}/`);
+    },
+
+    GetAllPastOPD: () => {
+        return demoaxiosInstance.get(`hospital/opd/past-all/`);
     }
 }
 

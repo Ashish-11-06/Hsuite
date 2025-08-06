@@ -15,6 +15,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
   const [perticularList, setPerticularList] = useState([]);
   const [editingKey, setEditingKey] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const isEditing = (record) => record.key === editingKey;
 
@@ -25,32 +26,33 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
         .then((res) => {
           const all = res.data || [];
           const unbilled = all.filter((item) => item.bill === null);
-          setPerticularOptions(unbilled); // save full objects
+          setPerticularOptions(unbilled); 
         });
     }
   }, [open, dispatch]);
 
- const handlePerticularAddSuccess = async (name, amount, description) => {
-  try {
-    const res = await dispatch(getBillParticulars()).unwrap();
-    const all = res.data || [];
-    const unbilled = all.filter((item) => item.bill === null);
-    setPerticularOptions(unbilled);
+  const handlePerticularAddSuccess = async (name, amount, description, type) => {
+    try {
+      const res = await dispatch(getBillParticulars()).unwrap();
+      const all = res.data || [];
+      const unbilled = all.filter((item) => item.bill === null);
+      setPerticularOptions(unbilled);
 
-    setPerticularList((prev) => [
-      ...prev,
-      {
-        key: Date.now(),
-        perticular: name,
-        quantity: 1,
-        amount,
-        description,
-      },
-    ]);
-  } catch (err) {
-    message.error("Failed to update dropdown");
-  }
-};
+      setPerticularList((prev) => [
+        ...prev,
+        {
+          key: Date.now(),
+          perticular: name,
+          quantity: 1,
+          amount,
+          description,
+          type,
+        },
+      ]);
+    } catch (err) {
+      message.error("Failed to update dropdown");
+    }
+  };
 
   const handleSelectPerticular = (id) => {
     const selected = perticularOptions.find((item) => item.id === id);
@@ -58,7 +60,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
 
     const alreadyExists = perticularList.some((item) => item.perticular === selected.name);
     if (alreadyExists) {
-      message.warning("Perticular already in the list");
+      message.warning("Particular already in the list");
       return;
     }
 
@@ -71,6 +73,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
         quantity: 1,
         amount: parseFloat(selected.amount),
         description: selected.description || "",
+        type: selected.type || "",
       },
     ]);
   };
@@ -94,7 +97,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
 
   const handleFinalSubmit = async () => {
     if (perticularList.length === 0) {
-      message.warning("No perticulars added");
+      message.warning("No particulars added");
       return;
     }
 
@@ -114,6 +117,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
       perticulars: perticularsPayload,
     };
 
+    setSubmitting(true);
     try {
       await dispatch(PostBill(body)).unwrap();
       onSubmit?.(perticularList); // optional callback
@@ -123,6 +127,8 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
       onClose();
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -134,9 +140,15 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
       render: (_, __, index) => index + 1,
     },
     {
-      title: "Perticular",
+      title: "Particular",
       dataIndex: "perticular",
       key: "perticular",
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (text) => text?.toUpperCase() || "-",
     },
     {
       title: "Amount",
@@ -198,7 +210,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
   return (
     <>
       <Modal
-        title="Add Perticular"
+        title="Add Particular"
         open={open}
         onCancel={() => {
           setEditingKey(null);
@@ -211,7 +223,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
         <Space style={{ marginBottom: 16 }} wrap>
           <Select
             showSearch
-            placeholder="Select Perticular"
+            placeholder="Select Particular"
             optionFilterProp="children"
             filterOption={(input, option) =>
               option?.children?.toLowerCase().includes(input.toLowerCase())
@@ -233,7 +245,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
             type="primary"
             icon={<PlusOutlined />}
           >
-            Add New Perticular
+            Add New Particular
           </Button>
         </Space>
 
@@ -246,7 +258,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
         />
 
         <div style={{ textAlign: "right", marginTop: 20 }}>
-          <Button type="primary" onClick={handleFinalSubmit}>
+          <Button type="primary" onClick={handleFinalSubmit} loading={submitting}>
             Submit
           </Button>
         </div>

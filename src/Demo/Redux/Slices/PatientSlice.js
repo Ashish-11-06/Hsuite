@@ -20,7 +20,7 @@ export const fetchAllPatients = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await PatientApi.GetAllPatients();
-       return {
+      return {
         hospital: res.data.hospital,
         patients: res.data.patients
       };// Ensure we return an empty array if no data is found
@@ -67,6 +67,17 @@ export const GetAllDetailHistoryyy = createAsyncThunk(
   }
 );
 
+export const getCount = createAsyncThunk(
+  "patient/getCount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await PatientApi.GetCount();
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Error fetching dashboard stats");
+    }
+  }
+);
 
 const patientSlice = createSlice({
   name: "patient",
@@ -75,6 +86,7 @@ const patientSlice = createSlice({
     data: null,
     historyData: [],
     allPatients: [],
+    countData: null,
     hospital: {},
     error: null,
   },
@@ -108,7 +120,7 @@ const patientSlice = createSlice({
       .addCase(fetchAllPatients.fulfilled, (state, action) => {
         state.loading = false;
         state.allPatients = action.payload.patients;
-        state.hospital = action.payload.hospital; 
+        state.hospital = action.payload.hospital;
       })
       .addCase(fetchAllPatients.rejected, (state, action) => {
         state.loading = false;
@@ -158,7 +170,21 @@ const patientSlice = createSlice({
       .addCase(GetAllDetailHistoryyy.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+      .addCase(getCount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.countData = action.payload;
+      })
+      .addCase(getCount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
   },
 });
 

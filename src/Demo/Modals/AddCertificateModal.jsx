@@ -38,7 +38,6 @@ const AddCertificateModal = ({ open, onClose, patientId, onCertificateAdded }) =
     form.resetFields();
     setDoctorId(null);
   } catch (error) {
-    console.error("Error submitting form:", error);
   } finally {
     setLoading(false);
   }

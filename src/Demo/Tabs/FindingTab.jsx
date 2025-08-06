@@ -94,7 +94,21 @@ const FindingTab = ({ patient, patient_id }) => {
       key: "srno",
       render: (_, __, index) => index + 1,
     },
-    { title: "Date", dataIndex: "date", key: "date" },
+    { title: "Date", dataIndex: "date", key: "date", render: (text) => new Date(text).toLocaleDateString() },
+    , {
+      title: "Time",
+      dataIndex: "date",
+      key: "time",
+      render: (text) => {
+        if (!text) return "-";
+        const time = new Date(text).toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+        return time;
+      },
+    },
     { title: "Temperature", dataIndex: "temperature", key: "temperature", render: renderVitalTag("temperature") },
     { title: "Pulse", dataIndex: "pulse", key: "pulse", render: renderVitalTag("pulse") },
     { title: "BP", dataIndex: "blood_pressure", key: "blood_pressure", render: renderVitalTag("blood_pressure") },
@@ -105,6 +119,7 @@ const FindingTab = ({ patient, patient_id }) => {
     { title: "PA", dataIndex: "pa", key: "pa", render: renderVitalTag("pa") },
     { title: "WBC", dataIndex: "wbc", key: "wbc", render: renderVitalTag("wbc") },
     { title: "RBC", dataIndex: "rbc", key: "rbc", render: renderVitalTag("rbc") },
+    { title: "Note", dataIndex: "note", key: "note", render: (text) => text || "-" },
     {
       title: "Actions",
       key: "actions",

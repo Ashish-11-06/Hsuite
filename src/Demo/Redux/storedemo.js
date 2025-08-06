@@ -5,6 +5,10 @@ import authReducer from "../Redux/Slices/AuthSlice";
 import usersReducer from "../Redux/Slices/UsersSlice";
 import opdReducer from "../Redux/Slices/OpdSlice";
 import billingReducer from "../Redux/Slices/BillingSlice";
+import ipdReducer from "../Redux/Slices/IpdSlice"; // Assuming you have an IpdSlice
+import stockReducer from "../Redux/Slices/StockSlice";
+import patientRegisterReducer from "../Redux/Slices/PatientRegisterSlice";
+import reportReducer from "../Redux/Slices/ReportSlice";
 
 const storedemo = configureStore({
   reducer: {
@@ -14,6 +18,10 @@ const storedemo = configureStore({
     users:usersReducer,
     opd: opdReducer,
     billing: billingReducer,
+    ipd: ipdReducer, 
+    stock: stockReducer,
+    patientRegister: patientRegisterReducer,
+    report: reportReducer,
     // other reducers
   },
 });

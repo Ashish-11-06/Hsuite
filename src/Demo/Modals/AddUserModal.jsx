@@ -51,6 +51,7 @@ const AddUserModal = ({ visible, onClose }) => {
             <Option value="nurse">Nurse</Option>
             <Option value="receptionist">Receptionist</Option>
             <Option value="pharmacist">Pharmacist</Option>
+            <Option value= "lab_assistant">Lab-Assistant</Option>
             <Option value="admin">Admin</Option>
           </Select>
         </Form.Item>

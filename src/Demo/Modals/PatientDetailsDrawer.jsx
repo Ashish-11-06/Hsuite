@@ -1,6 +1,7 @@
 import React from "react";
 import { Drawer, Divider, Button } from "antd";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 const PatientDetailsDrawer = ({ visible, onClose, patient }) => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const PatientDetailsDrawer = ({ visible, onClose, patient }) => {
             ))} */}
 
           {/* <p><b>Admission done on:</b> {patient.created_at}</p> */}
-          <p><b>Last Visit:</b> {patient.date}</p>
+         <p><b>Last Visit:</b> {patient.date ? dayjs(patient.date).format("DD-MM-YYYY") : "-"}</p>
         </div>
       )}
     </Drawer>

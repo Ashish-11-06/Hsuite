@@ -19,6 +19,10 @@ const PatientApi = {
 
   GetAllDetailHistory: (patient_id) => {
     return demoaxiosInstance.get(`hospital/patient/full-history/${patient_id}/`)
+  },
+
+  GetCount: () => {
+    return demoaxiosInstance.get(`hospital/dashboard-stats/`);
   }
 
 };

@@ -17,6 +17,11 @@ import { Provider } from "react-redux";
 import storedemo from "./Demo/Redux/storedemo.js";
 import store from "./Redux/store.js";
 import DemoLogin from "./Demo/Pages/DemoLogin.jsx";
+import PatientRegistration from "./Demo/Pages/PatientRegistration.jsx";
+import PatientSidebar from "./Demo/Components/PatientSidebar.jsx";
+import PatientMainContent from "./Demo/Components/PatientMainContent.jsx";
+import ProtectedRoutePatient from "./Demo/Components/ProtectedRoutePatient.jsx";
+import PatientHeader from "./Demo/Components/PatientHeader.jsx";
 
 const { Header, Content, Footer } = Layout;
 
@@ -87,7 +92,7 @@ function App() {
       <InactivityHandler />
 
       <Routes>
-       {/* 🔑 Main Login Route */}
+        {/* 🔑 Main Login Route */}
         <Route
           path="/login"
           element={
@@ -107,34 +112,65 @@ function App() {
           }
         />
 
+        <Route
+          path="/demo/:hospitalId/patientregistration"
+          element={
+            <Provider store={storedemo}>
+              <PatientRegistration />
+            </Provider>
+          }
+        />
+
+        <Route
+          path="/demo/:hospitalId/patient*"
+          element={
+            <Provider store={storedemo}>
+              <ProtectedRoutePatient>
+                <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                <Header>
+                  <PatientHeader />
+                </Header>
+                <Layout style={{ minHeight: "100vh", display: "flex" }}>
+                  <PatientSidebar />
+                    <Content style={{ padding: "30px", overflowY: "auto" }}>
+                      <PatientMainContent />
+                    </Content>
+                  </Layout>
+                </Layout>
+              </ProtectedRoutePatient>
+            </Provider>
+          }
+        />
+
         {/* DEMO CODE  */}
         <Route
           path="/demo/*"
           element={
             <Provider store={storedemo}>
               <ProtectedRouteDemo>
-              <Layout style={{ minHeight: "100vh", display: "flex" }}>
-                {/*demo Sidebar */}
-                <DemoSidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
+                <Layout style={{ minHeight: "100vh", display: "flex" }}>
+                  {/*demo Sidebar */}
+                  <DemoSidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
+                  {/* <PatientSidebar /> */}
 
-                <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-                  {/* Header */}
-                  <Header style={{ position: "fixed", top: 0, left: "200px", right: 0, height: "65px", zIndex: 100 }}>
-                    <DemoHeader />
-                  </Header>
+                  <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                    {/* Header */}
+                    <Header style={{ position: "fixed", top: 0, left: "235px", right: 0, height: "65px", zIndex: 100 }}>
+                      <DemoHeader />
+                    </Header>
 
-                  {/* Main Content */}
-                  <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
-                    <DemoMainContent />
-                  </Content>
+                    {/* Main Content */}
+                    <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
+                      <DemoMainContent />
+                    </Content>
 
-                  {/* Footer */}
-                  {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
+                    {/* Footer */}
+                    {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
                   <FooterComponent />
                 </Footer> */}
+                  </Layout>
                 </Layout>
-              </Layout>
-               </ProtectedRouteDemo>
+              </ProtectedRouteDemo>
             </Provider>
           }
         />

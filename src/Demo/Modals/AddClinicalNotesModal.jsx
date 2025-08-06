@@ -1,14 +1,7 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  message,
-  Select,
-  Typography
-} from "antd";
+import { Modal, Form, Input, DatePicker, message, Select,Typography} from "antd";
 import { useDispatch } from "react-redux";
+import dayjs from "dayjs";
 import { PostClinicalNotes } from "../Redux/Slices/PatientHistorySlice";
 import AddMedicineModal from "./AddMedicineModal";
 
@@ -21,6 +14,7 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
 
   const [isMedicineModalOpen, setIsMedicineModalOpen] = useState(false);
   const [clinicalNoteId, setClinicalNoteId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -40,6 +34,7 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
         next_followup_date: values.next_followup_date.format("YYYY-MM-DD"),
       };
 
+      setSubmitting(true);
       const result = await dispatch(PostClinicalNotes(payload)).unwrap();
       setClinicalNoteId(result.data.id);
       form.resetFields();
@@ -47,6 +42,8 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
       setIsMedicineModalOpen(true);
     } catch (error) {
       message.error("Please fill all required fields.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -57,6 +54,7 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
         title="Add Clinical Notes"
         onCancel={onClose}
         onOk={handleSubmit}
+        confirmLoading = {submitting}
         okText="Submit"
         width={800}
         styles={{
@@ -87,7 +85,9 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
               rules={[{ required: true }]}
               style={{ flex: "1 1 48%" }}
             >
-              <DatePicker style={{ width: "100%" }} />
+              <DatePicker style={{ width: "100%" }} 
+              disabledDate={(current) => current && current > dayjs().endOf("day")}
+              />
             </Form.Item>
 
             <Form.Item
@@ -164,7 +164,9 @@ const AddClinicalNotesModal = ({ open, onClose, onClinicalNoteAdded, patientId }
               rules={[{ required: true }]}
               style={{ flex: "1 1 48%" }}
             >
-              <DatePicker style={{ width: "100%" }} />
+              <DatePicker style={{ width: "100%" }} 
+               disabledDate={(current) => current && current < dayjs().startOf("day")}
+              />
             </Form.Item>
           </div>
         </Form>

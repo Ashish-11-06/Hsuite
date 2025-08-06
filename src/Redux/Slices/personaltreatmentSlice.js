@@ -33,7 +33,7 @@ export const createPersonalitySteps = createAsyncThunk(
         message: response.data.message || "Steps created successfully"
       };
     } catch (error) {
-    console.error("API Error:", error.response?.data); // Log full error data
+    // console.error("API Error:", error.response?.data); // Log full error data
       return rejectWithValue(
         error.response?.data?.message ||
         error.response?.data?.error ||

@@ -13,15 +13,12 @@ const PrescriptionTab = ({ patient, patient_id }) => {
   const { prescriptions = [], hospital } = useSelector((state) => state.opd);
   const [loading, setloading] = useState(false);
   const users = useSelector((state) => state.users.users || []);
-  // const doctorData = users.find((u) => u.id === Number(userId));
 
   const GetPrescriptions = async () => {
     try {
       setloading(true);
       const response = await dispatch(FetchPrescriptionByPatientId(patient_id)).unwrap();
-      // console.log("Fetched prescriptions:", response);
     } catch (error) {
-      // console.error("Failed to fetch prescriptions:", error);
     } finally {
       setloading(false);
     }

@@ -12,13 +12,13 @@ const ReportsAndAnalytics = () => {
       </Title>
 
       <Text type="secondary" style={{ fontSize: "16px" }}>
-        This feature is currently under development. Coming Soon!
+        This feature is currently under development. <span style={{color:"green"}}>Coming Soon!</span>
       </Text>
 
       <Row gutter={[24, 24]} justify="center" style={{ marginTop: "40px" }}>
         <Col xs={24} sm={12} md={8}>
           <Card
-            bordered={false}
+             variant="borderless"
             style={{
               minHeight: "180px",
               background: "#f5faff",
@@ -34,7 +34,7 @@ const ReportsAndAnalytics = () => {
 
         <Col xs={24} sm={12} md={8}>
           <Card
-            bordered={false}
+            variant="borderless"
             style={{
               minHeight: "180px",
               background: "#f5faff",
@@ -50,7 +50,7 @@ const ReportsAndAnalytics = () => {
 
         <Col xs={24} sm={12} md={8}>
           <Card
-            bordered={false}
+             variant="borderless"
             style={{
               minHeight: "180px",
               background: "#f5faff",

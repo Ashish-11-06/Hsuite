@@ -101,6 +101,14 @@ const AddFindingModal = ({ open, onClose, patientId }) => {
           <Form.Item name="rbc" label="RBC" style={{ flex: "1 1 48%" }}>
             <Input />
           </Form.Item>
+          <Form.Item
+            name="note"
+            label="Note"
+            style={{ flex: "1 1 48%" }}
+          >
+            <Input.TextArea rows={3} placeholder="Enter any additional notes..." />
+          </Form.Item>
+
         </div>
       </Form>
     </Modal>

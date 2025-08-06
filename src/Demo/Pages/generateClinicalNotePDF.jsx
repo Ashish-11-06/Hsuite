@@ -37,7 +37,6 @@ const generateClinicalNotePDF = ({ record, patient, doctor, hospital }) => {
   doc.setFont("times", "normal");
   doc.text(`Email: ${doctorEmail}`, 15, 56);
 
-  doc.setFont("times", "normal");
   doc.setTextColor(0);
   doc.text(`Date: ${new Date().toLocaleDateString()}`, 180, 50, { align: "right" });
 
@@ -45,7 +44,6 @@ const generateClinicalNotePDF = ({ record, patient, doctor, hospital }) => {
   doc.line(10, 68, 200, 68);
 
   // Heading
-  doc.setTextColor(0);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text("CLINICAL NOTE", 15, 78);
@@ -93,7 +91,7 @@ const generateClinicalNotePDF = ({ record, patient, doctor, hospital }) => {
 
       doc.text(med.medicine_name || "-", 17, y + 4);
       doc.text(`${med.dosage_amount}${med.dosage_unit}`, 87, y + 4);
-      doc.text(med.frequency.replace(/_/g, " ") || "-", 117, y + 4);
+      doc.text(med.frequency?.replace(/_/g, " ") || "-", 117, y + 4);
 
       y += lineHeight;
     });
@@ -105,20 +103,28 @@ const generateClinicalNotePDF = ({ record, patient, doctor, hospital }) => {
     y += 10;
   }
 
-  // Patient Info
+  // PATIENT DETAILS in table format
   doc.setFont("times", "bold");
   doc.setFontSize(13);
   doc.text("Patient Information", 15, y);
-  y += 6;
+  y += 8;
 
-  doc.setFont("times", "normal");
-  doc.setFontSize(11);
-  doc.text(`Name: ${patient.full_name || "N/A"}`, 15, y); y += 6;
-  doc.text(`Age: ${patient.age || "N/A"}`, 15, y); y += 6;
-  doc.text(`Gender: ${patient.gender || "N/A"}`, 15, y); y += 6;
-  doc.text(`Blood Group: ${patient.blood_group || "N/A"}`, 15, y); y += 6;
-  doc.text(`Contact: ${patient.contact_number || "N/A"}`, 15, y); y += 6;
-  doc.text(`Address: ${patient.address || "N/A"}`, 15, y); y += 10;
+  const drawLabelValueRow = (label, value) => {
+    doc.setFont("times", "bold");
+    doc.text(`${label}:`, 15, y);
+    doc.setFont("times", "normal");
+    doc.text(`${value || "N/A"}`, 60, y);
+    y += 6;
+  };
+
+  drawLabelValueRow("Name", patient.full_name);
+  drawLabelValueRow("Age", patient.age);
+  drawLabelValueRow("Gender", patient.gender);
+  drawLabelValueRow("Blood Group", patient.blood_group);
+  drawLabelValueRow("Contact", patient.contact_number);
+  drawLabelValueRow("Address", patient.address);
+
+  y += 10;
 
   // Signatures
   y = Math.max(y + 20, 250);

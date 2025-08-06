@@ -11,6 +11,7 @@ const BLOOD_GROUP_CHOICES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const [submitting, setSubmitting] = React.useState(false);
 
   const handleFinish = async (values) => {
     const payload = {
@@ -30,14 +31,17 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
       relative_name: values.relativeName,
     };
 
+    setSubmitting(true);
     try {
       const res = await dispatch(postPatientDetails(payload)).unwrap();
       message.success(res?.message || "Patient added successfully");
       form.resetFields();
       dispatch(fetchAllPatients());
-      onCancel();
+      onCancel(res?.data?.id);
     } catch (err) {
       message.error(err?.message || "Failed to add patient");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -48,6 +52,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
       onCancel={onCancel}
       onOk={() => form.validateFields().then(handleFinish)}
       okText={isEditing ? "Update" : "Add"}
+      confirmLoading={submitting}
       width={800}
       styles={{
         body: { maxHeight: "65vh", overflowY: "auto", paddingRight: 12, },
@@ -81,7 +86,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
             name="dob"
             label="DOB"
             style={{ flex: "1 1 48%" }}
-            rules={[{ required: true, message: "Please enter DOB" }]}
+            // rules={[{ message: "Please enter DOB" }]}
           >
             <DatePicker
               style={{ width: "100%" }}
@@ -101,7 +106,7 @@ const AddPatientModal = ({ visible, onCancel, isEditing = false }) => {
             style={{ flex: "1 1 48%" }}
             rules={[{ required: true, message: "Please enter age" }]}
           >
-            <Input type="number" disabled />
+            <Input type="number" />
           </Form.Item>
 
           <Form.Item

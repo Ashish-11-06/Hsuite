@@ -20,6 +20,36 @@ const BillingApi ={
 
     UpdatePerticulars: (perticular_id, data) => {
         return demoaxiosInstance.put(`hospital/bill-perticulars/update/${perticular_id}/`, data);
-    }
+    },
+
+    GetInvoice: () => {
+        return demoaxiosInstance.get(`hospital/invoices/`);
+    },
+
+    PostSuppliers: (data) => {
+        return demoaxiosInstance.post(`hospital/supplier/`, data);
+    },
+
+    getSuppliers: () => {
+        return demoaxiosInstance.get(`hospital/suppliers/`);
+    },
+
+    UpdatePrescriptions: (prescription_id) => {
+        return demoaxiosInstance.get(`hospital/prescription/${prescription_id}/update/`);
+    },
+
+    PostPharmacyBill: (data) => {
+        return demoaxiosInstance.post(`hospital/pharmacy-bill/`, data);
+    },
+
+    UpdatePharmacyBill: (bill_id, data) => {
+        return demoaxiosInstance.patch(`hospital/pharmacy-bill/${bill_id}/update/`, data);
+    },
+
+    PostStockMedicine: (data) => {
+        return demoaxiosInstance.post(`hospital/pharmacy/medicine/`, data);
+    },
+
+    
 }
 export default BillingApi;

@@ -9,7 +9,7 @@ export const PostOPD = createAsyncThunk(
     async (data, { rejectWithValue }) => {
         try {
             const response = await OpdApi.PostOPD(data);
-            message.success("OPD record saved successfully!")
+            message.success(response.data.message || "OPD record saved successfully!")
             return response.data;
         } catch (error) {
             message.error("Failed to save OPD record");
@@ -38,7 +38,7 @@ export const UpdateOPDStatus = createAsyncThunk(
     async ({ id, body }, { rejectWithValue }) => {
         try {
             const response = await OpdApi.UpdateStatus(id, body);
-            message.success("OPD status updated successfully!");
+            message.success(response.data.message || "OPD status updated successfully!");
             return response.data;
         } catch (error) {
             message.error("Failed to update OPD status");
@@ -62,9 +62,9 @@ export const GetOpdByDoctorId = createAsyncThunk(
 
 export const PostPrescription = createAsyncThunk(
     "opd/postprescription",
-    async (data, { rejectWithValue }) => {
+    async (payload, { rejectWithValue }) => {
         try {
-            const response = await OpdApi.PostPrescription(data);
+            const response = await OpdApi.PostPrescription(payload);
             message.success(response.data.message || "posted successfully");
             return response.data;
         } catch (error) {
@@ -127,6 +127,31 @@ export const PostBill = createAsyncThunk(
     }
 );
 
+//async thunk of all past opd
+export const GetPastOPD = createAsyncThunk(
+    "opd/getPastOpd",
+    async (doctorId, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.GetPastOPD(doctorId);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const GetAllPastOPD = createAsyncThunk(
+    "opd/getAllPastOpd",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await OpdApi.GetAllPastOPD();
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 //----slice------
 const OpdSlice = createSlice({
     name: "opd",
@@ -135,6 +160,7 @@ const OpdSlice = createSlice({
         opdByDoctor: [],
         medicineNames: [],
         prescriptions: [],
+        pastopd: [],
         medicineNamesFetched: false,
         opdStatus: null,
         loading: false,
@@ -282,6 +308,33 @@ const OpdSlice = createSlice({
                 state.loading = false;
             })
             .addCase(PostBill.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            //get past opd
+            .addCase(GetPastOPD.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(GetPastOPD.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pastopd = action.payload;
+            })
+            .addCase(GetPastOPD.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(GetAllPastOPD.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(GetAllPastOPD.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pastopd = action.payload;
+            })
+            .addCase(GetAllPastOPD.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

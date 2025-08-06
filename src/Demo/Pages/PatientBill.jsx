@@ -4,6 +4,7 @@ import { DownloadOutlined, EditOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBillByPatientId, clearBillData, updatePayment } from "../Redux/Slices/BillingSlice";
 import { generateBillPDF } from "./generateBillPDF";
+import { render } from "less";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -14,6 +15,9 @@ const PatientBill = ({ patient }) => {
   const { billData, hospital } = useSelector((state) => state.billing);
   const [paymentData, setPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("Cash");
 
   useEffect(() => {
     if (patient?.id) {
@@ -42,7 +46,8 @@ const PatientBill = ({ patient }) => {
     }
   }, [patient, dispatch]);
 
-  const allBills = billData ? [...billData].sort((a, b) => a.bill_id - b.bill_id) : [];
+  const allBills = billData || [];
+  // const allBills = billData ? [...billData].sort((a, b) => b.bill_id - a.bill_id) : [];
 
   const handlePaymentChange = (key, field, value) => {
     if (field === "status" && value === "Paid") {
@@ -65,18 +70,51 @@ const PatientBill = ({ patient }) => {
     );
   };
 
-  const toggleEdit = (key) => {
-    setPaymentData((prev) =>
-      prev.map((item) =>
-        item.key === key ? { ...item, isEditing: !item.isEditing } : item
-      )
-    );
+  const handleEditToggle = (record) => {
+    setSelectedRecord(record);
+    setSelectedPaymentMethod(record.method);
+    setIsModalVisible(true);
   };
+
+  const handleModalSubmit = async () => {
+    if (!selectedRecord) return;
+
+    setLoading(true);
+    await dispatch(
+      updatePayment({
+        bill_id: selectedRecord.key,
+        payment_mode: selectedPaymentMethod?.toLowerCase(),
+        status: "paid",
+        patient_id: patient?.id,
+      })
+    );
+
+    const res = await dispatch(fetchBillByPatientId(patient.id)).unwrap();
+    const bills = res?.data || [];
+
+    const updatedPayments = bills.map((b, index) => ({
+      key: b.bill_id || index,
+      date: b.payment_date_time
+        ? new Date(b.payment_date_time).toLocaleDateString()
+        : "—",
+      amount: b.paid_amount || 0,
+      totalAmount: b.total_amount || 0,
+      status: b.status || "Unpaid",
+      method: b.payment_mode || "Cash",
+      isEditing: false,
+    }));
+
+    setPaymentData(updatedPayments);
+    setIsModalVisible(false);
+    setLoading(false);
+  };
+
 
   const billingColumns = [
     { title: "Sr. No.", render: (_, __, i) => i + 1 },
     { title: "Date", dataIndex: "date" },
     { title: "Perticular", dataIndex: "perticular" },
+    { title: "Type", dataIndex: "type", render: (text) => text?.toUpperCase() || "-" },
     { title: "Rate", dataIndex: "rate" },
     { title: "Unit", dataIndex: "unit" },
     { title: "Amount", dataIndex: "amount" },
@@ -130,58 +168,24 @@ const PatientBill = ({ patient }) => {
         ),
     },
     {
-  title: "Actions",
-  render: (_, record) => {
-    const handleSave = async () => {
-      // Dispatch update
-      await dispatch(
-        updatePayment({
-          bill_id: record.key,
-          payment_mode: record.method?.toLowerCase() || "cash",
-          status: record.status?.toLowerCase() || "unpaid",
-        })
-      );
+      title: "Actions",
+      render: (_, record) => {
+        const isPaid = record.status?.toLowerCase() === "paid";
 
-      // Refetch data and update local paymentData
-      const res = await dispatch(fetchBillByPatientId(patient.id)).unwrap();
-      const bills = res?.data || [];
-
-      const updatedPayments = bills.map((b, index) => ({
-        key: b.bill_id || index,
-        date: b.payment_date_time
-          ? new Date(b.payment_date_time).toLocaleDateString()
-          : "—",
-        amount: b.paid_amount || 0,
-        totalAmount: b.total_amount || 0,
-        status: b.status || "Unpaid",
-        method: b.payment_mode || "Cash",
-        isEditing: false, // Ensure edit mode is reset
-      }));
-
-      setPaymentData(updatedPayments);
-    };
-
-    const handleEditToggle = () => {
-      toggleEdit(record.key);
-    };
-
-    const isEditing = record.isEditing;
-    const isPaidAndNotEditing = record.status?.toLowerCase() === "paid" && !isEditing;
-
-    return (
-      <Button
-        icon={<EditOutlined />}
-        type="primary"
-        size="small"
-        disabled={isPaidAndNotEditing}
-        onClick={isEditing ? handleSave : handleEditToggle}
-      >
-        {isEditing ? "Save" : "Edit"}
-      </Button>
-    );
-  },
-}
-
+        return (
+          <Button
+            icon={<EditOutlined />}
+            type="primary"
+            size="small"
+            disabled={isPaid}
+            onClick={() => handleEditToggle(record)}
+            loading={loading}
+          >
+            pay Bill
+          </Button>
+        );
+      },
+    }
   ];
 
   if (!patient) return null;
@@ -189,7 +193,9 @@ const PatientBill = ({ patient }) => {
     return (
       <div style={{ padding: 24 }}>
         <Card>
-          <Spin tip="Loading Bill Details..." size="large" />
+          <Spin tip="Loading Bill Details..." size="large">
+            <div style={{ height: 100 }}></div>
+          </Spin>
         </Card>
       </div>
     );
@@ -205,7 +211,7 @@ const PatientBill = ({ patient }) => {
     >
 
       {allBills.length === 0 ? (
-        <Card style={{ marginTop: 24, width: "100%" }} bordered>
+        <Card style={{ marginTop: 24, width: "100%" }} variant="borderless">
           <Text type="danger">No bills found for this patient.</Text>
         </Card>
       ) : (
@@ -216,6 +222,7 @@ const PatientBill = ({ patient }) => {
               key: item.id || i,
               date: new Date(item.date_time).toLocaleDateString(),
               perticular: item.name,
+              type: item.type || "N/A",
               rate: parseFloat(item.amount),
               unit: 1,
               amount: parseFloat(item.amount),
@@ -282,7 +289,6 @@ const PatientBill = ({ patient }) => {
                         <Tag color={bill.status?.toLowerCase() === "paid" ? "green" : "red"}>
                           {bill.status?.toUpperCase() || "UNPAID"}
                         </Tag>
-
                       </Space>
                     </Col>
                   </Row>
@@ -293,6 +299,27 @@ const PatientBill = ({ patient }) => {
         </Collapse>
 
       )}
+      <Modal
+        title="Update Payment"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        onOk={handleModalSubmit}
+        okText="Pay"
+      >
+        <Text>Select Payment Method:</Text>
+        <Select
+          value={selectedPaymentMethod}
+          onChange={(val) => setSelectedPaymentMethod(val)}
+          style={{ width: "100%", marginTop: 8 }}
+        >
+          <Option value="Cash">Cash</Option>
+          <Option value="Card">Card</Option>
+          <Option value="UPI">UPI</Option>
+          <Option value="NetBanking">Net Banking</Option>
+          <Option value="Other">Other</Option>
+        </Select>
+      </Modal>
+
     </div>
   );
 };

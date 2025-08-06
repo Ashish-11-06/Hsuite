@@ -59,6 +59,14 @@ const AddPresMedicineModal = ({ open, onClose, onAdd, defaultData, prefillName }
         </Form.Item>
 
         <Form.Item
+          name="quantity"
+          label="Quantity"
+          rules={[{ required: true, type: "number" }]}
+        >
+          <InputNumber min={1} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
           name="instruction"
           label="Instruction"
           rules={[{ required: true }]}

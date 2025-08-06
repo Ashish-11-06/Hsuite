@@ -36,11 +36,12 @@ export const getBillParticulars = createAsyncThunk(
 // Thunk to update payment for a specific bill
 export const updatePayment = createAsyncThunk(
   "billing/updatePayment",
-  async ({ bill_id, payment_mode, status }, { rejectWithValue }) => {
+  async ({ bill_id, payment_mode, status, patient_id }, { rejectWithValue }) => {
     try {
       const response = await BillingApi.UpdatePayment(bill_id, {
         payment_mode,
         status,
+        patient_id,
       });
       message.success(response.data.message || "updated successfully");
       return response.data;
@@ -87,12 +88,125 @@ export const updatePerticular = createAsyncThunk(
   }
 );
 
+// Thunk to get invoice
+export const getInvoice = createAsyncThunk(
+  "billing/getInvoice",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.GetInvoice();
+      return response.data;
+    } catch (error) { 
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to fetch invoice"
+      );
+    }
+  }
+);
+
+// thunk to post suppliers
+export const postSuppliers = createAsyncThunk(
+  "billing/postSuppliers",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.PostSuppliers(data);  
+      message.success(response.data.message || "Supplier added successfully");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to add supplier"
+      );
+    } 
+  }
+);
+
+// Thunk to get suppliers
+export const getSuppliers = createAsyncThunk(
+  "billing/getSuppliers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.getSuppliers();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to fetch suppliers"
+      );
+    }
+  }
+);
+
+// Thunk to update prescriptions
+export const updatePrescriptions = createAsyncThunk(
+  "billing/updatePrescriptions",
+  async (prescription_id, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.UpdatePrescriptions(prescription_id);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to update prescriptions"
+      );
+    }
+  }
+);
+
+// Thunk to post pharmacy bill
+export const postPharmacyBill = createAsyncThunk(
+  "billing/postPharmacyBill",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.PostPharmacyBill(data);
+      message.success(response.data.message || "Pharmacy bill posted successfully");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to post pharmacy bill"
+      );
+    }
+  }
+);
+
+// Thunk to update pharmacy bill
+export const updatePharmacyBill = createAsyncThunk(
+  "billing/updatePharmacyBill",
+  async ({ bill_id, data }, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.UpdatePharmacyBill(bill_id, data);
+      message.success(response.data.message || "Pharmacy bill updated successfully");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to update pharmacy bill"
+      );
+    }
+  }
+);
+
+//Post stock medicine
+export const postStockMedicine = createAsyncThunk(
+  "billing/postStockMedicine",  
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await BillingApi.PostStockMedicine(data);
+      message.success(response.data.message || "Stock medicine posted successfully");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to post stock medicine"
+      );
+    }
+  }
+);
+
+
 const billingSlice = createSlice({
   name: "billing",
   initialState: {
     billData: [],
     billParticulars: [],
-    hospital: [],
+    invoice: [],
+    suppliers: [],
+    hospital: {},
+    pharmacyMedicines:[],
     loading: false,
     error: null,
   },
@@ -178,9 +292,122 @@ const billingSlice = createSlice({
       .addCase(updatePerticular.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update bill particular";
+      })
+
+      // getInvoice
+      .addCase(getInvoice.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getInvoice.fulfilled, (state, action) => {
+        state.loading = false;
+        state.invoice = action.payload.data || [];
+        state.hospital = action.payload.hospital || {};
+      })
+      .addCase(getInvoice.rejected, (state, action) => {    
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch invoice";
+      })
+
+      // postSuppliers
+      .addCase(postSuppliers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postSuppliers.fulfilled, (state, action) => {
+        state.loading = false;
+        // Assuming suppliers are part of the hospital data
+        state.hospital.suppliers = [
+          ...(state.hospital.suppliers || []),
+          action.payload.data,
+        ];
+      })
+      .addCase(postSuppliers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to add supplier";
+      })
+
+      // getSuppliers
+      .addCase(getSuppliers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSuppliers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.suppliers = action.payload || [];
+      })
+      .addCase(getSuppliers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch suppliers";
+      })
+
+      // updatePrescriptions
+      .addCase(updatePrescriptions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePrescriptions.fulfilled, (state, action) => {
+        state.loading = false;
+        // Assuming the response contains updated prescription data
+        const updatedPrescription = action.payload;
+        state.billData = state.billData.map((bill) =>
+          bill.prescriptions.map((prescription) =>
+            prescription.id === updatedPrescription.id
+              ? updatedPrescription
+              : prescription
+          )
+        );
+      })
+      .addCase(updatePrescriptions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update prescriptions";
+      })
+
+      // postPharmacyBill
+      .addCase(postPharmacyBill.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postPharmacyBill.fulfilled, (state, action) => {
+        state.loading = false;
+        // Assuming the response contains the new pharmacy bill data
+        state.billData.push(action.payload.data);
+      })
+      .addCase(postPharmacyBill.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to post pharmacy bill";
+      })
+
+      // updatePharmacyBill
+      .addCase(updatePharmacyBill.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePharmacyBill.fulfilled, (state, action) => {
+        state.loading = false;
+        // Assuming the response contains the updated pharmacy bill data
+        const updatedBill = action.payload.data;
+        state.billData = state.billData.map((bill) =>
+          bill.id === updatedBill.id ? updatedBill : bill
+        );
+      })
+      .addCase(updatePharmacyBill.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update pharmacy bill";
+      })
+
+      // POST STOCK MEDICINE
+      .addCase(postStockMedicine.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postStockMedicine.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(postStockMedicine.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
-
-
   },
 });
 

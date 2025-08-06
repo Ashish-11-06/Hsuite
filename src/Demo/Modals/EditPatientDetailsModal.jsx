@@ -50,7 +50,7 @@ const EditPatientDetailsModal = ({ visible, onCancel, patient }) => {
             <Input type="date" />
           </Form.Item>
 
-          <Form.Item name="age" label="Age" rules={[{ required: true }]} style={{ flex: "1 1 48%" }}>
+          <Form.Item name="age" label="Age" style={{ flex: "1 1 48%" }}>
             <InputNumber min={0} style={{ width: "100%" }} disabled />
           </Form.Item>
 

@@ -4,16 +4,16 @@ import {
   Button,
   Row,
   Col,
-  Empty,
   Form,
   message,
   Select,
   Input,
+  Switch,
 } from "antd";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import AddPatientModal from "./AddPatientModal";
 import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
-import { GetAllUsers } from "../Redux/Slices/UsersSlice";
+import { GetAvaliableDoctors } from "../Redux/Slices/UsersSlice";
 import { PostOPD } from "../Redux/Slices/OpdSlice";
 
 const { TextArea } = Input;
@@ -21,33 +21,56 @@ const { Option } = Select;
 
 const GetPatientsModal = ({ visible, onClose, onSelect }) => {
   const dispatch = useDispatch();
-  const [addModalVisible, setAddModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  const { allPatients } = useSelector((state) => state.patient);
-  const { users } = useSelector((state) => state.users);
-
+  // Local states
+  const [patients, setPatients] = useState([]);
+  const [users, setUsers] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [description, setDescription] = useState("");
+  const [opdType, setOpdType] = useState("normal");
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
+  // Fetch patients and users manually via thunk in try/catch
   useEffect(() => {
     if (visible) {
-      dispatch(fetchAllPatients());
-      dispatch(GetAllUsers());
-      setSelectedPatient(null);
-      setSelectedDoctor(null);
-      setDescription("");
-    }
-  }, [dispatch, visible]);
+      const fetchData = async () => {
+        try {
+          const patientData = await dispatch(fetchAllPatients()).unwrap();
+          const userData = await dispatch(GetAvaliableDoctors()).unwrap();
+          setPatients(Array.isArray(patientData.patients) ? patientData.patients : []);
+          setUsers(Array.isArray(userData.available_doctors) ? userData.available_doctors : []);
+        } catch (err) {
+          // console.error("Error fetching data:", err);
+          message.error("Failed to load patient or user data");
+        }
 
-  const handleAddFinish = (values) => {
-    form.resetFields();
+        setSelectedPatient(null);
+        setSelectedDoctor(null);
+        setDescription("");
+        setOpdType("normal");
+      };
+
+      fetchData();
+    }
+  }, [visible, dispatch]);
+
+  const handleAddFinish = (newPatientId) => {
     setAddModalVisible(false);
-    dispatch(fetchAllPatients());
+    dispatch(fetchAllPatients())
+      .unwrap()
+      .then((data) => {
+        setPatients(data || []);setPatients(Array.isArray(data.patients) ? data.patients : []);
+        if (newPatientId) setSelectedPatient(newPatientId);
+      })
+      .catch(() => {
+        message.error("Failed to refresh patients");
+      });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedPatient || !selectedDoctor || !description.trim()) {
       message.warning("Please fill all fields.");
       return;
@@ -57,14 +80,20 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
       patient: selectedPatient,
       doctor: selectedDoctor,
       description: description.trim(),
+      opd_type: opdType,
     };
 
-    dispatch(PostOPD(data)).then((res) => {
-      onSelect?.();
-    }).catch((err) => {
-       message.error(err);
-    });
+    setSubmitting(true);
 
+    try {
+      await dispatch(PostOPD(data)).unwrap();
+      onSelect?.();
+      onClose?.();
+    } catch (err) {
+      message.error(err?.message || "Failed to submit OPD");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const doctorOptions = users?.filter((u) => u.designation === "doctor") || [];
@@ -78,7 +107,20 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
         footer={null}
         width={600}
       >
-        <Form layout="vertical">
+        <Form layout="vertical" form={form}>
+          <Form.Item label="OPD Type">
+            <Switch
+              checkedChildren="Normal"
+              unCheckedChildren="Emergency"
+              checked={opdType === "normal"}
+              onChange={(checked) => setOpdType(checked ? "normal" : "emergency")}
+              className="opd-type-switch"
+              style={{
+                backgroundColor: opdType === "normal" ? "#52c41a" : "#ff4d4f",
+              }}
+            />
+          </Form.Item>
+
           <Form.Item label="Select Patient">
             <Row gutter={8} align="middle">
               <Col flex="auto">
@@ -93,9 +135,9 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
                     option?.children?.toLowerCase().includes(input.toLowerCase())
                   }
                 >
-                  {allPatients?.map((patient) => (
+                  {patients?.map((patient) => (
                     <Option key={patient.id} value={patient.id}>
-                      {patient.full_name} - {patient.age} yrs
+                      {patient.patient_id} - {patient.full_name}
                     </Option>
                   ))}
                 </Select>
@@ -107,7 +149,6 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
               </Col>
             </Row>
           </Form.Item>
-
 
           <Form.Item label="Description">
             <TextArea
@@ -138,7 +179,12 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" block onClick={handleSubmit}>
+            <Button
+              type="primary"
+              block
+              onClick={handleSubmit}
+              loading={submitting}
+            >
               Submit OPD
             </Button>
           </Form.Item>
@@ -147,7 +193,10 @@ const GetPatientsModal = ({ visible, onClose, onSelect }) => {
 
       <AddPatientModal
         visible={addModalVisible}
-        onCancel={() => setAddModalVisible(false)}
+        onCancel={(newPatientId) => {
+          setAddModalVisible(false);
+          if (newPatientId) handleAddFinish(newPatientId);
+        }}
         onFinish={handleAddFinish}
         form={form}
         isEditing={false}

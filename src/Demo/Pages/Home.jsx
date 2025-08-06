@@ -1,67 +1,71 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Row, Col } from "antd";
-import { GetAllOPD } from "../Redux/Slices/OpdSlice";
-import { fetchAllPatients } from "../Redux/Slices/PatientSlice";
-import { GetAllUsers } from "../Redux/Slices/UsersSlice";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Row, Col, Spin } from "antd";
+import { getCount } from "../Redux/Slices/PatientSlice";
 
-const isToday = (someDate) => {
-  const today = new Date();
-  const date = new Date(someDate);
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
+import { CalendarOutlined, TeamOutlined, ExperimentOutlined, UserOutlined, MedicineBoxOutlined, PlusCircleOutlined, SolutionOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+
+const iconMap = {
+  "TODAY'S OPD": <CalendarOutlined />,
+  "TODAY'S IPD": <PlusCircleOutlined />,
+  "TOTAL PATIENTS": <TeamOutlined />,
+  "DOCTORS": <UserOutlined />,
+  "NURSES": <SolutionOutlined />,
+  "RECEPTIONISTS": <UsergroupAddOutlined />,
+  "LAB ASSISTANTS": <ExperimentOutlined />,
+  "PHARMACISTS": <MedicineBoxOutlined />,
+  "TOTAL USERS": <TeamOutlined />,
 };
 
-const StatCard = ({ title, todayCount, totalCount }) => {
-  const showToday = todayCount !== null && todayCount !== undefined;
+const gradientMap = {
+  "TODAY'S OPD": "linear-gradient(135deg, #f54ea2, #ff7676)",
+  "TODAY'S IPD": "linear-gradient(135deg, #42e695, #3bb2b8)",
+  "TOTAL PATIENTS": "linear-gradient(135deg, #f093fb, #f5576c)",
+  "DOCTORS": "linear-gradient(135deg, #43e97b, #38f9d7)",
+  "NURSES": "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+  "RECEPTIONISTS": "linear-gradient(135deg, #a18cd1, #fbc2eb)",
+  "LAB ASSISTANTS": "linear-gradient(135deg, #667eea, #764ba2)",
+  "PHARMACISTS": "linear-gradient(135deg, #f6d365, #fda085)",
+  "TOTAL USERS": "linear-gradient(135deg, #ffecd2, #fcb69f)",
+};
+
+const StatCard = ({ title, count }) => {
+  const icon = iconMap[title] || <UserOutlined />;
+  const bg = gradientMap[title] || "#ccc";
 
   return (
     <div style={{
-      background: "white",
+      background: "#fff",
       borderRadius: "12px",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-      overflow: "hidden",
-      minHeight: "180px",
-      width: "100%",
-      maxWidth: "300px",
-      margin: "auto",
+      boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
       display: "flex",
-      flexDirection: "column"
+      alignItems: "center",
+      padding: "16px 20px",
+      minHeight: "100px",
     }}>
-      <div style={{
-        background: "#0077b6",
-        padding: "12px",
-        textAlign: "center",
-        color: "white",
-        fontWeight: 600,
-        fontSize: "16px"
-      }}>
-        {title}
+      {/* Icon */}
+      <div
+        style={{
+          background: bg,
+          borderRadius: "50%",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#fff",
+          fontSize: "24px",
+          marginRight: "16px",
+          flexShrink: 0,
+        }}
+      >
+        {icon}
       </div>
-      <div style={{
-        flex: 1,
-        padding: "20px",
-        textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center"
-      }}>
-        {showToday && (
-          <>
-            <div style={{ color: "#7d7d7d", fontSize: "14px", marginBottom: "4px" }}>TODAY</div>
-            <div style={{ color: "#0077b6", fontSize: "28px", fontWeight: "bold", marginBottom: "16px" }}>
-              {todayCount}
-            </div>
-          </>
-        )}
-        {/* Keep spacing consistent even if TODAY is not shown */}
-        {!showToday && <div style={{ height: "64px" }}></div>}
 
-        <div style={{ color: "#7d7d7d", fontSize: "14px", marginBottom: "4px" }}>TOTAL</div>
-        <div style={{ color: "#0077b6", fontSize: "28px", fontWeight: "bold" }}>{totalCount}</div>
+      {/* Content */}
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "4px" }}>{count}</div>
+        <div style={{ fontSize: "14px", color: "#777", textTransform: "uppercase" }}>{title}</div>
       </div>
     </div>
   );
@@ -70,37 +74,82 @@ const StatCard = ({ title, todayCount, totalCount }) => {
 
 const Home = () => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(GetAllOPD());
-    dispatch(fetchAllPatients());
-    dispatch(GetAllUsers());
-  }, [dispatch]);
-
-  const opdData = useSelector((state) => state.opd?.opdData?.data || []);
-  const patients = useSelector((state) => state.patient?.allPatients || []);
-  const users = useSelector((state) => state.users?.users || []);
-
-  const todayOpds = opdData.filter((item) => isToday(item.date_time));
-  const todayPatients = patients.filter((item) => isToday(item.created_at || item.date));
+  const [countData, setCountData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const hmsUser = JSON.parse(localStorage.getItem("HMS-user"));
   const isAdmin = hmsUser?.designation === "admin";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const resultAction = await dispatch(getCount());
+        if (getCount.fulfilled.match(resultAction)) {
+          setCountData(resultAction.payload);
+        } else {
+          // console.error("Failed to fetch count:", resultAction.payload);
+        }
+      } catch (err) {
+        // console.error("Unexpected error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  if (loading || !countData) {
+    return (
+      <Spin
+        size="large"
+        style={{ display: "block", margin: "100px auto" }}
+      />
+    );
+  }
 
   return (
     <div className="dashboard-container" style={{ padding: "40px" }}>
       <Row gutter={[24, 24]} justify="center">
         <Col xs={24} sm={12} md={8}>
-          <StatCard title="OPD" todayCount={todayOpds.length} totalCount={opdData.length} />
+          <StatCard title="TODAY'S OPD" count={countData.todays_opd_count} />
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <StatCard title="PATIENTS" todayCount={todayPatients.length} totalCount={patients.length} />
+          <StatCard title="TODAY'S IPD" count={countData.todays_ipd_count} />
         </Col>
-         {isAdmin && (
         <Col xs={24} sm={12} md={8}>
-          <StatCard title="TOTAL USERS" todayCount={null} totalCount={users.length} />
+          <StatCard title="TOTAL PATIENTS" count={countData.total_patient_count} />
         </Col>
-         )}
+        <Col xs={24} sm={12} md={8}>
+          <StatCard title="DOCTORS" count={countData.doctors_count} />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <StatCard title="NURSES" count={countData.nurses_count} />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <StatCard title="RECEPTIONISTS" count={countData.receptionist_count} />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <StatCard title="LAB ASSISTANTS" count={countData.lab_assistant_count} />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <StatCard title="PHARMACISTS" count={countData.pharmacist_count} />
+        </Col>
+        {isAdmin && (
+          <Col xs={24} sm={12} md={8}>
+            <StatCard
+              title="TOTAL STAFF"
+              count={
+                countData.doctors_count +
+                countData.nurses_count +
+                countData.receptionist_count +
+                countData.lab_assistant_count +
+                countData.pharmacist_count
+              }
+            />
+          </Col>
+        )}
       </Row>
     </div>
   );

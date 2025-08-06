@@ -37,7 +37,7 @@ const DemoHeader = () => {
           }}
         >
           Welcome, 
-          <span style={{color:"blue"}}>{userName || "Guest"}</span>
+          <span style={{color:"blue"}}> {userName || "Guest"}</span>
 
         </h2>
       </div>
