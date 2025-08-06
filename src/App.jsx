@@ -175,6 +175,19 @@ function App() {
           }
         />
 
+         <Route
+          path="/web/*"
+          element={
+            <Provider >
+                    {/* Main Content */}
+                    <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
+                      <DemoMainContent />
+                    </Content>
+
+            </Provider>
+          }
+        />
+
         {/* MAIN CODE  */}
         <Route
           path="*"
