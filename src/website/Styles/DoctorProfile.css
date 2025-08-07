@@ -1,0 +1,105 @@
+.doctor-stack-container {
+  position: relative;
+  width: 100%;
+  height: 300vh; /* Enough height to scroll */
+  background: #f0f4f8;
+}
+
+.doctor-sticky-wrapper {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.doctor-card-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.doctor-card-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  opacity: 0;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  width: 80%;
+  max-width: 1500px;
+  height: 55vh;
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  z-index: 0;
+}
+
+/* Active card (on top) */
+.doctor-card-layer.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 10;
+}
+
+/* Show next few cards stacked above */
+.doctor-card-layer.behind-1 {
+  opacity: 1;
+  transform: translate(-50%, calc(-50% - 20px)) scale(0.95);
+  z-index: 5;
+}
+
+.doctor-card-layer.behind-2 {
+  opacity: 1;
+  transform: translate(-50%, calc(-50% - 40px)) scale(0.9);
+  z-index: 3;
+}
+
+.doctor-img {
+  width: 700px;
+  height: 500px;
+  border-radius: 20px;
+  /* object-fit: cover; */
+}
+
+.doctor-details {
+  flex: 1;
+  text-align: left;
+}
+
+.doctor-details h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #111;
+}
+
+.doctor-details h4 {
+  color: #008060;
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.doctor-details p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.book-btn {
+  background-color: #008060;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.book-btn:hover {
+  background-color: #005e47;
+}

@@ -1,14 +1,20 @@
-import { Routes, Route, Router } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
+import Navbar from "./Components/Navbar";
+import About from "./Pages/About";
 
+const WebSiteRoute = () => {
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
 
-const DemoMainContent = () => {
-
-    return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-        </Routes> 
-    )
+       
+      </Routes>
+    </>
+  );
 };
 
-export default DemoMainContent;
+export default WebSiteRoute;

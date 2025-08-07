@@ -1,0 +1,57 @@
+/* src/Styles/Services.css */
+
+.services-container {
+  padding: 50px 20px;
+  background: #f4f9ff;
+  text-align: center;
+}
+
+.services-heading {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 40px;
+}
+
+.service-card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px 20px;
+  min-height: 300px; /* Increased card height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); /* Added box-shadow */
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.service-title {
+  font-size: 1.5rem;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.service-description {
+  font-size: 1rem;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+/* Pagination outside the swiper */
+.swiper-pagination {
+  position: static !important;
+  margin-top: 40px;
+}
+
+/* Optional: center the pagination bullets */
+.swiper-pagination-bullets {
+  display: flex;
+  justify-content: center;
+}
