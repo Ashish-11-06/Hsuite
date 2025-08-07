@@ -24,5 +24,16 @@
       "email": "lucy@example.com",
       "role": "Reviewer"
     }
-  ]
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#0d6efd",
+      "secondary": "#ffc107",
+      "background": "#f8f9fa",
+      "text": "#212529",
+      "navbarBg": "#ffffff",
+      "navbarText": "#000000",
+      "borderColor": "#dee2e6"
+    }
+  }
 }

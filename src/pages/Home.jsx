@@ -97,21 +97,21 @@ const Home = () => {
         </Col>
 
         {currentUser?.role === "Admin" && (
-  <Col>
-    <Link to="/users">
-      <Card style={cardStyle}>
-        <Title level={5} style={titleStyle}>
-          <TeamOutlined /> Users
-        </Title>
-        {loading ? (
-          <Spin size="small" />
-        ) : (
-          <Title level={3} style={{ color: "#000" }}>{userCount}</Title>
+          <Col>
+            <Link to="/users">
+              <Card style={cardStyle}>
+                <Title level={5} style={titleStyle}>
+                  <TeamOutlined /> Users
+                </Title>
+                {loading ? (
+                  <Spin size="small" />
+                ) : (
+                  <Title level={3} style={{ color: "#000" }}>{userCount}</Title>
+                )}
+              </Card>
+            </Link>
+          </Col>
         )}
-      </Card>
-    </Link>
-  </Col>
-)}
 
       </Row>
     </Content>
