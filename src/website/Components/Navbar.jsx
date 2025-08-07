@@ -3,9 +3,16 @@ import { Link } from "react-router-dom";
 import '../Styles/Navbar.css'; 
 import logo from '../Images/logo.png'; 
 import { FaSearch } from "react-icons/fa";
-import theme from "../theme";
+import { useContext } from "react";
+import ThemeContext from "../ThemeContext";
 
 const Navbar = () => {
+
+   const theme = useContext(ThemeContext);
+
+  if (!theme || !theme.colors) {
+    return null; // or a fallback loader
+  }
   return (
     <nav
       className="custom-navbar"

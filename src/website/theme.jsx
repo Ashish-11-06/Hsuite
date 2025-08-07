@@ -1,15 +1,14 @@
 // src/website/theme.js
 
-const theme = {
+const createTheme = (colors = {}) => ({
   colors: {
-    primary: "#1f3c88",
-    secondary: "#FFA500",
-    background: "#ffffff",
-    text: "#333333",
-    navbarBg: "#ffffff",
-    navbarText: "#000000",
-    borderColor: "#E0E0E0",
-   
+    primary: colors.primary || "#1f3c88",
+    secondary: colors.secondary || "#FFA500",
+    background: colors.background || "#ffffff",
+    text: colors.text || "#333333",
+    navbarBg: colors.navbarBg || "#ffffff",
+    navbarText: colors.navbarText || "#000000",
+    borderColor: colors.borderColor || "#E0E0E0",
   },
   fonts: {
     body: "'Roboto', sans-serif",
@@ -20,6 +19,6 @@ const theme = {
     medium: "16px",
     large: "24px",
   },
-};
+});
 
-export default theme;
+export default createTheme;

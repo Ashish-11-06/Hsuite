@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+// src/website/Pages/Home.jsx
+import React, { useContext, useState } from "react";
+import ThemeContext from "../ThemeContext";
 import "../Styles/Home.css";
-import heroImage from "../Images/homeimg.jpg";
 
-// Image variations for each card click
+// Default image and variations
 import defaultImage from "../Images/homeimg.jpg";
 import imageWho from "../Images/hero1.jpg";
 import imageWhen from "../Images/hero2.jpg";
@@ -10,6 +11,7 @@ import imageWhat from "../Images/hero3.jpg";
 import imageWhere from "../Images/hero1.jpg";
 import imageWhy from "../Images/hero4.jpg";
 import imageHow from "../Images/hero5.jpg";
+
 import About from "./About";
 import Services from "./Services";
 import WhyChooseUs from "./WhyChooseUs";
@@ -18,34 +20,48 @@ import DoctorProfiles from "./DoctorProfiles";
 const Home = () => {
   const [bgImage, setBgImage] = useState(defaultImage);
 
-  return (
-    <div className="home-container">
-      {/* Hero Section */}
-      {/* <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>Welcome to Indeed Hospital</h1>
-            <p>Your health is our top priority.</p>
-            <button className="btn-appointment">Book Appointment</button>
-          </div>
-          <div className="hero-image">
-            <img src={heroImage} alt="Hospital" />
-          </div>
-        </div>
-      </section> */}
+  // Access dynamic theme
+  const { colors, fonts, spacing } = useContext(ThemeContext);
 
-      {/* Interactive Section */}
+  return (
+    <div
+      className="home-container"
+      style={{
+        backgroundColor: colors?.background,
+        color: colors?.text,
+        fontFamily: fonts?.body,
+        padding: spacing?.medium,
+      }}
+    >
+      {/* Hero Section */}
       <section className="hospital-hero-section">
         <div className="hospital-hero-left">
-          <h1>Welcome to Indeed Hospital</h1>
+          <h1 style={{ color: colors?.primary, fontFamily: fonts?.heading }}>
+            Welcome to Indeed Hospital
+          </h1>
           <p>Your health is our top priority.</p>
-          <button className="btn-appointment">Book Appointment</button>
+          <button
+            className="btn-appointment"
+            style={{
+              backgroundColor: colors?.secondary,
+              color: "#fff",
+              border: `1px solid ${colors?.borderColor}`,
+              padding: spacing?.small,
+              cursor: "pointer",
+            }}
+          >
+            Book Appointment
+          </button>
           <hr />
         </div>
 
         <div
           className="hospital-hero-right"
-          style={{ backgroundImage: `url(${bgImage})` }}
+          style={{
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
           onMouseLeave={() => setBgImage(defaultImage)}
         >
           <div
@@ -99,57 +115,11 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Website Sections */}
       <About />
-
-      {/* About Section */}
-      {/* <section className="about-section">
-        <h2>About Us</h2>
-        <p>
-          Lifecare Hospital is a leading healthcare provider with
-          state-of-the-art facilities and a team of expert doctors, surgeons,
-          and staff. We are committed to delivering quality care to improve
-          lives.
-        </p>
-      </section> */}
-
-      {/* Services Section */}
       <Services />
-
-      {/* Why Choose Us Section */}
       <WhyChooseUs />
-
-      {/* Doctor Profiles Section */}
       <DoctorProfiles />
-
-      {/* Services Section */}
-      {/* <section className="services-section">
-        <h2>Our Services</h2>
-        <div className="services-list">
-          <div className="service-box">
-            <h3>24/7 Emergency</h3>
-            <p>Immediate and critical care round-the-clock.</p>
-          </div>
-          <div className="service-box">
-            <h3>Cardiology</h3>
-            <p>Advanced heart care by experienced cardiologists.</p>
-          </div>
-          <div className="service-box">
-            <h3>Pediatrics</h3>
-            <p>Specialized care for infants, children, and adolescents.</p>
-          </div>
-          <div className="service-box">
-            <h3>Diagnostic Lab</h3>
-            <p>Accurate testing services for timely diagnosis.</p>
-          </div>
-        </div>
-      </section>
-
-
-      <section className="contact-section">
-        <h2>Need Help?</h2>
-        <p>Contact us at +91-9876543210 or book an appointment online.</p>
-        <button className="btn-contact">Contact Us</button>
-      </section> */}
     </div>
   );
 };
