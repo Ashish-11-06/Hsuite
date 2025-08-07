@@ -5,9 +5,56 @@
     <link rel="icon" type="image/png" href="/medical-logo-2.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HSuite</title>
+    <style>
+      #global-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #ffffff;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .medical-loader {
+        width: 60px;
+        height: 60px;
+        animation: rotate 2s linear infinite;
+      }
+
+      @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .medical-loader path {
+        fill: #1f3c88; /* Hospital blue */
+      }
+    </style>
   </head>
   <body>
+    <!-- Loader -->
+    <div id="global-loader">
+      <!-- SVG Medical Cross -->
+      <svg class="medical-loader" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M28 0h8v28h28v8H36v28h-8V36H0v-8h28V0z"/>
+      </svg>
+    </div>
+
+    <!-- React app root -->
     <div id="root"></div>
+
+    <!-- Hide loader after app loads -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.style.display = "none";
+      });
+    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

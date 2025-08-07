@@ -6,9 +6,13 @@ import Navbar from "./Components/Navbar";
 import ThemeContext from "./ThemeContext";
 import createTheme from "./theme";
 import { useEffect, useState } from "react";
+import Career from "./Pages/Career";
+import ContactUs from "./Pages/ContactUs";
+import Specialities from "./Pages/Specialities";
+import Footer from "./Components/Footer";
 
 const WebSiteRoute = () => {
- const [theme, setTheme] = useState(createTheme());
+  const [theme, setTheme] = useState(createTheme());
 
 
   useEffect(() => {
@@ -31,7 +35,11 @@ const WebSiteRoute = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/careers" element={<Career />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/specialities" element={<Specialities />} />
       </Routes>
+        <Footer />
     </ThemeContext.Provider>
   );
 };

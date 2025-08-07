@@ -38,7 +38,6 @@ const WhyChooseUs = () => {
       <div className="usp-cards-container">
         {uspData.map((usp, index) => (
           <div key={index} className="usp-card">
-            <div className="usp-icon">{usp.icon}</div>
             <h3 className="usp-title">{usp.title}</h3>
             <p className="usp-description">{usp.description}</p>
           </div>

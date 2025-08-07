@@ -97,9 +97,8 @@
 /* Interactive Section */
 .hospital-hero-section {
   display: flex;
-  height: 800px;
+  height: 500px;
   width: 100%;
-  margin-top: 40px;
   font-family: 'Segoe UI', sans-serif;
 }
 
