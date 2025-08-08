@@ -22,6 +22,7 @@ import PatientSidebar from "./Demo/Components/PatientSidebar.jsx";
 import PatientMainContent from "./Demo/Components/PatientMainContent.jsx";
 import ProtectedRoutePatient from "./Demo/Components/ProtectedRoutePatient.jsx";
 import PatientHeader from "./Demo/Components/PatientHeader.jsx";
+import WebSiteRoute from "./website/websiteRoute.jsx";
 
 const { Header, Content, Footer } = Layout;
 
@@ -171,6 +172,19 @@ function App() {
                   </Layout>
                 </Layout>
               </ProtectedRouteDemo>
+            </Provider>
+          }
+        />
+
+         <Route
+          path="/web/*"
+          element={
+            <Provider store={storedemo}>
+                    {/* Main Content */}
+                    <Content>
+                      <WebSiteRoute />
+                    </Content>
+
             </Provider>
           }
         />
