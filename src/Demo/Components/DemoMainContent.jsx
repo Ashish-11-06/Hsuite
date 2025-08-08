@@ -27,6 +27,7 @@ import LabReport from "../Pages/LabReport";
 import BirthReport from "../Pages/BirthReport";
 import DeathReport from "../Pages/DeathReport";
 import NewBill from "../Pages/NewBill";
+import PrescriptionInvoice from "../Pages/PrescriptionInvoice";
 
 const DemoMainContent = () => {
 
@@ -60,6 +61,7 @@ const DemoMainContent = () => {
             <Route path="/birth" element={<BirthReport />} />
             <Route path="/death" element={<DeathReport />} />
             <Route path="/newbill" element={<NewBill />} />
+            <Route path="/presInvoice" element={<PrescriptionInvoice />} />
         </Routes> 
     )
 };

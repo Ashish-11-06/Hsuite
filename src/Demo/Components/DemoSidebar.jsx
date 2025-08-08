@@ -53,7 +53,8 @@ const DemoSidebar = () => {
         if (location.pathname === "/demo/report") return "9-5";
         if (location.pathname === "/demo/stockitems") return "9-3";
         if (location.pathname === "/demo/medicine") return "9-4";
-        if (location.pathname === "demo/newbill") return "9-6";
+        if (location.pathname === "/demo/newbill") return "9-6";
+        if (location.pathname === "/demo/presInvoice") return "9-7";
         if (location.pathname === "/demo/profile") return "10";
         if (location.pathname === "/demo/lab") return "11-1";
         if (location.pathname === "/demo/birth") return "11-2";
@@ -193,6 +194,10 @@ const DemoSidebar = () => {
                             key: "9-1",
                             icon: <FileTextFilled />,
                             label: <Link to="/demo/pharmacy">Prescription</Link>,
+                        },
+                        {
+                            key: "9-7",
+                            label: <Link to="/demo/presInvoice">Prescription Invoice</Link>,
                         },
                         {
                             key: "9-6",

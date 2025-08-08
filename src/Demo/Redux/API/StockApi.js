@@ -20,11 +20,25 @@ const StockApi = {
         );
     },
 
-    PostPharamacyOutBill: ()=> {
-        return demoaxiosInstance.post(`hospital/pharmacy/out-bill/`);
+    PostPharmacyOutBill: (payload)=> {
+        return demoaxiosInstance.post(`hospital/pharmacy/out-bill/`, payload);
     },
     
-    
+    UpdatePaymentPharmacyOutBill: (bill_id, data) => {
+        return demoaxiosInstance.patch(`hospital/pharmacy/out-bill/${bill_id}/update/`, data);
+    },
+
+    GetPharmacyOutBill: () => {
+        return demoaxiosInstance.get(`hospital/pharmacy/out-bills/`);
+    },
+
+    GetPrescriptionInvoice: () => {
+        return demoaxiosInstance.get(`hospital/pharmacy-invoices/`);
+    },
+
+    GetInvoiceOutPharmacyBill: () => {
+        return demoaxiosInstance.get(`hospital/pharmacy-out/invoices/`);
+    }
 }
 
 export default StockApi;

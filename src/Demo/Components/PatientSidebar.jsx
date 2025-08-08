@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Menu, message } from "antd";
+import { Layout, Menu, message, Modal } from "antd";
 import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeOutlined,
@@ -16,11 +16,18 @@ const PatientSidebar = () => {
   const { hospitalId } = useParams();
   const isMobile = window.innerWidth < 768;
 
-  const handleLogout = () => {
-    localStorage.clear();
-    message.success("Logged out successfully");
-    navigate(`/demo/${hospitalId}/patientregistration`);
-  };
+ const handleLogout = () => {
+  Modal.confirm({
+    title: "Are you sure you want to logout?",
+    okText: "Yes",
+    cancelText: "No",
+    onOk: () => {
+      localStorage.clear();
+      message.success("Logged out successfully");
+      navigate(`/demo/${hospitalId}/patientregistration`);
+    },
+  });
+};
 
   const getSelectedKey = () => {
     if (location.pathname.includes("patientHome")) return "1";

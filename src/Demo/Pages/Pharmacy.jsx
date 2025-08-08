@@ -19,6 +19,7 @@ const Pharmacy = () => {
     const [submittedBills, setSubmittedBills] = useState({});
     const [editBill, setEditBill] = useState({});
     const [updatingBillId, setUpdatingBillId] = useState(null);
+    const [hospital, setHospital] = useState(null);
     const [editingAmount, setEditingAmount] = useState({});
 
     const patients = useSelector((state) => state.patient.allPatients);
@@ -26,7 +27,17 @@ const Pharmacy = () => {
     const HMSuser = JSON.parse(localStorage.getItem("HMS-user"));
 
     useEffect(() => {
-        dispatch(fetchAllPatients());
+        const fetchPatients = async () => {
+            try {
+                const response = await dispatch(fetchAllPatients()).unwrap();
+                setHospital(response?.hospital || null);
+            } catch (error) {
+                //   console.error("Failed to fetch patients:", error);
+                message.error("Failed to load patients. Please try again.");
+            }
+        };
+
+        fetchPatients();
     }, [dispatch]);
 
     const handleChange = async (patientId) => {
@@ -250,6 +261,7 @@ const Pharmacy = () => {
                                             setSubmittedBills={setSubmittedBills}
                                             updatingBillId={updatingBillId}
                                             setUpdatingBillId={setUpdatingBillId}
+                                            hospital={hospital}
                                         />
                                     </>
                                 ),
