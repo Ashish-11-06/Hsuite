@@ -1,27 +1,33 @@
 import axios from 'axios';
 
+// export const BASE_URL = 'https://hsuite.prushal.com/backend';
+// export const BASE_URL = 'http://192.168.1.55:8000';
+// export const BASE_URL = 'http://192.168.1.57:8000';
+export const BASE_URL = 'https://hsuite.prushal.com/main-backend';
+
 const axiosInstance = axios.create({
-  //  baseURL: 'http://192.168.1.34:8080/api',
-  // baseURL: 'http://192.168.1.62:8001/api', 
-    //  baseURL: 'https://medical-backend-rxuk.onrender.com/api', // JSON Server URL
-    baseURL:'https://hsuite.prushal.com/backend/api/',
-    //  baseURL: 'https://hsuite.prushal.com/test-backend/api/',
-    // baseURL: 'https://8ced-103-211-60-165.ngrok-free.app/api/',
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  baseURL: `${BASE_URL}/api`,
+  // baseURL: 'http://192.168.1.40:8000/api', 
+  //  baseURL: 'https://medical-backend-rxuk.onrender.com/api', // JSON Server URL
+  // baseURL: 'https://hsuite.prushal.com/backend/api/',
+  // baseURL: 'https://hsuite.prushal.com/test-backend/api/',
+  // baseURL: 'https://feb3-103-211-60-173.ngrok-free.app/api/',
+  //  baseURL: 'https://cannon-retained-it-forces.trycloudflare.com/api/',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // Automatically attach token to headers
 axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("token"); // 💡 get token from localStorage
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default axiosInstance;

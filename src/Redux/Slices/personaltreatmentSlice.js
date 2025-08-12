@@ -33,7 +33,7 @@ export const createPersonalitySteps = createAsyncThunk(
         message: response.data.message || "Steps created successfully"
       };
     } catch (error) {
-    console.error("API Error:", error.response?.data); // Log full error data
+    // console.error("API Error:", error.response?.data); // Log full error data
       return rejectWithValue(
         error.response?.data?.message ||
         error.response?.data?.error ||
@@ -72,10 +72,10 @@ export const updateCurrentStep = createAsyncThunk(
   'treatment/updateCurrentStep',
   async ({ treatment_id, step_id }, { rejectWithValue }) => {
     try {
-      const response = await personaltreatmentApi.UpdateCurrentStep({ treatment_id, step_id });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Update step failed');
+      const res = await personaltreatmentApi.UpdateCurrentStep({ treatment_id, step_id });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.res?.data || err.message);
     }
   }
 );

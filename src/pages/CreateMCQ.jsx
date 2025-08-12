@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Button, 
   Space, 
@@ -14,7 +15,7 @@ import {
   Col,
   Spin, 
 } from "antd";
-import { DeleteOutlined, EditOutlined, FileAddOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, FileAddOutlined, PlusSquareOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import AddMCQQuestionModal from "../Modals/AddMCQQuestionModal";
 import AddMcqQuizModal from "../Modals/AddMcqQuizModal";
 import EditMCQModal from "../Modals/EditMCQModal";
@@ -33,6 +34,7 @@ const { Text } = Typography;
 
 const CreateMCQ = () => {
   const dispatch = useDispatch();
+    const navigate = useNavigate();
   const { quizzes, questions, loading, quizQuestions } = useSelector((state) => state.mcq);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
@@ -58,7 +60,7 @@ const CreateMCQ = () => {
   const handleCloseQuizModal = () => setIsQuizModalOpen(false);
 
   const handleQuestionSubmit = (data) => {
-    console.log("Received MCQ data:", data);
+    // console.log("Received MCQ data:", data);
     handleCloseModal();
     dispatch(fetchAllQuestionsByQuiz(selectedQuiz));
   };
@@ -186,9 +188,24 @@ const CreateMCQ = () => {
   ];
 
   return (
+    <>
+   <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
     <div style={{ 
       maxWidth: "1200px", 
-      margin: "20px auto",
+      margin: "40px auto",
       padding: "0 20px",
       minHeight: "calc(100vh - 40px)"
     }}>
@@ -337,6 +354,7 @@ const CreateMCQ = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

@@ -23,7 +23,7 @@ const Books = () => {
     if (!books || books.length === 0) {
       dispatch(fetchBooks()); // Fetch books on mount
     }
-  }, [status, dispatch]);
+  }, []);
 
   // Function to open Add Book modal
   const showModal = () => {

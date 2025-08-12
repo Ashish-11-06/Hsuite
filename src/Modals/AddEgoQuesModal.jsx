@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Modal, Typography, Select, Button, Row, Col, Space, message, Spin, Tag } from "antd";
+import { Modal, Typography, Select, Button, Row, Col, Space, message, Spin, Tag, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import AddNewEgoNameModal from "./AddNewEgoNameModal";
 import AddEgoStateModal from "./AddEgoStateModal";
@@ -10,6 +10,7 @@ import {
   fetchAllEgogramCategories,
   clearEgoState
 } from "../Redux/Slices/egoSlice";
+import AddEgoCatModal from "./AddEgoCatModal";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -20,18 +21,19 @@ const AddEgoQuesModal = ({ open, onClose }) => {
 
   const [newModalOpen, setNewModalOpen] = useState(false);
   const [statementModalOpen, setStatementModalOpen] = useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [selectedEgogramName, setSelectedEgogramName] = useState(null);
   const [selectedStatement, setSelectedStatement] = useState([]);
   const [categories, setCategories] = useState([]);
   const [usedCategories, setUsedCategories] = useState(new Set());
-   const [selectedCategories, setSelectedCategories] = useState(new Set());
-  const [statementsPerCategory, setStatementsPerCategory] = useState(0);
+  const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const [statementsPerCategory, setStatementsPerCategory] = useState(null);
 
   // Clear messages when modal opens/closes
   useEffect(() => {
     if (open) {
       dispatch(clearEgoState());
-      message.destroy(); // Clear all messages
+      message.destroy();
     }
   }, [open, dispatch]);
 
@@ -52,123 +54,130 @@ const AddEgoQuesModal = ({ open, onClose }) => {
     }
   }, [dispatch, selectedEgogramName]);
 
-  // Calculate categories from selected statements
+  // Calculate categories from selected statements and check statement counts
   useEffect(() => {
-  const categoriesInUse = new Set();
-  selectedStatement.forEach(statementId => {
-    const statement = statements.find(s => s.id === statementId);
-    if (statement && statement.category) {
-      categoriesInUse.add(statement.category);
-    }
-  });
-  setUsedCategories(categoriesInUse);
-}, [selectedStatement, statements]);
-
-   useEffect(() => {
-    if (statements.length > 0) {
-      // setStatementsPerCategory(Math.floor(statements.length / 4));
-      setStatementsPerCategory(5);
-    }
-  }, [statements]);
-
-   // Filter statements based on category selection limits
- const filteredStatements = useMemo(() => {
-  const categoryCounts = {};
-  selectedCategories.forEach(catId => {
-    categoryCounts[catId] = selectedStatement.filter(id => {
-      const stmt = statements.find(s => s.id === id);
-      return stmt && stmt.category === catId;
-    }).length;
-  });
-
- return statements
-  .filter(statement => statement && typeof statement.category !== 'undefined') // safeguard
-  .map(statement => {
-    const isCategorySelected = selectedCategories.has(statement.category);
-    const currentCount = categoryCounts[statement.category] || 0;
-
-    const isDisabled =
-      !selectedStatement.includes(statement.id) &&
-      ((!isCategorySelected && selectedCategories.size >= 4) ||
-        (isCategorySelected && currentCount >= statementsPerCategory));
-
-    return {
-      ...statement,
-      disabled: isDisabled,
-    };
-  });
-
-}, [statements, selectedStatement, selectedCategories, statementsPerCategory]);
-
-
-  const handleStatementSelection = (values) => {
-    // Determine which categories are being used
-    const newCategories = new Set();
-    const newCategoryCounts = {};
+    const categoriesInUse = new Set();
+    const categoryCounts = {};
     
-    values.forEach(id => {
-      const stmt = statements.find(s => s.id === id);
-      if (stmt?.category) {
-        newCategories.add(stmt.category);
-        newCategoryCounts[stmt.category] = (newCategoryCounts[stmt.category] || 0) + 1;
+    selectedStatement.forEach(statementId => {
+      const statement = statements.find(s => s.id === statementId);
+      if (statement && statement.category) {
+        categoriesInUse.add(statement.category);
+        categoryCounts[statement.category] = (categoryCounts[statement.category] || 0) + 1;
       }
     });
 
-    // Check if any category exceeds its limit
-    const wouldExceedLimit = Object.entries(newCategoryCounts).some(
-      ([catId, count]) => count > statementsPerCategory
-    );
+    setUsedCategories(categoriesInUse);
+    setSelectedCategories(categoriesInUse);
 
-    if (wouldExceedLimit) {
-      message.warning(`Maximum ${statementsPerCategory} statements per category allowed`);
-      return;
+    if (categoriesInUse.size > 0) {
+      const counts = Object.values(categoryCounts);
+      const allSame = counts.every(val => val === counts[0]);
+      setStatementsPerCategory(allSame ? counts[0] : null);
+    } else {
+      setStatementsPerCategory(null);
     }
+  }, [selectedStatement, statements]);
 
-    if (newCategories.size > 4) {
-      message.warning('Maximum 4 categories allowed');
-      return;
-    }
+  const filteredStatements = useMemo(() => {
+    return statements
+      .filter(statement => statement && typeof statement.category !== 'undefined')
+      .map(statement => ({
+        ...statement,
+        disabled: false
+      }));
+  }, [statements]);
 
-    setSelectedCategories(newCategories);
+  const handleStatementSelection = (values) => {
     setSelectedStatement(values);
+    const newCategories = new Set();
+    values.forEach(id => {
+      const stmt = statements.find(s => s.id === id);
+      if (stmt?.category) newCategories.add(stmt.category);
+    });
+    setSelectedCategories(newCategories);
   };
 
   const getCategoryName = (categoryId) => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.category : "No category";
-  };
-
-  const handleAddNewNameClick = () => {
-    setNewModalOpen(true);
-  };
-
-  const handleAddNewStatementClick = () => {
-    setStatementModalOpen(true);
+    return categories.find((cat) => cat.id === categoryId)?.category || "No category";
   };
 
   const handleAddStatementToTest = () => {
-  // Clear any existing messages first
-  message.destroy();
-  
-  dispatch(
-    addStatementsToEgogramTest({
+    message.destroy();
+    
+    const categoryCounts = {};
+    selectedStatement.forEach(id => {
+      const stmt = statements.find(s => s.id === id);
+      if (stmt?.category) {
+        categoryCounts[stmt.category] = (categoryCounts[stmt.category] || 0) + 1;
+      }
+    });
+
+    const counts = Object.values(categoryCounts);
+    const allSame = counts.length > 0 && counts.every(val => val === counts[0]);
+
+    if (!allSame) {
+      message.error("All categories must have the same number of statements");
+      return;
+    }
+
+    dispatch(addStatementsToEgogramTest({
       test_id: selectedEgogramName,
       statement_ids: selectedStatement,
-    })
-  ).then((res) => {
-    if (res.error) {
-      message.error("Failed to add statements");
-    } else {
-      message.success("Statements added successfully");
-      setSelectedStatement([]);
-      onClose();
+    })).then((res) => {
+      if (res.error) {
+        message.error("Failed to add statements");
+      } else {
+        message.success("Statements added successfully");
+        setSelectedStatement([]);
+        onClose();
+      }
+    });
+  };
+
+  const isSubmissionDisabled = () => {
+    if (!selectedStatement.length || !selectedEgogramName || loading) return true;
+    if (selectedCategories.size === 0) return true;
+    
+    const categoryCounts = {};
+    selectedStatement.forEach(id => {
+      const stmt = statements.find(s => s.id === id);
+      if (stmt?.category) {
+        categoryCounts[stmt.category] = (categoryCounts[stmt.category] || 0) + 1;
+      }
+    });
+
+    const counts = Object.values(categoryCounts);
+    return !(counts.length > 0 && counts.every(val => val === counts[0]));
+  };
+
+  const selectedTest = tests?.find((test) => test?.id === selectedEgogramName);
+
+  // Tooltip content based on what's missing
+  const getTooltipContent = () => {
+    if (!selectedEgogramName) return "Please select an egogram name";
+    if (!selectedStatement.length) return "Please select at least one statement";
+    if (statementsPerCategory === null) return "All categories must have the same number of statements";
+    return "";
+  };
+
+    const handleNewNameAdded = (newNameId) => {
+    setSelectedEgogramName(newNameId);
+    // Refresh both tests and statements
+    dispatch(fetchAllEgogramTests()).then(() => {
+      dispatch(fetchAllEgogramStatements());
+    });
+  };
+
+ const handleNewCategoryAdded = () => {
+  dispatch(fetchAllEgogramCategories()).then((res) => {
+    if (res.payload?.categories) {
+      setCategories(res.payload.categories); // ✅ Update local state
     }
   });
+  dispatch(fetchAllEgogramStatements());
 };
 
-  const selectedTest = Array.isArray(tests)
-    ? tests.find((test) => test?.id === selectedEgogramName)
-    : null;
 
   return (
     <>
@@ -177,28 +186,33 @@ const AddEgoQuesModal = ({ open, onClose }) => {
         title="Add Egogram Test"
         visible={open}
         onCancel={onClose}
-        styles={{ body: { maxHeight: "60vh", overflowY: "auto" } }}
         footer={[
-          <Button key="back" onClick={onClose}>
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            danger
-            onClick={handleAddStatementToTest}
-            disabled={!selectedStatement.length || !selectedEgogramName || loading}
-          >
-            {loading ? <Spin size="small" /> : "Add Statement to Test"}
-          </Button>,
+          <Button key="back" onClick={onClose}>Cancel</Button>,
+          <Tooltip 
+  title={isSubmissionDisabled() ? getTooltipContent() : null} 
+  placement="top"
+>
+  <span>
+    <Button
+      key="submit"
+      type="primary"
+      danger
+      onClick={handleAddStatementToTest}
+      disabled={isSubmissionDisabled()}
+    >
+      {loading ? <Spin size="small" /> : "Add Statement to Test"}
+    </Button>
+  </span>
+</Tooltip>
+
         ]}
       >
+        {/* Rest of your original modal content remains exactly the same */}
         <Title level={5}>Add Egogram Name</Title>
-
         <Row gutter={16} align="middle" style={{ marginBottom: 16 }}>
           <Col>
             <Button 
-              onClick={handleAddNewNameClick} 
+              onClick={() => setNewModalOpen(true)} 
               type="primary"
               disabled={loading}
             >
@@ -211,25 +225,17 @@ const AddEgoQuesModal = ({ open, onClose }) => {
               <Select
                 placeholder="Select Egogram Name"
                 style={{ width: 200 }}
-                onChange={(value) => setSelectedEgogramName(value)}
-                value={selectedEgogramName || undefined}
+                onChange={setSelectedEgogramName}
+                value={selectedEgogramName}
                 showSearch
                 filterOption={(input, option) =>
                   option.children.toLowerCase().includes(input.toLowerCase())
                 }
                 disabled={loading}
               >
-                {Array.isArray(tests) && tests.length > 0 ? (
-                  tests.map((test, index) =>
-                    test && test.test_name ? (
-                      <Option key={test.id || index} value={test.id}>
-                        {test.test_name}
-                      </Option>
-                    ) : null
-                  )
-                ) : (
-                  <Option disabled>No Egogram tests available</Option>
-                )}
+                {tests?.map(test => test?.test_name && (
+                  <Option key={test.id} value={test.id}>{test.test_name}</Option>
+                ))}
               </Select>
             </Space>
           </Col>
@@ -237,117 +243,104 @@ const AddEgoQuesModal = ({ open, onClose }) => {
 
         {selectedEgogramName && (
           <div style={{ marginBottom: 24 }}>
-            <strong>Selected Egogram:</strong>{" "}
-            {selectedTest?.test_name || "Unknown"}
+            <strong>Selected Egogram:</strong> {selectedTest?.test_name}
           </div>
         )}
 
-        <Title level={5}>Add Statement</Title>
-
-        <Row gutter={16} align="middle">
-          <Col>
-            <Button
-              onClick={handleAddNewStatementClick}
-              type="dashed"
-              style={{ color: "#52c41a", borderColor: "#52c41a" }}
-              disabled={loading}
-            >
-              Add New Statement
-            </Button>
-          </Col>
-          <Col>
-            <Space>
-              <span>Existing Statements</span>
-              <Select
-  mode="multiple"
-  placeholder="Select Statement"
-  style={{ width: 350 }}
-  onChange={handleStatementSelection}
-  value={selectedStatement || undefined}
-  showSearch
-  filterOption={(input, option) =>
-    option.children.props.children[0]
-      .toLowerCase()
-      .includes(input.toLowerCase())
-  }
-  optionLabelProp="truncatedLabel" // Use custom truncated label
-  disabled={loading}
-  maxTagCount="responsive"
-  tagRender={(props) => ( // Custom render for selected tags
-    <Tag 
-      closable={props.closable}
-      onClose={props.onClose}
-      style={{ marginRight: 4 }}
+        <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
+  <Col>
+    <Title level={5} style={{ margin: 0 }}>Add Statement</Title>
+  </Col>
+  <Col>
+    <Button
+      onClick={() => setStatementModalOpen(true)}
+      type="dashed"
+      style={{ color: "#52c41a", borderColor: "#52c41a", marginRight: 80  }}
+      disabled={loading}
     >
-      {props.label.length > 3 
-        ? `${props.label.substring(0, 3)}...` 
-        : props.label}
-    </Tag>
-  )}
->
-  {Array.isArray(filteredStatements) &&
-    filteredStatements.map((statement) =>
-      statement && statement.statement ? (
-        <Option
-          key={statement.id}
-          value={statement.id}
-          label={statement.statement} // Full label for dropdown
-          truncatedLabel={ // First 3 letters for selected display
-            statement.statement.length > 3
-              ? `${statement.statement.substring(0, 3)}...`
-              : statement.statement
-          }
-        >
-          <div>
-            {statement.statement} {/* Full text in dropdown */}
-            <span style={{ color: "#bfbfbf", marginLeft: "8px" }}>
-              ({getCategoryName(statement.category)})
-              {statement.disabled && " (limit reached)"}
-            </span>
-          </div>
-        </Option>
-      ) : null
-    )}
-</Select>
-            </Space>
-          </Col>
-   <div style={{ marginTop: 8 }}>
-        <Text type="secondary">
-          Categories: {selectedCategories.size}/4 | 
-          Statements per category: {selectedStatement.length > 0 ? 
-            Math.floor(selectedStatement.length / selectedCategories.size) || 0 : 0}
-        </Text>
-        {selectedCategories.size > 0 && (
-          <div style={{ marginTop: 4 }}>
-            {Array.from(selectedCategories).map(catId => {
-              const cat = categories.find(c => c.id === catId);
-              const count = selectedStatement.filter(id => {
-                const stmt = statements.find(s => s.id === id);
-                return stmt?.category === catId;
-              }).length;
-              
-              return cat ? (
-                <Tag color="blue" key={catId} style={{ marginRight: 4 }}>
-                  {cat.category} ({count}/{statementsPerCategory})
-                </Tag>
-              ) : null;
-            })}
-          </div>
+      Add New Statement
+    </Button>
+  </Col>
+</Row>
+
+<Row gutter={16} align="middle">
+  <Col>
+    <Space>
+      <span>Existing Statements</span>
+      <Select
+        mode="multiple"
+        placeholder="Select Statement"
+        style={{ width: 350 }}
+        onChange={handleStatementSelection}
+        value={selectedStatement}
+        showSearch
+        filterOption={(input, option) =>
+          option.children.props.children[0].toLowerCase().includes(input.toLowerCase())
+        }
+        optionLabelProp="truncatedLabel"
+        disabled={loading}
+        maxTagCount="responsive"
+        tagRender={(props) => (
+          <Tag closable={props.closable} onClose={props.onClose} style={{ marginRight: 4 }}>
+            {props.label.length > 3 ? `${props.label.substring(0, 3)}...` : props.label}
+          </Tag>
         )}
-      </div>
-        </Row>
+      >
+        {filteredStatements.map(statement => statement?.statement && (
+          <Option key={statement.id} value={statement.id} label={statement.statement}
+            truncatedLabel={statement.statement.length > 3 ? `${statement.statement.substring(0, 3)}...` : statement.statement}>
+            <div>
+              {statement.statement}
+              <span style={{ color: "#bfbfbf", marginLeft: "8px" }}>
+                ({getCategoryName(statement.category)})
+              </span>
+            </div>
+          </Option>
+        ))}
+      </Select>
+    </Space>
+  </Col>
+</Row>
+
+        <div style={{ marginTop: 8 }}>
+          <Text type="secondary">
+            Categories: {selectedCategories.size} | 
+            Total Statements: {selectedStatement.length}
+            {statementsPerCategory !== null && (
+              <span> | {statementsPerCategory} per category</span>
+            )}
+          </Text>
+          {selectedCategories.size > 0 && (
+            <div style={{ marginTop: 4 }}>
+              {Array.from(selectedCategories).map(catId => {
+                const cat = categories.find(c => c.id === catId);
+                const count = selectedStatement.filter(id => 
+                  statements.find(s => s.id === id)?.category === catId
+                ).length;
+                return cat && (
+                  <Tag 
+                    color={statementsPerCategory !== null && count === statementsPerCategory ? "green" : "blue"} 
+                    key={catId}
+                  >
+                    {cat.category} ({count})
+                  </Tag>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {selectedStatement.length > 0 && (
           <div style={{ marginTop: 16 }}>
             <strong>Selected Statements:</strong>
             <ul>
               {selectedStatement.map((id, index) => {
-                const statementObj = statements.find((s) => s.id === id);
-                return (
+                const statement = statements.find((s) => s.id === id);
+                return statement && (
                   <li key={index}>
-                    {statementObj?.statement}
+                    {statement.statement}
                     <span style={{ color: "#bfbfbf", marginLeft: "8px" }}>
-                      ({getCategoryName(statementObj?.category)})
+                      ({getCategoryName(statement.category)})
                     </span>
                   </li>
                 );
@@ -360,10 +353,7 @@ const AddEgoQuesModal = ({ open, onClose }) => {
       <AddNewEgoNameModal
         open={newModalOpen}
         onClose={() => setNewModalOpen(false)}
-        onNewNameAdded={(newNameId) => {
-          setSelectedEgogramName(newNameId);
-          dispatch(fetchAllEgogramTests());
-        }}
+        onNewNameAdded={handleNewNameAdded}
       />
       <AddEgoStateModal
         open={statementModalOpen}
@@ -372,6 +362,11 @@ const AddEgoQuesModal = ({ open, onClose }) => {
           dispatch(fetchAllEgogramStatements());
         }}
       />
+      <AddEgoCatModal 
+      open={categoryModalOpen}
+  onClose={() => setCategoryModalOpen(false)}
+  onNewCategoryAdded={handleNewCategoryAdded}
+  />
     </>
   );
 };

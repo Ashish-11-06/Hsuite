@@ -1,0 +1,48 @@
+.doctor-scroll-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px;
+  scroll-behavior: smooth;
+}
+
+.doctor-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.doctor-scroll-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.doctor-card {
+  flex: 0 0 250px; /* Fixed width for horizontal layout */
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+}
+
+.doctor-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.doctor-details {
+  padding: 15px;
+}
+
+.book-btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  margin-top: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.book-btn:hover {
+  background-color: #0056b3;
+}

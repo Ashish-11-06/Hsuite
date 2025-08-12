@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Spin, Row, Col, Input, Typography, Empty, Button } from "antd";
-import {FileAddOutlined, PlusSquareOutlined, OrderedListOutlined} from "@ant-design/icons"
+import { FileAddOutlined, PlusSquareOutlined, OrderedListOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import CreateQuizModal from "../Modals/CreateQuizModal";
 import Test from "./Test";
 import AllTestQuestions from "./AllTestQuestions";
@@ -15,14 +16,16 @@ const { Text } = Typography;
 const Createset = () => {
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
-  const [isStepsModalOpen, setIsStepsModalOpen] = useState(false); 
+  const [isStepsModalOpen, setIsStepsModalOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
   const openModal = () => setIsQuizModalOpen(true);
   const closeModal = () => setIsQuizModalOpen(false);
 
   const dispatch = useDispatch();
-  const { quizList, loading: quizLoading } = useSelector((state) => state.quiz);
+  // Ensure quizList defaults to empty array if undefined/null
+  const { quizList = [], loading: quizLoading } = useSelector((state) => state.quiz);
 
   useEffect(() => {
     dispatch(getQuizCategories());
@@ -43,16 +46,32 @@ const Createset = () => {
   };
 
   const handleQuizSelect = (value) => {
-    console.log("Selected Quiz ID:", value);
+    // console.log("Selected Quiz ID:", value);
     setSelectedQuizId(value);
   };
 
   return (
+    <>
+    <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+
     <div style={{ 
       maxWidth: "1200px", 
-      margin: "20px auto",
+      margin: "50px auto",
       padding: "0 20px",
-      minHeight: "calc(100vh - 40px)" // Ensure full viewport height
+      minHeight: "calc(100vh - 40px)"
     }}>
       {/* Search row */}
       <Row gutter={16} style={{ marginBottom: "20px" }}>
@@ -90,7 +109,7 @@ const Createset = () => {
                 }
                 notFoundContent={<Text type="secondary">No quizzes found</Text>}
               >
-                {quizList?.map((quiz) => (
+                {Array.isArray(quizList) && quizList.map((quiz) => (
                   <Option key={quiz.id} value={quiz.id}>
                     {quiz.quiz_name}
                   </Option>
@@ -99,10 +118,10 @@ const Createset = () => {
             </div>
           )}
         </Col>
-        <Col xs={24} md={12} style={{ textAlign: "right", marginTop: { xs: "16px", md: "0" } }}>
+        <Col xs={24} md={12} style={{ textAlign: "right", marginTop: "16px" }}>
           <div style={{ display: "inline-flex", gap: "10px" }}>
             <Button
-            icon={<PlusSquareOutlined />}
+              icon={<PlusSquareOutlined />}
               onClick={showQuizModal}
               style={{
                 padding: "8px 16px",
@@ -114,13 +133,12 @@ const Createset = () => {
                 cursor: "pointer",
                 minWidth: "120px"
               }}
-              
             >
               Add Quiz
             </Button>
 
             <Button
-            icon={<FileAddOutlined />}
+              icon={<FileAddOutlined />}
               onClick={showTestModal}
               style={{
                 padding: "8px 16px",
@@ -136,7 +154,7 @@ const Createset = () => {
               Add Question
             </Button>
 
-             <Button
+            <Button
               icon={<OrderedListOutlined />}
               onClick={showStepsModal}
               style={{
@@ -157,11 +175,10 @@ const Createset = () => {
       </Row>
 
       {/* Modals */}
-      {/* to add quiz name and categories */}
       <CreateQuizModal
         visible={isQuizModalOpen}
-        onCancel={handleCancel}  // This will actually close the modal programmatically
-        onSuccess={handleCancel} // Optional, good for when you want to handle after success too
+        onCancel={handleCancel}
+        onSuccess={handleCancel}
         destroyOnClose
       />
 
@@ -177,10 +194,10 @@ const Createset = () => {
       </Modal>
 
       <PersonalityStepsModal 
-      visible={isStepsModalOpen}
+        visible={isStepsModalOpen}
         onCancel={handleCancel}
         onSuccess={handleCancel}
-        />
+      />
 
       {/* Content area */}
       {selectedQuizId ? (
@@ -200,13 +217,14 @@ const Createset = () => {
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <Text type="secondary" style={{ fontSize: "16px" }}>
-                ⚠️ Please select a quiz from the dropdown <br></br>to view questions
+                ⚠️ Please select a quiz from the dropdown <br />to view questions
               </Text>
             }
           />
         </div>
       )}
     </div>
+    </>
   );
 };
 

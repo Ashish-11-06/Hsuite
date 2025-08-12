@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom"; 
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { Layout } from "antd";
+import { Navigate } from "react-router-dom";
 import HeaderComponent from "./Components/HeaderComponent.jsx";
 import FooterComponent from "./Components/FooterComponent.jsx";
 import MainContent from "./Components/MainContent.jsx";
@@ -7,7 +8,21 @@ import "./App.css";
 import Login from "./pages/Login.jsx";
 import Sidebar from "./Components/Sidebar.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import ProtectedRouteDemo from "./Demo/Components/ProtectedRouteDemo.jsx";
 import { useEffect } from "react";
+import DemoMainContent from "./Demo/Components/DemoMainContent.jsx";
+import DemoSidebar from "./Demo/Components/DemoSidebar.jsx";
+import DemoHeader from "./Demo/Components/DemoHeader.jsx";
+import { Provider } from "react-redux";
+import storedemo from "./Demo/Redux/storedemo.js";
+import store from "./Redux/store.js";
+import DemoLogin from "./Demo/Pages/DemoLogin.jsx";
+import PatientRegistration from "./Demo/Pages/PatientRegistration.jsx";
+import PatientSidebar from "./Demo/Components/PatientSidebar.jsx";
+import PatientMainContent from "./Demo/Components/PatientMainContent.jsx";
+import ProtectedRoutePatient from "./Demo/Components/ProtectedRoutePatient.jsx";
+import PatientHeader from "./Demo/Components/PatientHeader.jsx";
+import WebSiteRoute from "./website/websiteRoute.jsx";
 
 const { Header, Content, Footer } = Layout;
 
@@ -17,11 +32,7 @@ function InactivityHandler() {
 
   useEffect(() => {
     const EXPIRY_HOURS = 24;
-    const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000; //24 hrs
-    // const EXPIRY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
-    console.log("App component mounted, setting up localStorage expiry check");
-    console.log('expiry in ms:', EXPIRY_MS);
-
+    const EXPIRY_MS = EXPIRY_HOURS * 60 * 60 * 1000;
     const LAST_ACTIVE_KEY = 'lastActiveTime';
 
     const updateLastActiveTime = () => {
@@ -34,9 +45,7 @@ function InactivityHandler() {
         const now = Date.now();
         const diff = now - parseInt(lastActive, 10);
         if (diff > EXPIRY_MS) {
-          localStorage.clear(); // or selectively remove items
-          // console.log('localStorage cleared due to 24h inactivity');
-          // navigate....................................
+          localStorage.clear();
           navigate("/login");
         }
       }
@@ -56,11 +65,21 @@ function InactivityHandler() {
     window.addEventListener('keydown', resetTimer);
     window.addEventListener('click', resetTimer);
 
+    //listen for change sin local storage from other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'isLoggedIn' && e.newValue === 'false') {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
       clearInterval(intervalId);
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
       window.removeEventListener('click', resetTimer);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [navigate]);
 
@@ -74,34 +93,131 @@ function App() {
       <InactivityHandler />
 
       <Routes>
-        <Route path="/login" element={<Login />}/>
+        {/* 🔑 Main Login Route */}
+        <Route
+          path="/login"
+          element={
+            <Provider store={store}>
+              <Login />
+            </Provider>
+          }
+        />
 
+        {/* 🧪 DEMO ROUTES */}
+        <Route
+          path="/demo/logindemo"
+          element={
+            <Provider store={storedemo}>
+              <DemoLogin />
+            </Provider>
+          }
+        />
+
+        <Route
+          path="/demo/:hospitalId/patientregistration"
+          element={
+            <Provider store={storedemo}>
+              <PatientRegistration />
+            </Provider>
+          }
+        />
+
+        <Route
+          path="/demo/:hospitalId/patient*"
+          element={
+            <Provider store={storedemo}>
+              <ProtectedRoutePatient>
+                <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                <Header>
+                  <PatientHeader />
+                </Header>
+                <Layout style={{ minHeight: "100vh", display: "flex" }}>
+                  <PatientSidebar />
+                    <Content style={{ padding: "30px", overflowY: "auto" }}>
+                      <PatientMainContent />
+                    </Content>
+                  </Layout>
+                </Layout>
+              </ProtectedRoutePatient>
+            </Provider>
+          }
+        />
+
+        {/* DEMO CODE  */}
+        <Route
+          path="/demo/*"
+          element={
+            <Provider store={storedemo}>
+              <ProtectedRouteDemo>
+                <Layout style={{ minHeight: "100vh", display: "flex" }}>
+                  {/*demo Sidebar */}
+                  <DemoSidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
+                  {/* <PatientSidebar /> */}
+
+                  <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                    {/* Header */}
+                    <Header style={{ position: "fixed", top: 0, left: "235px", right: 0, height: "65px", zIndex: 100 }}>
+                      <DemoHeader />
+                    </Header>
+
+                    {/* Main Content */}
+                    <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
+                      <DemoMainContent />
+                    </Content>
+
+                    {/* Footer */}
+                    {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
+                  <FooterComponent />
+                </Footer> */}
+                  </Layout>
+                </Layout>
+              </ProtectedRouteDemo>
+            </Provider>
+          }
+        />
+
+         <Route
+          path="/web/*"
+          element={
+            <Provider store={storedemo}>
+                    {/* Main Content */}
+                    <Content>
+                      <WebSiteRoute />
+                    </Content>
+
+            </Provider>
+          }
+        />
+
+        {/* MAIN CODE  */}
         <Route
           path="*"
           element={
-            <ProtectedRoute>
-            <Layout style={{ minHeight: "100vh", display: "flex" }}>
-              {/* Sidebar */}
-              <Sidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
+            <Provider store={store}>
+              <ProtectedRoute>
+                <Layout style={{ minHeight: "100vh", display: "flex" }}>
+                  {/* Sidebar */}
+                  <Sidebar style={{ width: "250px", height: "100vh", position: "fixed", left: 0, top: 0, bottom: 0, right: 0 }} />
 
-              <Layout style={{  display: "flex", flexDirection: "column", height: "100vh" }}>
-                {/* Header */}
-                <Header style={{ position: "fixed", top: 0, left: "200px", right: 0, height: "65px", zIndex: 100 }}>
-                  <HeaderComponent />
-                </Header>
+                  <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                    {/* Header */}
+                    <Header style={{ position: "fixed", top: 0, left: "200px", right: 0, height: "65px", zIndex: 100 }}>
+                      <HeaderComponent />
+                    </Header>
 
-                {/* Main Content */}
-                <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
-                  <MainContent />
-                </Content>
+                    {/* Main Content */}
+                    <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
+                      <MainContent />
+                    </Content>
 
-                {/* Footer */}
-                {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
+                    {/* Footer */}
+                    {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
                   <FooterComponent />
                 </Footer> */}
-              </Layout>
-            </Layout>
-            </ProtectedRoute>
+                  </Layout>
+                </Layout>
+              </ProtectedRoute>
+            </Provider>
           }
         />
       </Routes>

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authAPI from "../API/authApi";
+import { act, useCallback } from "react";
 
 // 🔹 Register User & Send OTP (combined)
 export const registerUser = createAsyncThunk(
@@ -68,7 +69,9 @@ export const sendResetOTP = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "Failed to send OTP",
+        message: 
+        error.response?.data?.message || 
+        error.response?.data.error ||"Failed to send OTP",
         error: error.response?.data
       });
     }
@@ -88,7 +91,8 @@ export const verifyResetOTP = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "OTP verification failed",
+        message: error.response?.data?.message ||
+        error.response?.data.error || "OTP verification failed",
         error: error.response?.data
       });
     }
@@ -108,13 +112,45 @@ export const resetPassword = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || "Password reset failed",
+        message: error.response?.data?.message || 
+        error.response?.data.error ||"Password reset failed",
         error: error.response?.data
       });
     }
   }
 );
 
+//Counsellor thunk
+export const CompleteCounsellorProfile = createAsyncThunk(
+  "auth/completeCounsellorProfile", 
+  async(profileData, { rejectWithValue}) => {
+    try {
+      const response = await authAPI.CompleteCounsellor(profileData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "failed to complete profile");
+    }
+  }
+);
+
+//update counsellor thunk
+export const UpdateCounsellorProfile = createAsyncThunk(
+  "auth/updateCounsellorProfile",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      // console.log('Sending to API - ID:', id);
+      // console.log('Sending to API - Data:', data);
+      
+      const response = await authAPI.UpdateCounsellorProfile(id, data);
+      
+      // console.log('API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('API error:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || "Failed to update profile");
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -124,13 +160,24 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     userId: null,
+    counsellorProfile: {
+      loading: false,
+      success: false,
+      error: null
+    },
     resetPassword: {
       loading: false,
       error: null,
       success: false,
       email: null,
       step: 1 // 1 = email, 2 = OTP, 3 = new password
-    }
+    },
+    updateCounsellorProfile: {
+  loading: false,
+  success: false,
+  error: null
+},
+
   },
   reducers: {
     loginSuccess: (state, action) => {
@@ -194,6 +241,7 @@ const authSlice = createSlice({
     
         localStorage.setItem("token", action.payload.token); // 🛠 Ensure token is stored
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        // 🏥 Store hospital ID
         localStorage.setItem("role", action.payload.user.role);
     
         window.location.href = "/"; // 🔥 Force Redirect After Login
@@ -245,7 +293,37 @@ const authSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPassword.loading = false;
         state.resetPassword.error = action.payload?.message || "Password reset failed";
-      });
+      })
+
+      //counsellor profile
+      .addCase(CompleteCounsellorProfile.pending, (state) => {
+        state.counsellorProfile.loading = true;
+        state.counsellorProfile.error = null;
+        state.counsellorProfile.success= false;
+      })
+      .addCase(CompleteCounsellorProfile.fulfilled, (state) => {
+        state.counsellorProfile.loading = false;
+        state.counsellorProfile.success = true;
+      })
+      .addCase(CompleteCounsellorProfile.rejected, (state,action) => {
+        state.counsellorProfile.loading = false;
+        state.counsellorProfile.error = action.payload || "failed to complete profile";
+      })
+
+      .addCase(UpdateCounsellorProfile.pending, (state) => {
+  state.updateCounsellorProfile.loading = true;
+  state.updateCounsellorProfile.error = null;
+  state.updateCounsellorProfile.success = false;
+})
+.addCase(UpdateCounsellorProfile.fulfilled, (state) => {
+  state.updateCounsellorProfile.loading = false;
+  state.updateCounsellorProfile.success = true;
+})
+.addCase(UpdateCounsellorProfile.rejected, (state, action) => {
+  state.updateCounsellorProfile.loading = false;
+  state.updateCounsellorProfile.error = action.payload || "Failed to update profile";
+})
+
   },
 });
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Row, Col, Typography, Button, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
+import ActionModal from "../Modals/ActionModal"; // ✅ Import ActionModal
 import { InfoCircleOutlined, PlusOutlined, FileDoneOutlined, BarChartOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
@@ -10,6 +11,7 @@ const Assessment = () => {
   const userRole = localStorage.getItem("role");
   const [modalVisible, setModalVisible] = useState(false);
   const [currentTest, setCurrentTest] = useState("");
+    const [actionModalVisible, setActionModalVisible] = useState(false); // ✅ Action modal state
 
   const testDescriptions = {
     personality: {
@@ -192,6 +194,14 @@ const Assessment = () => {
         </Col>
       </Row>
 
+       {/* Actions Button */}
+      {/* <div style={{ marginTop: 24, textAlign: "center" }}>
+        <Button type="primary" onClick={() => setActionModalVisible(true)}>
+          Actions
+        </Button>
+      </div> */}
+
+   {/* Info Modal */}
       <Modal
         title={testDescriptions[currentTest]?.title || "Test Information"}
         visible={modalVisible}
@@ -201,7 +211,17 @@ const Assessment = () => {
       >
         {testDescriptions[currentTest]?.content || ""}
       </Modal>
+
+       {/* Action Modal */}
+      {/* <ActionModal
+        visible={actionModalVisible}
+        onClose={() => setActionModalVisible(false)}
+        quizResult={null} // ✅ Replace with actual quiz result if needed
+        userId={null} // ✅ Replace with actual user ID if needed
+      /> */}
     </div>
+
+
   );
 };
 

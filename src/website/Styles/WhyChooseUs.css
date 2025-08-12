@@ -1,0 +1,59 @@
+.why-choose-section {
+  padding: 50px 20px;
+  background-color: #eefefc;
+  text-align: center;
+}
+
+.why-choose-heading {
+  font-size: 32px;
+  color: #00695c;
+  margin-bottom: 40px;
+  font-weight: bold;
+}
+
+.usp-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.usp-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px 20px;
+  width: 260px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.usp-card:hover {
+  transform: translateY(-6px);
+}
+
+.usp-icon {
+  font-size: 42px;
+  color: #00796b;
+  margin-bottom: 15px;
+}
+
+.usp-title {
+  font-size: 20px;
+  color: #00796b;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.usp-description {
+  font-size: 15px;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .usp-card {
+    width: 100%;
+    max-width: 90%;
+  }
+}

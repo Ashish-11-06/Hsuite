@@ -55,31 +55,54 @@ const EgoTestQuestionModal = ({ testId, open, onClose }) => {
   }, [currentIndex, currentStatement]);
 
  const autoNext = () => {
-  if (autoNextCalled.current) return; // prevent duplicate calls
+  if (autoNextCalled.current) return;
   autoNextCalled.current = true;
 
   const currentId = currentStatement?.id;
   const currentValue = ratings[currentId] ?? 0;
-  setRatings((prev) => ({ ...prev, [currentId]: currentValue }));
+  const updatedRatings = { ...ratings, [currentId]: currentValue };
+  setRatings(updatedRatings);
 
   if (currentIndex < statementsByTestToTest.length - 1) {
     setCurrentIndex((prev) => prev + 1);
-    autoNextCalled.current = false; // allow for next question
+    autoNextCalled.current = false;
   } else {
-    const payload = {
-      user: userId,
-      statement_marks: ratings,
-    };
+    // ✅ Count how many are unanswered or 0-rated
+    const totalQuestions = statementsByTestToTest.length;
+    let zeroCount = 0;
 
-    const f = async () => {
-      const result = await dispatch(postEgogramResult(payload));
-      setResult(result.payload);
-      setResultModalVisible(true);
-    };
+    statementsByTestToTest.forEach((q) => {
+      const rating = updatedRatings[q.id] ?? 0;
+      if (rating === 0) zeroCount++;
+    });
 
-    f();
+    if (zeroCount >= 5) {
+      AntModal.warning({
+        title: "Incomplete Test",
+        content: `You have ${zeroCount} unanswered or zero-rated questions. Please ensure less than 5 remain unattempted before submitting.`,
+        onOk: () => {
+          // Just close the modal; don't submit
+          autoNextCalled.current = false;
+          onClose();
+        },
+      });
+    } else {
+      const payload = {
+        user: userId,
+        statement_marks: updatedRatings,
+      };
+
+      const f = async () => {
+        const result = await dispatch(postEgogramResult(payload));
+        setResult(result.payload);
+        setResultModalVisible(true);
+      };
+
+      f();
+    }
   }
 };
+
 
 
   const handleNext = () => autoNext();

@@ -1,0 +1,166 @@
+.home-container {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  padding: 20px;
+ 
+}
+
+/* Hero Section */
+.hero-section {
+  background: #e9f5ff;
+  padding: 40px 20px;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  color: #0077cc;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.hero-image {
+  flex: 1;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.btn-appointment {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+/* About, Services, Contact */
+.about-section,
+.services-section,
+.contact-section {
+  margin-top: 40px;
+}
+
+/* Services */
+.services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.service-box {
+  background: #f0f8ff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1 1 200px;
+}
+
+/* Contact */
+.contact-section {
+  background-color: #fefefe;
+  padding: 20px;
+  text-align: center;
+}
+
+.btn-contact {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Interactive Section */
+.hospital-hero-section {
+  display: flex;
+  height: 500px;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.hospital-hero-left {
+  width: 30%;
+  background: linear-gradient(to bottom, #1a4e99, #3ac2a6);
+  color: white;
+  padding: 50px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hospital-hero-left p {
+  font-size: 1.3rem;
+  line-height: 1.8rem;
+  font-weight: 500;
+}
+
+.hospital-hero-left hr {
+  width: 40px;
+  border: 2px solid white;
+  margin-top: 20px;
+}
+
+.hospital-hero-right {
+  width: 70%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* Overlay Cards */
+.hero-card {
+  position: absolute;
+  width: 33.33%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px #000;
+}
+
+.hero-card span em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.hero-card:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Card Positioning */
+.hero-card.who { top: 0; left: 0; }
+.hero-card.when { top: 0; left: 33.33%; }
+.hero-card.what { top: 0; left: 66.66%; }
+.hero-card.where { top: 50%; left: 0; }
+.hero-card.why { top: 50%; left: 33.33%; }
+.hero-card.how { top: 50%; left: 66.66%; }

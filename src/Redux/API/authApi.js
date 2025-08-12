@@ -12,7 +12,9 @@ const authAPI = {
   loginUser: (credentials) => axiosInstance.post(`/accounts/login`, credentials),
 
    // 🔹 Update Profile
-   updateProfile: (profileData) => axiosInstance.put(`/accounts/update-profile/`, profileData),
+   updateProfile: (profileData) => {
+    return axiosInstance.put(`/accounts/update-profile/`, profileData);
+  },
 
   sendResetOTP: (emailData) => {
     return axiosInstance.post('accounts/send-reset-otp/', emailData);
@@ -24,6 +26,20 @@ const authAPI = {
 
   ResetPassword: (passwordData) => {
     return axiosInstance.post('accounts/reset-password/', passwordData);
+  },
+
+  CompleteCounsellor: (profileData) => {
+    return axiosInstance.post('accounts/complete-counsellor-profile/', profileData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  },
+
+  UpdateCounsellorProfile: (id, updatedData) => {
+     return axiosInstance.put(`accounts/update-counsellor-profile/${id}/`, updatedData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
   }
 };
 

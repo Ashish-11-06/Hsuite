@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Table, Card, Button, Tag, Typography, Spin, Alert, Empty, Modal } from "antd";
+import {ArrowLeftOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuizReportHistory } from "../Redux/Slices/quizSlice";
-import AddPredefinedTreatModal from "../Modals/AddPredefinedTreatModal";
+import ActionModal from "../Modals/ActionModal";
 
 const { Title, Text } = Typography;
 
 const Report = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { data: quizHistory, loading, error } = useSelector((state) => state.quiz);
   const [filteredQuiz, setFilteredQuiz] = useState(null);
   const { user } = useSelector((state) => state.auth); 
@@ -69,13 +72,7 @@ const Report = () => {
   // Color mapping for categories (consistent between table and modal)
   const getCategoryColor = (categoryName) => {
     const colorMap = {
-      // Add your specific category-color mappings here
-      // Example:
-      // 'Openness': 'blue',
-      // 'Conscientiousness': 'green',
-      // Default colors if no specific mapping
     };
-    
     const defaultColors = ['blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'red', 'volcano'];
     return colorMap[categoryName] || defaultColors[Math.abs(hashCode(categoryName)) % defaultColors.length];
   };
@@ -162,7 +159,22 @@ const Report = () => {
   ];
 
   return (
-    <Card style={{ margin: 20 }}>
+    <>
+     <div style={{ position: "relative", margin: "-18px" }}>
+  <Button
+    icon={<ArrowLeftOutlined />}
+    type="primary"
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      // fontSize: "40px",
+      color: "white",
+    }}
+  >Back</Button>
+</div>
+    <Card style={{ margin: 40 }}>
       <Title level={3}>Quiz Reports</Title>
 
       <div style={{ marginBottom: 20 }}>
@@ -213,7 +225,7 @@ const Report = () => {
   onCancel={handleCancel}
   footer={[
     <Button key="treatment" type="primary" onClick={() => setShowTreatModal(true)}>
-      Predefined Treatment
+    Show Actions
     </Button>
   ]}
   width={800}
@@ -275,7 +287,7 @@ const Report = () => {
   )}
 </Modal>
 
-<AddPredefinedTreatModal
+<ActionModal
   visible={showTreatModal}
   onClose={() => setShowTreatModal(false)}
   userId={user?.id}
@@ -285,6 +297,7 @@ const Report = () => {
         </>
       )}
     </Card>
+    </>
   );
 };
 

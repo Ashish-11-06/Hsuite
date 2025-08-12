@@ -2,7 +2,7 @@ import React, { useState, useEffect , useRef } from "react";
 import { Modal, Form, Input, Button, Typography, message } from "antd";
 import { MailOutlined, LockOutlined, ArrowLeftOutlined, KeyOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { sendResetOTP, verifyResetOTP, resetPassword, resetPasswordState } from "../Redux/Slices/authSlice";
+import { sendResetOTP, verifyResetOTP, resetPassword, resetPasswordState, setResetPasswordStep } from "../Redux/Slices/authSlice";
 
 const { Title, Text } = Typography;
 
@@ -30,12 +30,12 @@ const handleEmailSubmit = ({ email }) => {
   dispatch(sendResetOTP({ email }))
     .unwrap()
     .then((payload) => {
-      console.log("Send OTP Response:", payload); // Debug log
+      // console.log("Send OTP Response:", payload); // Debug log
       message.success(payload.message || "OTP sent to your email");
     })
     .catch((err) => {
-      console.error("Send OTP Error:", err); // Debug log
-      message.error(err.message || "Failed to send OTP");
+      // console.error("Send OTP Error:", err); // Debug log
+      message.error(err.message || err?.error?.messgae || "Failed to send OTP");
     });
 };
 
@@ -50,12 +50,12 @@ const handleOtpSubmit = () => {
   }))
     .unwrap()
     .then((payload) => {
-      console.log("Verify OTP Response:", payload); // Debug log
+      // console.log("Verify OTP Response:", payload); // Debug log
       message.success(payload.message || "OTP verified");
     })
     .catch((err) => {
-      console.error("Verify OTP Error:", err); // Debug log
-      message.error(err.message || "OTP verification failed");
+      // console.error("Verify OTP Error:", err); // Debug log
+      message.error(err.message || err?.error?.messgae || "OTP verification failed");
     });
 };
 
@@ -67,13 +67,13 @@ const handlePasswordReset = ({ password, confirm }) => {
   }))
     .unwrap()
     .then((payload) => {
-      console.log("Reset Password Response:", payload); // Debug log
+      // console.log("Reset Password Response:", payload); // Debug log
       message.success(payload.message || "Password reset successful!");
       onCancel();
     })
     .catch((err) => {
-      console.error("Reset Password Error:", err); // Debug log
-      message.error(err.message || "Password reset failed");
+      // console.error("Reset Password Error:", err); // Debug log
+      message.error(err.message || err?.error?.messgae || "Password reset failed");
     });
 };
 
@@ -98,7 +98,10 @@ const handlePasswordReset = ({ password, confirm }) => {
     dispatch(sendResetOTP({ email: resetState.email }))
       .unwrap()
       .then(() => message.success("New OTP sent to your email"))
-      .catch((err) => message.error(err || "Failed to resend OTP"));
+      .catch((err) => {
+  message.error(err?.message || err?.error?.message || "Failed to resend OTP");
+});
+
   };
 
   return (
@@ -194,10 +197,25 @@ const handlePasswordReset = ({ password, confirm }) => {
               <Form.Item
                 name="password"
                 label="New Password"
-                rules={[
-                  { required: true, message: "Please input your new password" },
-                //   { message: "Password ers" }
-                ]}
+                // rules={[
+                //   { required: true, message: "Please input your new password" },
+                // //   { message: "Password ers" }
+                // ]}
+                rules={[{ required: true, message: "Please enter a password" },
+                            {
+                              pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/,
+                              message:
+                        "Password must be at least 6 characters, include 1 uppercase letter, 1 number, and 1 special character",
+                            },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || value !== getFieldValue("username")) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error("Password cannot be the same as username"));
+                      },
+                    }),
+                          ]}
               >
                 <Input.Password placeholder="New password" />
               </Form.Item>

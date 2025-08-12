@@ -371,7 +371,7 @@ extraReducers: (builder) => {
       .addCase(fetchMcqResultsByUser.fulfilled, (state, action) => {
         state.loading = false;
         state.results = action.payload; // Verify payload structure here
-        console.log("Results stored:", action.payload); // Debug log
+        // console.log("Results stored:", action.payload); // Debug log
       })
       .addCase(fetchMcqResultsByUser.rejected, (state, action) => {
         state.loading = false;

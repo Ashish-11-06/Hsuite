@@ -25,10 +25,16 @@ const Login = () => {
   const [showForgotModal, setShowForgotModal] = useState(false);
 
   const handleLogin = async (values) => {
+
+// const updatedValues = {
+//   ...values,
+//   role: 'Student'
+// }
+
     try {
       const response = await dispatch(loginUser(values)).unwrap();
       message.success(response?.message || "Login successful!");
-      setTimeout(() => navigate("/profile"), 1500);
+      navigate("/", { replace: true });
     } catch (error) {
       message.error(error?.error || "Invalid email or password");
     }
@@ -73,7 +79,7 @@ const Login = () => {
           </div>
         </div>
 
-        <Form layout="vertical" onFinish={handleLogin}>
+        <Form layout="vertical" onFinish={handleLogin} onSubmit={e => e.preventDefault()}>
           <Form.Item
             label="Email"
             name="email"

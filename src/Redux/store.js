@@ -9,7 +9,8 @@ import quizReducer from "./Slices/quizSlice";
 import mcqReducer from "./Slices/mcqSlice";
 import egoReducer from "./Slices/egoSlice";
 import personaltreatmentReducer from "./Slices/personaltreatmentSlice";
-import egotreatReducer from "./Slices/egotreatSlice";
+import AIintegrationReducer from "./Slices/AIintegrationSlice";
+import CounsellorReducer from "./Slices/CounsellorSlice";
 
 const store = configureStore({
   reducer: {
@@ -23,7 +24,8 @@ const store = configureStore({
     mcq: mcqReducer,
     ego: egoReducer,
     personaltreatment: personaltreatmentReducer,
-    egotreat: egotreatReducer,
+    aiintegration: AIintegrationReducer,
+    counsellor: CounsellorReducer,
   },
 });
 

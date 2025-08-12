@@ -140,6 +140,30 @@ const GetPersonalityStepsModal = ({
   const getCategoryDisplayName = () =>
     stepData?.category_name || categoryName || "Selected Category";
 
+  const handleModalClose = async () => {
+  const isLastStep = currentStepIndex === stepArray.length - 1;
+
+  if (treatmentId && !isLastStep) {
+    try {
+      const res = await dispatch(updateCurrentStep({
+        treatment_id: treatmentId,
+        step_id: currentStepIndex + 1 // 1-based step index
+      })).unwrap();
+
+      if (res?.message) {
+        message.success(res.message); // ✅ Show backend message
+      }
+    } catch (err) {
+      message.error(err?.message || "Failed to save current step.");
+    } finally {
+      onClose(); // Always close modal
+    }
+  } else {
+    onClose(); // No need to update if at last step
+  }
+};
+
+
   return (
     <Modal
       title={
@@ -148,7 +172,7 @@ const GetPersonalityStepsModal = ({
         </span>
       }
       open={visible}
-      onCancel={onClose}
+      onCancel={handleModalClose}
       footer={null}
       width={800}
       destroyOnClose
@@ -158,21 +182,24 @@ const GetPersonalityStepsModal = ({
           <Spin size="large" />
           <p>Loading steps...</p>
         </div>
-      ) : allStepsError ? (
+      ) 
+      : allStepsError ? (
         <Alert
-          // message="Error loading steps"
-          // description={allStepsError.message || "Failed to load steps"}
-          type="error"
+          message="Error loading steps"
+          description={allStepsError.message || "Failed to load steps"}
+          type="Warning"
           showIcon
         />
-      ) : stepArray.length === 0 ? (
-        <Alert
-          message="No steps found"
-          description={`No ${type} steps found for the selected category`}
-          type="warning"
-          showIcon
-        />
-      ) : (
+      ) 
+      // : stepArray.length === 0 ? (
+      //   <Alert
+      //     message="No steps found"
+      //     description={`No ${type} steps found for the selected category`}
+      //     type="warning"
+      //     showIcon
+      //   />
+      // )
+       : (
         <>
           <div
             style={{

@@ -1,13 +1,14 @@
 {
   "name": "h_suite",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "json-server": "json-server --watch db.json --port 5000"
   },
   "dependencies": {
     "@ant-design/charts": "^2.2.7",
@@ -16,11 +17,20 @@
     "antd": "^5.24.2",
     "axios": "^1.7.9",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.23.12",
+    "gsap": "^3.13.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "less": "^4.2.2",
     "react": "^18.3.1",
+    "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.2.0"
+    "react-router-dom": "^7.2.0",
+    "react-slick": "^0.31.0",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -32,6 +42,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "json-server": "^1.0.0-beta.3",
     "vite": "^6.1.0"
   }
 }

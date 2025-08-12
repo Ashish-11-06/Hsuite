@@ -86,7 +86,7 @@ export const useResults = (loggedInUserId, responses, currentQuestions, testType
 
   const handleShowResults = useCallback(() => {
     if (isResultModalOpen || isResultLoading || !responses) {
-      console.log('Prevented duplicate call', { isResultModalOpen, isResultLoading });
+      // console.log('Prevented duplicate call', { isResultModalOpen, isResultLoading });
       return;
     }
 

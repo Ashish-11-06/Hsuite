@@ -7,9 +7,9 @@ import "antd/dist/reset.css"; // Ant Design styles
 import "./index.css"; // Custom global styles
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Provider store={store}> {/* Ensure Provider wraps App */}
+  // <React.StrictMode>
+    // {/* <Provider store={store}> Ensure Provider wraps App */}
       <App />
-    </Provider>
-  </React.StrictMode>
+    // {/* </Provider> */}
+  // </React.StrictMode>
 );

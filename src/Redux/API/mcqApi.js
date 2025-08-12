@@ -88,9 +88,9 @@ const mcqAPIs = {
     },
 
     getMcqQuizResult: async (userId) => {
-      console.log("Fetching results for user:", userId); // Debug log
+      // console.log("Fetching results for user:", userId); // Debug log
       const response = await axiosInstance.get(`assessments/mcq-result-history/${userId}/`);
-      console.log("API Response:", response.data); // Debug log
+      // console.log("API Response:", response.data); // Debug log
       return response;
     },
 
