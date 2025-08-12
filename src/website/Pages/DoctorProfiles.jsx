@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import "../Styles/DoctorProfile.css";
 import hero2 from "../Images/doctor2.jpg";
 import doctor2 from "../Images/doctor2.jpg";
@@ -29,59 +29,19 @@ const doctors = [
 ];
 
 const DoctorProfile = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = scrollRef.current;
-      const scrollTop = container.scrollTop;
-      const containerHeight = container.clientHeight;
-
-      const index = Math.min(
-        doctors.length - 1,
-        Math.floor(scrollTop / containerHeight)
-      );
-
-      setActiveIndex(index);
-    };
-
-    const container = scrollRef.current;
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <section className="doctor-stack-container" ref={scrollRef}>
-      <div className="doctor-sticky-wrapper">
-        <div className="doctor-card-wrapper">
-          {doctors.map((doctor, index) => {
-            let className = "doctor-card-layer";
-
-            if (index === activeIndex) className += " active";
-            else if (index === activeIndex - 1) className += " behind-1";
-            else if (index === activeIndex - 2) className += " behind-2";
-
-            return (
-              <div className={className} key={index}>
-                <div className="doctor-card">
-                  <img
-                    src={doctor.image}
-                    alt={doctor.name}
-                    className="doctor-img"
-                  />
-                  <div className="doctor-details">
-                    <h2>{doctor.name}</h2>
-                    <h4>{doctor.specialty}</h4>
-                    <p>{doctor.description}</p>
-                    <button className="book-btn">Book Appointment</button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+    <section className="doctor-scroll-container">
+      {doctors.map((doctor, index) => (
+        <div className="doctor-card" key={index}>
+          <img src={doctor.image} alt={doctor.name} className="doctor-img" />
+          <div className="doctor-details">
+            <h2>{doctor.name}</h2>
+            <h4>{doctor.specialty}</h4>
+            <p>{doctor.description}</p>
+            <button className="book-btn">Book Appointment</button>
+          </div>
         </div>
-      </div>
+      ))}
     </section>
   );
 };

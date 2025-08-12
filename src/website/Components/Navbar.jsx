@@ -53,7 +53,7 @@ const Navbar = () => {
 
       {/* Middle: Navigation Links */}
       <ul className="nav-links">
-        <li><Link to="/web/opd" style={{ color: theme.colors.primary }}>OPD SERVICES</Link></li>
+        <li><Link to="/web/services" style={{ color: theme.colors.primary }}>OPD SERVICES</Link></li>
         <li><Link to="/web/doctors" style={{ color: theme.colors.primary }}>FIND A DOCTOR</Link></li>
         <li><Link to="/web/specialities" style={{ color: theme.colors.primary }}>SPECIALTIES</Link></li>
         <li><Link to="/web/about" style={{ color: theme.colors.primary }}>ABOUT US</Link></li>

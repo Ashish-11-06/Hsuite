@@ -11,6 +11,9 @@ import ContactUs from "./Pages/ContactUs";
 import Specialities from "./Pages/Specialities";
 import Footer from "./Components/Footer";
 import FindDoctorPage from "./Pages/FindDoctorPage";
+import OPDServices from "./Pages/OPDServices";
+import Services from "./Pages/Services";
+import DoctorProfile from "./Pages/DoctorProfiles";
 
 const WebSiteRoute = () => {
   const [theme, setTheme] = useState(createTheme());
@@ -39,7 +42,10 @@ const WebSiteRoute = () => {
         <Route path="/careers" element={<Career />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/specialities" element={<Specialities />} />
-        <Route path="/doctors" element={<FindDoctorPage />} />
+        <Route path="/finddoctors" element={<FindDoctorPage />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/opdServices" element={<OPDServices />} />
+        <Route path="/doctors" element={<DoctorProfile />} />
       </Routes>
         <Footer />
     </ThemeContext.Provider>

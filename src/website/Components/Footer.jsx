@@ -21,10 +21,10 @@ const Footer = () => {
         <Col xs={24} sm={12} md={8}>
           <Title level={5}>Quick Links</Title>
           <Space direction="vertical">
-            <Link href="/">Home</Link>
-            <Link href="/specialities">Specialities</Link>
-            <Link href="/careers">Careers</Link>
-            <Link href="/contact">Contact Us</Link>
+            <Link href="/web/">Home</Link>
+            <Link href="/web/specialities">Specialities</Link>
+            <Link href="/web/careers">Careers</Link>
+            <Link href="/web/contact">Contact Us</Link>
           </Space>
         </Col>
 
