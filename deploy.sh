@@ -18,6 +18,19 @@ echo "Building project..." | tee -a "$LOG_FILE"
 npm install >> "$LOG_FILE" 2>&1
 npm run build >> "$LOG_FILE" 2>&1
 
+# Check if rsync exists
+if ! command -v rsync >/dev/null 2>&1; then
+  echo "rsync not found. Installing..."
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt update && sudo apt install -y rsync
+  elif [[ "$OSTYPE" == "msys" ]]; then
+    pacman -S --noconfirm rsync
+  else
+    echo "Please install rsync manually."
+    exit 1
+  fi
+fi
+
 # === UPLOAD FILES (including hidden ones) ===
 echo "Uploading files to server..." | tee -a "$LOG_FILE"
 rsync -avz --delete \
