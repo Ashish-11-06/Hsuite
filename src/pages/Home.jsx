@@ -3,7 +3,7 @@ import { Card, Typography, Layout, Row, Col, Spin, message } from "antd";
 import {
   BookOutlined,
   CodeOutlined,
-  TeamOutlined,
+  TeamOutlined, ReadOutlined, UsergroupAddOutlined
 } from "@ant-design/icons"; // ✅ Importing icons
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -92,6 +92,26 @@ const Home = () => {
               ) : (
                 <Title level={3} style={{ color: "#000" }}>{codeCount}</Title>
               )}
+            </Card>
+          </Link>
+        </Col>
+
+        <Col>
+          <Link to="/assessents">
+            <Card style={cardStyle}>
+              <Title level={5} style={titleStyle}>
+                <ReadOutlined /> Assessments
+              </Title>
+            </Card>
+          </Link>
+        </Col>
+
+        <Col>
+          <Link to="/counsellor">
+            <Card style={cardStyle}>
+              <Title level={5} style={titleStyle}>
+                <UsergroupAddOutlined /> Counsellors
+              </Title>
             </Card>
           </Link>
         </Col>

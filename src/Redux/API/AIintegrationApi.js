@@ -8,6 +8,10 @@ const AIintegrationApi = {
             'Content-Type': 'multipart/form-data'
         }
     });
+   },
+
+   ChatBot: (message) => {
+    return axiosInstance.post(`voice-chat/`, {message});
    }
 
 }

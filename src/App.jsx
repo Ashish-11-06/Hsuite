@@ -23,6 +23,7 @@ import PatientMainContent from "./Demo/Components/PatientMainContent.jsx";
 import ProtectedRoutePatient from "./Demo/Components/ProtectedRoutePatient.jsx";
 import PatientHeader from "./Demo/Components/PatientHeader.jsx";
 import WebSiteRoute from "./website/websiteRoute.jsx";
+import ChatBot from "./pages/ChatBot.jsx";
 
 const { Header, Content, Footer } = Layout;
 
@@ -209,6 +210,9 @@ function App() {
                     <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
                       <MainContent />
                     </Content>
+
+                    {/* {chat bot } */}
+                    <ChatBot />
 
                     {/* Footer */}
                     {/* <Footer style={{ textAlign: "center", position: "fixed", bottom: 0, left: "250px", right: 0 }}>
