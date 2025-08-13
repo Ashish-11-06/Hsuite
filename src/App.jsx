@@ -207,7 +207,7 @@ function App() {
                     </Header>
 
                     {/* Main Content */}
-                    <Content style={{ marginTop: "60px", padding: "30px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
+                    <Content style={{ marginTop: "60px", overflowY: "auto", flexGrow: 1, height: "calc(100vh - 60px)" }}>
                       <MainContent />
                     </Content>
 
