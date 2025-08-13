@@ -3,9 +3,12 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
 
-  server: {
-    allowedHosts: ['3aff-103-211-60-165.ngrok-free.app'],
-  },
+  // server: {
+  //   host: true,
+  //   port: 5173,
+  //   allowedHosts: ['37d1cdc7f417.ngrok-free.app'],
+  // },
+  // base:'/',
 
   plugins: [react()],
   css: {

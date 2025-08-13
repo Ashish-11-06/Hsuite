@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // export const BASE_URL = 'https://hsuite.prushal.com/backend';
 // export const BASE_URL = 'http://192.168.1.55:8000';
-// export const BASE_URL = 'http://192.168.1.57:8000';
+// export const BASE_URL = 'https://named-development-dreams-photographs.trycloudflare.com/';
 export const BASE_URL = 'https://hsuite.prushal.com/main-backend';
 
 const axiosInstance = axios.create({
