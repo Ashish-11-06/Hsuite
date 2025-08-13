@@ -160,7 +160,9 @@ const Report = () => {
 
   return (
     <>
-      <div style={{ position: "relative", margin: "-18px" }}>
+     
+      <Card style={{ margin: 40 }}>
+         <div style={{ position: "relative" }}>
         <Button
           icon={<ArrowLeftOutlined />}
           type="primary"
@@ -173,10 +175,12 @@ const Report = () => {
             color: "white",
           }}
         >Back</Button>
-      </div>
-      <Card style={{ margin: 40 }}>
-        <Title level={3}>Quiz Reports</Title>
+         <Title level={3} 
+         style={{ textAlign: 'center', marginBottom: '20px' }}>
+         Quiz Reports</Title>
 
+      </div>
+       
         <div style={{ marginBottom: 20 }}>
           <Button
             type={!filteredQuiz ? "primary" : "default"}

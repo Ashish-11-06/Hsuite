@@ -52,7 +52,7 @@ const EgogramTest = () => {
 
   return (
     <>
-    <div style={{ position: "relative", margin: "-18px" }}>
+    <div style={{ position: "relative", margin: "20px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"
@@ -73,8 +73,6 @@ const EgogramTest = () => {
         </div>
       ) : (
         <>
-        
-          <h1 style={{ marginBottom: '16px' }}>Egogram Tests</h1>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
             <Card

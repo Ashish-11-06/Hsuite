@@ -15,7 +15,7 @@ const Counsellor = () => {
   const dispatch = useDispatch();
   const [selectedId, setSelectedId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const {
     counsellors,
@@ -38,7 +38,7 @@ const Counsellor = () => {
     setModalVisible(false);
   };
 
-     const showModal = () => {
+  const showModal = () => {
     setIsModalVisible(true);
   };
   const handleCancel = () => {
@@ -48,18 +48,18 @@ const Counsellor = () => {
   return (
     <div style={{ padding: "20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <Title level={2}>Available Counsellors</Title>
-      
-      <Button type="secondary" onClick={showModal}>Help ?</Button>
-      
-            <Modal
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}  // <-- This removes OK and Cancel buttons
-        closable={true} // (default is true) shows the close (X) icon
-      >
-        <p>On this page, you can view all your ongoing and completed treatments. Each treatment will be shown based on its status—ongoing or completed. You can also download a PDF of the steps. These treatments appear after you choose a counsellor, send a request, and the counsellor adds steps for you. Once added, the steps will be displayed here so you can proceed with your treatment. After you send the request and the counsellor accepts it, they will be able to view all your test result reports.</p>
-      </Modal>
+        <Title level={2}>Available Counsellors</Title>
+
+        <Button type="secondary" onClick={showModal}>Help ?</Button>
+
+        <Modal
+          visible={isModalVisible}
+          onCancel={handleCancel}
+          footer={null}  // <-- This removes OK and Cancel buttons
+          closable={true} // (default is true) shows the close (X) icon
+        >
+          <p>On this page, you can view all your ongoing and completed treatments. Each treatment will be shown based on its status—ongoing or completed. You can also download a PDF of the steps. These treatments appear after you choose a counsellor, send a request, and the counsellor adds steps for you. Once added, the steps will be displayed here so you can proceed with your treatment. After you send the request and the counsellor accepts it, they will be able to view all your test result reports.</p>
+        </Modal>
       </div>
 
       {loading && !modalVisible && <Spin tip="Loading counsellors..." />}
@@ -68,42 +68,54 @@ const Counsellor = () => {
       )}
 
       {(counsellors || []).length === 0 && !loading && !error ? (
-  <div style={{ textAlign: "center", marginTop: "40px", width: "100%" }}>
-    <Empty description="No counsellors available" />
-  </div>
-) : (
-  <Row gutter={[16, 16]}>
-    {(counsellors || []).map((counsellor) => {
-      const profile = counsellor.profile;
-      return (
-        <Col xs={24} sm={12} md={8} lg={6} key={counsellor.id}>
+        <div style={{ textAlign: "center", marginTop: "40px", width: "100%" }}>
+          <Empty description="No counsellors available" />
+        </div>
+      ) : (
+      <Row gutter={[16, 16]}>
+  {(counsellors || []).map((counsellor) => {
+    const profile = counsellor.profile;
+    return (
+      <Col xs={24} sm={12} md={8} lg={6} key={counsellor.id}>
+        <div style={{ height: "100%", display: "flex" }}>
           <Card
             bordered
             hoverable
             onClick={() => handleCardClick(counsellor.id)}
             bodyStyle={{ textAlign: "center" }}
+            style={{ height: "100%", width: "100%" }}
           >
             {profile && profile.photo ? (
               <Avatar
                 size={120}
                 src={
-                  profile.photo.startsWith('http')
+                  profile.photo.startsWith("http")
                     ? profile.photo
                     : `${BASE_URL}${profile.photo}`
                 }
                 alt={`${profile.first_name} ${profile.last_name}`}
-                style={{ marginBottom: 12, objectFit: 'cover' }}
+                style={{ marginBottom: 12, objectFit: "cover" }}
                 icon={<UserOutlined />}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '';
+                  e.target.src = "";
                 }}
               />
             ) : (
-              <Avatar size={120} icon={<UserOutlined />} style={{ marginBottom: 12 }} />
+              <Avatar
+                size={120}
+                icon={<UserOutlined />}
+                style={{ marginBottom: 12 }}
+              />
             )}
             <Divider style={{ margin: "12px 0" }} />
-            <div style={{ fontWeight: "bold", fontSize: 16, marginBottom: 16 }}>
+            <div
+              style={{
+                fontWeight: "bold",
+                fontSize: 16,
+                marginBottom: 16,
+              }}
+            >
               {profile
                 ? `${profile.first_name} ${profile.last_name}`
                 : counsellor.username}
@@ -131,11 +143,13 @@ const Counsellor = () => {
               </Paragraph>
             )}
           </Card>
-        </Col>
-      );
-    })}
-  </Row>
-)}
+        </div>
+      </Col>
+    );
+  })}
+</Row>
+
+      )}
 
 
       <RequestCounsellorModal

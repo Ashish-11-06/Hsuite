@@ -52,7 +52,7 @@ const Createset = () => {
 
   return (
     <>
-    <div style={{ position: "relative", margin: "-18px" }}>
+    <div style={{ position: "relative", margin: "20px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"
@@ -69,7 +69,8 @@ const Createset = () => {
 
     <div style={{ 
       maxWidth: "1200px", 
-      margin: "50px auto",
+      margin: "40px",
+      marginTop: "70px",
       padding: "0 20px",
       minHeight: "calc(100vh - 40px)"
     }}>

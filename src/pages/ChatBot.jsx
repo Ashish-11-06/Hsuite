@@ -66,7 +66,7 @@ const ChatBot = () => {
             bottom: "90px",
             right: "20px",
             width: "280px",
-            height: "350px",
+            height: "450px",
             background: "#fff",
             borderRadius: "8px",
             boxShadow: "0 4px 10px rgba(0,0,0,0.15)",

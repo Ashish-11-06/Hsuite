@@ -177,7 +177,7 @@ const AddCounsellorDetailsModal = ({ visible, onClose }) => {
           name="educational_qualifications"
           rules={[{ required: true }]}
         >
-          <Input.TextArea rows={4} />
+          <Input.TextArea rows={1} />
         </Form.Item>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

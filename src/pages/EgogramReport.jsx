@@ -172,7 +172,9 @@ const chartData = selectedRecord?.statement_marks
 
   return (
     <>
-    <div style={{ position: "relative", margin: "-18px" }}>
+    
+   <Card style={{ margin: 40 }}>
+      <div style={{ position: "relative", margin: "10px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"
@@ -185,8 +187,9 @@ const chartData = selectedRecord?.statement_marks
     }}
   >Back</Button>
 </div>
-    <div style={{ padding: 30 }}>
-      <Title level={2} style={{ marginBottom: 24 }}>Egogram Performance Report</Title>
+      <Title level={3} 
+      style={{ textAlign: 'center', marginBottom: 24 }}>
+      Egogram Performance Report</Title>
       
       {tableData.length === 0 ? (
         <Card 
@@ -295,7 +298,7 @@ const chartData = selectedRecord?.statement_marks
   />
         </>
       )}
-    </div>
+    </Card>
     </>
   );
 };

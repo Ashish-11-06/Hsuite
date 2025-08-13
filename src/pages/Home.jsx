@@ -119,7 +119,7 @@ const Home = () => {
           </Col>
 
           <Col>
-            <Link to="/assessents">
+            <Link to="/assessment">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
                   <ReadOutlined /> Assessments
