@@ -200,7 +200,7 @@ function App() {
 
                   <Layout style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
                     {/* Header */}
-                    <Header style={{ position: "fixed", top: 0, left: "200px", right: 0, height: "65px", zIndex: 100 }}>
+                    <Header style={{ position: "fixed", top: 0, width: '100%', right: 0, height: "65px", zIndex: 100 }}>
                       <HeaderComponent />
                     </Header>
 

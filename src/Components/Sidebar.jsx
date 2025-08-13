@@ -22,6 +22,7 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../Redux/Slices/authSlice";
+import styled from "styled-components";
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -37,6 +38,27 @@ const Sidebar = () => {
     dispatch(logout());
     navigate("/login");
   };
+
+  const CustomSider = styled(Layout.Sider)`
+  .ant-layout-sider-zero-width-trigger {
+    position: absolute;
+    top: 14px;
+    inset-inline-end: -40px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    color: #000000;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0000007d;
+    background: #ffffff;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+`;
 
   const getSelectedKey = () => {
     if (location.pathname === "/") return "1";
@@ -76,26 +98,9 @@ const Sidebar = () => {
 
 
   return (
-    <Sider
-      breakpoint="md" // collapses automatically at <768px
-      collapsedWidth="0" // completely hides when collapsed
-      onBreakpoint={(broken) => {
-        console.log(broken); // true when in mobile mode
-      }}
-      onCollapse={(collapsed) => {
-        console.log(collapsed);
-      }}
-      style={{
-        height: "100vh",
-        // position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 1000,
-      }}
-    >
-      <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center" }}>
-        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+    <CustomSider breakpoint="md" collapsedWidth="0">
+      <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1000 }}>
+        <Link to="/" style={{ textDecoration: "none", color: "black"}}>
           HSuite
         </Link>
       </div>
@@ -190,7 +195,7 @@ const Sidebar = () => {
           </Popconfirm>
         </Menu>
       )} */}
-    </Sider>
+    </CustomSider>
   );
 };
 
