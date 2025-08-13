@@ -14,10 +14,10 @@ import {
   SolutionOutlined,
   MedicineBoxOutlined,
   ClockCircleOutlined,
-  SafetyCertificateOutlined  ,
+  SafetyCertificateOutlined,
   ContainerOutlined,
   RobotOutlined,
-HeartOutlined
+  HeartOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -38,45 +38,62 @@ const Sidebar = () => {
     navigate("/login");
   };
 
-const getSelectedKey = () => {
-  if (location.pathname === "/") return "1";
-  if (location.pathname.startsWith("/books")) return "2";
-  if (location.pathname.startsWith("/codes")) return "3";
-  if (location.pathname.startsWith("/profile")) return "4";
-  if (location.pathname.startsWith("/users")) return "5";
-  if (
-    location.pathname.startsWith("/assessment") ||
-    location.pathname.startsWith("/createset") ||
-    location.pathname.startsWith("/assessents") ||
-    location.pathname.startsWith("/report") ||
-    location.pathname.startsWith("/createmcq") ||
-    location.pathname.startsWith("/mcqtest") ||
-    location.pathname.startsWith("/mcqreport") ||
-    location.pathname.startsWith("/createegogram") ||
-    location.pathname.startsWith("/testegogram") ||
-    location.pathname.startsWith("/egogramreport")
-  ) {
-    return "6";
-  }
-  if (location.pathname.startsWith("/mindfulness")) return "7";
-  if (location.pathname.startsWith("/clinical")) return "8";
-  if (location.pathname.startsWith("/work")) return "9";
-  if (location.pathname.startsWith("/treatment")) return "10";
-  if (location.pathname.startsWith("/counsellortreatment")) return "11";
-  if (
-    location.pathname.startsWith("/therapy") ||
-    location.pathname.startsWith("/viewresult") // Add this condition
-  ) {
-    return "12"; // This should match your Therapies menu item key
-  }
-  if (location.pathname.startsWith("/ongocountreatment")) return "13";
-  if (location.pathname.startsWith("/counsellor")) return "14";
-  return "1";
-};
+  const getSelectedKey = () => {
+    if (location.pathname === "/") return "1";
+    if (location.pathname.startsWith("/books")) return "2";
+    if (location.pathname.startsWith("/codes")) return "3";
+    if (location.pathname.startsWith("/profile")) return "4";
+    if (location.pathname.startsWith("/users")) return "5";
+    if (
+      location.pathname.startsWith("/assessment") ||
+      location.pathname.startsWith("/createset") ||
+      location.pathname.startsWith("/assessents") ||
+      location.pathname.startsWith("/report") ||
+      location.pathname.startsWith("/createmcq") ||
+      location.pathname.startsWith("/mcqtest") ||
+      location.pathname.startsWith("/mcqreport") ||
+      location.pathname.startsWith("/createegogram") ||
+      location.pathname.startsWith("/testegogram") ||
+      location.pathname.startsWith("/egogramreport")
+    ) {
+      return "6";
+    }
+    if (location.pathname.startsWith("/mindfulness")) return "7";
+    if (location.pathname.startsWith("/clinical")) return "8";
+    if (location.pathname.startsWith("/work")) return "9";
+    if (location.pathname.startsWith("/treatment")) return "10";
+    if (location.pathname.startsWith("/counsellortreatment")) return "11";
+    if (
+      location.pathname.startsWith("/therapy") ||
+      location.pathname.startsWith("/viewresult") // Add this condition
+    ) {
+      return "12"; // This should match your Therapies menu item key
+    }
+    if (location.pathname.startsWith("/ongocountreatment")) return "13";
+    if (location.pathname.startsWith("/counsellor")) return "14";
+    return "1";
+  };
 
 
   return (
-    <Sider>
+    <Sider
+      breakpoint="md" // collapses automatically at <768px
+      collapsedWidth="0" // completely hides when collapsed
+      onBreakpoint={(broken) => {
+        console.log(broken); // true when in mobile mode
+      }}
+      onCollapse={(collapsed) => {
+        console.log(collapsed);
+      }}
+      style={{
+        height: "100vh",
+        // position: "fixed",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 1000,
+      }}
+    >
       <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center" }}>
         <Link to="/" style={{ textDecoration: "none", color: "black" }}>
           HSuite
@@ -103,17 +120,17 @@ const getSelectedKey = () => {
           <Link to="/assessment">Assessments</Link>
         </Menu.Item>
 
-       {userRole === "Counsellor" && (
-        <Menu.Item key="12" icon={<HeartOutlined />} title="Therapies">
-          <Link to="/therapy">Therapies</Link>
-        </Menu.Item>
-       )}
+        {userRole === "Counsellor" && (
+          <Menu.Item key="12" icon={<HeartOutlined />} title="Therapies">
+            <Link to="/therapy">Therapies</Link>
+          </Menu.Item>
+        )}
 
         <SubMenu key="treatmentMenu" icon={<SafetyCertificateOutlined />} title="Treatment">
-          <Menu.Item key="10" icon = {<ContainerOutlined />} title="Predefined Treatment">
+          <Menu.Item key="10" icon={<ContainerOutlined />} title="Predefined Treatment">
             <Link to="/treatment">Predefined Treatment</Link>
           </Menu.Item>
-           <Menu.Item key="14" icon={<IdcardOutlined />} title="Counsellors">
+          <Menu.Item key="14" icon={<IdcardOutlined />} title="Counsellors">
             <Link to="/counsellor" >Counsellors</Link>
           </Menu.Item>
           <Menu.Item key="11" icon={<MedicineBoxOutlined />} title="Counsellor Treatment">
@@ -124,7 +141,7 @@ const getSelectedKey = () => {
           </Menu.Item>
         </SubMenu>
 
-       {/* {userRole === "Admin" && (
+        {/* {userRole === "Admin" && (
          <Menu.Item key="7" icon={<RobotOutlined />} title="Coding Automation">
           <Link to="/automation">Coding Automation</Link>
         </Menu.Item>
@@ -139,7 +156,7 @@ const getSelectedKey = () => {
           <Link to="/work">Work Organisation</Link>
         </Menu.Item> */}
 
-         <Menu.Item key="7" icon={<AuditOutlined />} title="Mindfulness">
+        <Menu.Item key="7" icon={<AuditOutlined />} title="Mindfulness">
           <Link to="/mindfulness">Mindfulness</Link>
         </Menu.Item>
 

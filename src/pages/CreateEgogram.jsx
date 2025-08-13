@@ -76,7 +76,7 @@ const CreateEgogram = () => {
   >Back</Button>
 </div>
     <div style={{ 
-      maxWidth: "1200px", 
+      // maxWidth: "1200px", 
       margin: "40px",
       marginTop: "70px",
       padding: "0 20px",
