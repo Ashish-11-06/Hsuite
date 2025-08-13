@@ -107,12 +107,12 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!formData[0]?.quiz_id) {
       antdMessage.error("Please select a quiz");
       return;
     }
-  
+
     // Different validation for question-based vs statement-based
     if (quizType === "question-based") {
       const isValid = formData.every(item =>
@@ -127,13 +127,13 @@ const Test = ({ onSuccess, selectedQuizId }) => {
         const filledCount = countFilledOptions(item);
         return filledCount !== 2; // Must have exactly 2 options filled
       });
-      
+
       if (hasInvalidItems) {
         antdMessage.error("For statement-based quizzes, please fill exactly two options.");
         return;
       }
     }
-  
+
     const payload = formData.map(item => {
       if (quizType === "question-based") {
         return {
@@ -152,7 +152,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
           { name: "option_3", value: item.option_3 },
           { name: "option_4", value: item.option_4 }
         ].filter(opt => opt.value && opt.value.trim());
-  
+
         // Create payload with the two filled options in their original positions
         return {
           quiz_id: item.quiz_id,
@@ -164,7 +164,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
         };
       }
     });
-  
+
     try {
       await dispatch(createTestQuestion(payload)).unwrap();
     } catch (err) {
@@ -173,10 +173,10 @@ const Test = ({ onSuccess, selectedQuizId }) => {
   };
 
   const disabledCondition =
-  !formData[0]?.quiz_id || formData.some(item => countFilledOptions(item) !== 2);
+    !formData[0]?.quiz_id || formData.some(item => countFilledOptions(item) !== 2);
 
   const disabledCondition2 =
-  !formData[0]?.quiz_id || formData.some(item => countFilledOptions(item) !== 4);
+    !formData[0]?.quiz_id || formData.some(item => countFilledOptions(item) !== 4);
 
 
   const selectedQuizName = filteredQuizList?.find(q => q.id === formData[0]?.quiz_id)?.quiz_name || "";
@@ -194,7 +194,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* <div style={{ marginBottom: "16px" }}>
+      <div style={{ marginBottom: "16px" }}>
         <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz Type:</label>
         <Radio.Group
           onChange={(e) => setQuizType(e.target.value)}
@@ -204,7 +204,7 @@ const Test = ({ onSuccess, selectedQuizId }) => {
           <Radio value="question-based">Question-Based</Radio>
           <Radio value="statement-based">Statement-Based</Radio>
         </Radio.Group>
-      </div> */}
+      </div>
 
       <div style={{ marginBottom: "16px" }}>
         <label style={{ display: "block", marginBottom: "6px", fontWeight: "500" }}>Select Quiz:</label>
@@ -264,8 +264,8 @@ const Test = ({ onSuccess, selectedQuizId }) => {
               value={item.option_1}
               onChange={(e) => handleChange(index, e)}
               placeholder={
-                quizType === "statement-based" && categoryNames[0] 
-                  ? categoryNames[0] 
+                quizType === "statement-based" && categoryNames[0]
+                  ? categoryNames[0]
                   : "Option 1"
               }
               style={{ marginBottom: 8 }}
@@ -275,8 +275,8 @@ const Test = ({ onSuccess, selectedQuizId }) => {
               value={item.option_2}
               onChange={(e) => handleChange(index, e)}
               placeholder={
-                quizType === "statement-based" && categoryNames[1] 
-                  ? categoryNames[1] 
+                quizType === "statement-based" && categoryNames[1]
+                  ? categoryNames[1]
                   : "Option 2"
               }
               style={{ marginBottom: 8 }}
@@ -286,8 +286,8 @@ const Test = ({ onSuccess, selectedQuizId }) => {
               value={item.option_3}
               onChange={(e) => handleChange(index, e)}
               placeholder={
-                quizType === "statement-based" && categoryNames[2] 
-                  ? categoryNames[2] 
+                quizType === "statement-based" && categoryNames[2]
+                  ? categoryNames[2]
                   : "Option 3"
               }
               style={{ marginBottom: 8 }}
@@ -297,8 +297,8 @@ const Test = ({ onSuccess, selectedQuizId }) => {
               value={item.option_4}
               onChange={(e) => handleChange(index, e)}
               placeholder={
-                quizType === "statement-based" && categoryNames[3] 
-                  ? categoryNames[3] 
+                quizType === "statement-based" && categoryNames[3]
+                  ? categoryNames[3]
                   : "Option 4"
               }
             />
@@ -308,100 +308,83 @@ const Test = ({ onSuccess, selectedQuizId }) => {
 
       <Button
         type="dashed"
-        onClick={addQuestion}  
+        onClick={addQuestion}
         style={{ width: "100%", marginBottom: "16px" }}
       >
         + Add Another Question
       </Button>
 
-      {/* <Button
-        type="primary"
-        htmlType="submit"
-        loading={questionLoading}
-        disabled={
-          !formData[0]?.quiz_id || 
-          (quizType === "question-based" 
-            ? formData.some(item => !item.question || !item.option_1 || !item.option_2 || !item.option_3 || !item.option_4)
-            : formData.some(item => countFilledOptions(item) !== 2))
-        }
-        style={{ width: "100%" }}
-      >
-        {questionLoading ? "Submitting..." : "Submit"}
-      </Button> */}
-
-{quizType === "statement-based" ? (
-  disabledCondition ? (
-    // Show Tooltip only when button is disabled
-    <Tooltip title="To submit, add exactly 2 options" color="#008dce" placement="top">
-      <Button
-        type="primary"
-        htmlType="submit"
-        loading={questionLoading}
-        disabled={true}
-        style={{ width: "100%" }}
-      >
-        {questionLoading ? "Submitting..." : "Submit"}
-      </Button>
-    </Tooltip>
-  ) : (
-    <Button
-      type="primary"
-      htmlType="submit"
-      loading={questionLoading}
-      disabled={false}
-      style={{ width: "100%" }}
-    >
-      {questionLoading ? "Submitting..." : "Submit"}
-    </Button>
-  )
-) : (
-  disabledCondition2 ? (
-    // Show Tooltip only when button is disabled
-    <Tooltip title="To submit, add question and all the options" color="#008dce" placement="top">
-      <Button
-        type="primary"
-        htmlType="submit"
-        loading={questionLoading}
-        disabled={
-          !formData[0]?.quiz_id ||
-          formData.some(
-            item =>
-              !item.question ||
-              !item.option_1 ||
-              !item.option_2 ||
-              !item.option_3 ||
-              !item.option_4
-          )
-        }
-        style={{ width: "100%" }}
-      >
-        {questionLoading ? "Submitting..." : "Submit"}
-      </Button>
-    </Tooltip>
-  ) : (
-    <Button
-      type="primary"
-      htmlType="submit"
-      loading={questionLoading}
-      disabled={
-        !formData[0]?.quiz_id ||
-        formData.some(
-          item =>
-            !item.question ||
-            !item.option_1 ||
-            !item.option_2 ||
-            !item.option_3 ||
-            !item.option_4
+      {quizType === "statement-based" ? (
+        disabledCondition ? (
+          // Show Tooltip only when button is disabled
+          <Tooltip title="To submit, add exactly 2 options" color="#008dce" placement="top">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={questionLoading}
+              disabled={true}
+              style={{ width: "100%" }}
+            >
+              {questionLoading ? "Submitting..." : "Submit"}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={questionLoading}
+            disabled={false}
+            style={{ width: "100%" }}
+          >
+            {questionLoading ? "Submitting..." : "Submit"}
+          </Button>
         )
-      }
-      style={{ width: "100%" }}
-    >
-      {questionLoading ? "Submitting..." : "Submit"}
-    </Button>
-  )
-)}
-
-
+      ) : (
+        disabledCondition2 ? (
+          // Show Tooltip only when button is disabled
+          <Tooltip title="To submit, add question and all the options" color="#008dce" placement="top">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={questionLoading}
+              disabled={
+                !formData[0]?.quiz_id ||
+                formData.some(
+                  item =>
+                    !item.question ||
+                    !item.option_1 ||
+                    !item.option_2 ||
+                    !item.option_3 ||
+                    !item.option_4
+                )
+              }
+              style={{ width: "100%" }}
+            >
+              {questionLoading ? "Submitting..." : "Submit"}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={questionLoading}
+            disabled={
+              !formData[0]?.quiz_id ||
+              formData.some(
+                item =>
+                  !item.question ||
+                  !item.option_1 ||
+                  !item.option_2 ||
+                  !item.option_3 ||
+                  !item.option_4
+              )
+            }
+            style={{ width: "100%" }}
+          >
+            {questionLoading ? "Submitting..." : "Submit"}
+          </Button>
+        )
+      )}
 
       {testQuestions?.length > 0 && (
         <div style={{ marginTop: "32px" }}>

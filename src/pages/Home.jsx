@@ -4,7 +4,9 @@ import {
   BookOutlined,
   CodeOutlined,
   TeamOutlined,
-} from "@ant-design/icons"; // ✅ Importing icons
+  ReadOutlined,
+  UsergroupAddOutlined
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import codeAPIs from "../Redux/API/codeApi";
@@ -64,56 +66,95 @@ const Home = () => {
   };
 
   return (
-    <Content style={{ padding: "10px" }}>
-      <Row gutter={[10]} align="start">
-        <Col>
-          <Link to="/books">
-            <Card style={cardStyle}>
-              <Title level={5} style={titleStyle}>
-                <BookOutlined /> Books
-              </Title>
-              {loading ? (
-                <Spin size="small" />
-              ) : (
-                <Title level={3} style={{ color: "#000" }}>{bookCount}</Title>
-              )}
-            </Card>
-          </Link>
-        </Col>
+    <Content style={{ position: "relative", height: "100vh", heightoverflowY: "hidden", overflowX: "hidden"}}>
+      {/* Background image layer */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundImage: `url("/home.jpg")`, // public folder image
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          filter: "brightness(0.6)", // dims only background
+          zIndex: 0,
+        }}
+      />
 
-        <Col>
-          <Link to="/codes">
-            <Card style={cardStyle}>
-              <Title level={5} style={titleStyle}>
-                <CodeOutlined /> Codes
-              </Title>
-              {loading ? (
-                <Spin size="small" />
-              ) : (
-                <Title level={3} style={{ color: "#000" }}>{codeCount}</Title>
-              )}
-            </Card>
-          </Link>
-        </Col>
-
-        {currentUser?.role === "Admin" && (
+      {/* Foreground content */}
+      <div style={{ position: "relative", zIndex: 1, padding: "60px", height: "100%" , overflow: "hidden"}}>
+        <Row gutter={[10]} align="start">
           <Col>
-            <Link to="/users">
+            <Link to="/books">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
-                  <TeamOutlined /> Users
+                  <BookOutlined /> Books
                 </Title>
                 {loading ? (
                   <Spin size="small" />
                 ) : (
-                  <Title level={3} style={{ color: "#000" }}>{userCount}</Title>
+                  <Title level={3} style={{ color: "#000" }}>{bookCount}</Title>
                 )}
               </Card>
             </Link>
           </Col>
-        )}
 
-      </Row>
+          <Col>
+            <Link to="/codes">
+              <Card style={cardStyle}>
+                <Title level={5} style={titleStyle}>
+                  <CodeOutlined /> Codes
+                </Title>
+                {loading ? (
+                  <Spin size="small" />
+                ) : (
+                  <Title level={3} style={{ color: "#000" }}>{codeCount}</Title>
+                )}
+              </Card>
+            </Link>
+          </Col>
+
+          <Col>
+            <Link to="/assessents">
+              <Card style={cardStyle}>
+                <Title level={5} style={titleStyle}>
+                  <ReadOutlined /> Assessments
+                </Title>
+              </Card>
+            </Link>
+          </Col>
+
+          <Col>
+            <Link to="/counsellor">
+              <Card style={cardStyle}>
+                <Title level={5} style={titleStyle}>
+                  <UsergroupAddOutlined /> Counsellors
+                </Title>
+              </Card>
+            </Link>
+          </Col>
+
+          {currentUser?.role === "Admin" && (
+            <Col>
+              <Link to="/users">
+                <Card style={cardStyle}>
+                  <Title level={5} style={titleStyle}>
+                    <TeamOutlined /> Users
+                  </Title>
+                  {loading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <Title level={3} style={{ color: "#000" }}>{userCount}</Title>
+                  )}
+                </Card>
+              </Link>
+            </Col>
+          )}
+        </Row>
+      </div>
     </Content>
   );
 };

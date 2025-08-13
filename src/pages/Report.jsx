@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Card, Button, Tag, Typography, Spin, Alert, Empty, Modal } from "antd";
-import {ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuizReportHistory } from "../Redux/Slices/quizSlice";
 import ActionModal from "../Modals/ActionModal";
@@ -13,7 +13,7 @@ const Report = () => {
   const navigate = useNavigate();
   const { data: quizHistory, loading, error } = useSelector((state) => state.quiz);
   const [filteredQuiz, setFilteredQuiz] = useState(null);
-  const { user } = useSelector((state) => state.auth); 
+  const { user } = useSelector((state) => state.auth);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showTreatModal, setShowTreatModal] = useState(false);
@@ -40,7 +40,7 @@ const Report = () => {
   if (!user?.id) {
     return (
       <Card style={{ margin: 20 }}>
-        <Alert 
+        <Alert
           message="Authentication Required"
           description="Please log in to view your quiz reports"
           type="warning"
@@ -50,7 +50,7 @@ const Report = () => {
     );
   }
 
-  const quizNames = quizHistory?.quiz_history 
+  const quizNames = quizHistory?.quiz_history
     ? [...new Set(quizHistory.quiz_history.map(item => item.quiz_name))]
     : [];
 
@@ -59,14 +59,14 @@ const Report = () => {
 
   // Function to calculate total questions
   const calculateTotalQuestions = (report) => {
-    return report.total_questions || 
-           (Object.values(report.category_scores || {}).reduce((a, b) => a + b, 0) + (report.skip || 0));
+    return report.total_questions ||
+      (Object.values(report.category_scores || {}).reduce((a, b) => a + b, 0) + (report.skip || 0));
   };
 
   // Function to calculate total answered
   const calculateTotalAnswered = (report) => {
-    return report.total_answered || 
-           Object.values(report.category_scores || {}).reduce((a, b) => a + b, 0);
+    return report.total_answered ||
+      Object.values(report.category_scores || {}).reduce((a, b) => a + b, 0);
   };
 
   // Color mapping for categories (consistent between table and modal)
@@ -160,143 +160,143 @@ const Report = () => {
 
   return (
     <>
-     <div style={{ position: "relative", margin: "-18px" }}>
-  <Button
-    icon={<ArrowLeftOutlined />}
-    type="primary"
-    onClick={() => navigate(-1)}
-    style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      // fontSize: "40px",
-      color: "white",
-    }}
-  >Back</Button>
-</div>
-    <Card style={{ margin: 40 }}>
-      <Title level={3}>Quiz Reports</Title>
-
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ position: "relative", margin: "-18px" }}>
         <Button
-          type={!filteredQuiz ? "primary" : "default"}
-          onClick={() => setFilteredQuiz(null)}
-          style={{ marginRight: 10 }}
-        >
-          All Quizzes
-        </Button>
-        {quizNames.map((name) => (
+          icon={<ArrowLeftOutlined />}
+          type="primary"
+          onClick={() => navigate(-1)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            // fontSize: "40px",
+            color: "white",
+          }}
+        >Back</Button>
+      </div>
+      <Card style={{ margin: 40 }}>
+        <Title level={3}>Quiz Reports</Title>
+
+        <div style={{ marginBottom: 20 }}>
           <Button
-            key={name}
-            type={filteredQuiz === name ? "primary" : "default"}
-            onClick={() => setFilteredQuiz(name)}
+            type={!filteredQuiz ? "primary" : "default"}
+            onClick={() => setFilteredQuiz(null)}
             style={{ marginRight: 10 }}
           >
-            {name}
+            All Quizzes
           </Button>
-        ))}
-      </div>
-
-      {loading ? (
-        <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
-      ) : error ? (
-        <Alert 
-          message="Error loading quiz reports" 
-          description={error.message || "Failed to fetch quiz history"} 
-          type="error" 
-          showIcon 
-        />
-      ) : !quizHistory?.quiz_history || quizHistory.quiz_history.length === 0 ? (
-        <Empty description="No quiz reports available" />
-      ) : (
-        <>
-          <Table
-            dataSource={filteredData}
-            columns={columns}
-            rowKey="id"
-            bordered
-            pagination={{ pageSize: 5 }}
-            scroll={{ x: true }}
-          />
-          
-          <Modal
-  title="Quiz Report Details"
-  visible={isModalVisible}
-  onCancel={handleCancel}
-  footer={[
-    <Button key="treatment" type="primary" onClick={() => setShowTreatModal(true)}>
-    Show Actions
-    </Button>
-  ]}
-  width={800}
->
-  {selectedReport && (
-    <div>
-      <Title level={4} style={{ color: '#1890ff' }}>Personality Type: {selectedReport.result}</Title>
-      
-      <Text strong>Date Taken: </Text>
-      <Text>{new Date(selectedReport.date_taken).toLocaleString()}</Text>
-      <br /><br />
-      
-      <Title level={5}>Quiz Summary</Title>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
-        <thead>
-          <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-            <th style={{ textAlign: 'left', padding: '8px' }}>Category</th>
-            <th style={{ textAlign: 'left', padding: '8px' }}>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedReport.category_scores && Object.entries(selectedReport.category_scores).map(([category, score]) => (
-            <tr key={category} style={{ borderBottom: '1px solid #f0f0f0' }}>
-              <td style={{ padding: '8px' }}>
-                <Tag color={getCategoryColor(category)}>
-                  <strong>{category}</strong>
-                </Tag>
-              </td>
-              <td style={{ padding: '8px' }}>{score}</td>
-            </tr>
+          {quizNames.map((name) => (
+            <Button
+              key={name}
+              type={filteredQuiz === name ? "primary" : "default"}
+              onClick={() => setFilteredQuiz(name)}
+              style={{ marginRight: 10 }}
+            >
+              {name}
+            </Button>
           ))}
-          <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-            <td style={{ padding: '8px' }}>
-              <Tag color="red">
-                <strong>Skipped</strong>
-              </Tag>
-            </td>
-            <td style={{ padding: '8px' }}>{selectedReport.skip}</td>
-          </tr>
-          <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-            <td style={{ padding: '8px' }}>
-              <Tag color="yellow">
-                <strong>Total Answered</strong>
-              </Tag>
-            </td>
-            <td style={{ padding: '8px' }}>{calculateTotalAnswered(selectedReport)}</td>
-          </tr>
-          <tr>
-            <td style={{ padding: '8px' }}>
-              <Tag color="green">
-                <strong>Total Questions</strong>
-              </Tag>
-            </td>
-            <td style={{ padding: '8px' }}>{calculateTotalQuestions(selectedReport)}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  )}
-</Modal>
+        </div>
 
-<ActionModal
-  visible={showTreatModal}
-  onClose={() => setShowTreatModal(false)}
-  userId={user?.id}
-  quizResult={selectedReport}
-/>
+        {loading ? (
+          <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
+        ) : error ? (
+          <Alert
+            message="Error loading quiz reports"
+            description={error.message || "Failed to fetch quiz history"}
+            type="error"
+            showIcon
+          />
+        ) : !quizHistory?.quiz_history || quizHistory.quiz_history.length === 0 ? (
+          <Empty description="No quiz reports available" />
+        ) : (
+          <>
+            <Table
+              dataSource={filteredData}
+              columns={columns}
+              rowKey="id"
+              bordered
+              pagination={{ pageSize: 5 }}
+              scroll={{ x: true }}
+            />
 
-        </>
-      )}
-    </Card>
+            <Modal
+              title="Quiz Report Details"
+              visible={isModalVisible}
+              onCancel={handleCancel}
+              footer={[
+                <Button key="treatment" type="primary" onClick={() => setShowTreatModal(true)}>
+                  Show Actions
+                </Button>
+              ]}
+              width={800}
+            >
+              {selectedReport && (
+                <div>
+                  <Title level={4} style={{ color: '#1890ff' }}>Personality Type: {selectedReport.result}</Title>
+
+                  <Text strong>Date Taken: </Text>
+                  <Text>{new Date(selectedReport.date_taken).toLocaleString()}</Text>
+                  <br /><br />
+
+                  <Title level={5}>Quiz Summary</Title>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <th style={{ textAlign: 'left', padding: '8px' }}>Category</th>
+                        <th style={{ textAlign: 'left', padding: '8px' }}>Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedReport.category_scores && Object.entries(selectedReport.category_scores).map(([category, score]) => (
+                        <tr key={category} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                          <td style={{ padding: '8px' }}>
+                            <Tag color={getCategoryColor(category)}>
+                              <strong>{category}</strong>
+                            </Tag>
+                          </td>
+                          <td style={{ padding: '8px' }}>{score}</td>
+                        </tr>
+                      ))}
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '8px' }}>
+                          <Tag color="red">
+                            <strong>Skipped</strong>
+                          </Tag>
+                        </td>
+                        <td style={{ padding: '8px' }}>{selectedReport.skip}</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '8px' }}>
+                          <Tag color="yellow">
+                            <strong>Total Answered</strong>
+                          </Tag>
+                        </td>
+                        <td style={{ padding: '8px' }}>{calculateTotalAnswered(selectedReport)}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '8px' }}>
+                          <Tag color="green">
+                            <strong>Total Questions</strong>
+                          </Tag>
+                        </td>
+                        <td style={{ padding: '8px' }}>{calculateTotalQuestions(selectedReport)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Modal>
+
+            <ActionModal
+              visible={showTreatModal}
+              onClose={() => setShowTreatModal(false)}
+              userId={user?.id}
+              quizResult={selectedReport}
+            />
+
+          </>
+        )}
+      </Card>
     </>
   );
 };

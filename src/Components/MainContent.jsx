@@ -27,6 +27,8 @@ import AddTreatment from "../pages/AddTreatment.jsx";
 import OngoingCounTreatment from "../pages/OngoingCounTreatment.jsx";
 import DemoMainContent from "../Demo/Components/DemoMainContent.jsx";
 import MindfulnessPage from "../pages/MindFulnessPage.jsx";
+import NotAuthorized from "../pages/NotAuthorized.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 
 const MainContent = () => {
   return (
@@ -37,7 +39,15 @@ const MainContent = () => {
       <Route path="/about" element={<About />} />
       <Route path="/codes" element={<Codes />} />
       <Route path="/profile" element={<Profile />}></Route>
-      <Route path="/users" element={<Users />}></Route>
+      {/* <Route path="/users" element={<Users />}></Route> */}
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <Users />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/assessents" element={<Assessments />}></Route>
       <Route path="/report" element={<Report />}></Route>
       <Route path="/createset" element={<Createset />}></Route>
@@ -61,7 +71,8 @@ const MainContent = () => {
       <Route path="/view-results/:userId" element={<ViewResults />} />
       <Route path="/addtreatment" element={<AddTreatment />} />
       <Route path="/ongocountreatment" element={<OngoingCounTreatment />} />
-      <Route path="/mindfulness" element={<MindfulnessPage />} />
+      <Route path="/mindfulness" element={<MindfulnessPage />} />      <Route path="/not-authorized" element={<NotAuthorized />} />
+
     </Routes>
   );
 };
