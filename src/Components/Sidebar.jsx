@@ -58,7 +58,7 @@ const getSelectedKey = () => {
   ) {
     return "6";
   }
-  if (location.pathname.startsWith("/automation")) return "7";
+  if (location.pathname.startsWith("/mindfulness")) return "7";
   if (location.pathname.startsWith("/clinical")) return "8";
   if (location.pathname.startsWith("/work")) return "9";
   if (location.pathname.startsWith("/treatment")) return "10";

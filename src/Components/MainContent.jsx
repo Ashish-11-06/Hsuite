@@ -61,9 +61,7 @@ const MainContent = () => {
       <Route path="/view-results/:userId" element={<ViewResults />} />
       <Route path="/addtreatment" element={<AddTreatment />} />
       <Route path="/ongocountreatment" element={<OngoingCounTreatment />} />
-
       <Route path="/mindfulness" element={<MindfulnessPage />} />
-
     </Routes>
   );
 };

@@ -1,81 +1,82 @@
 import React, { useState } from "react";
-import { Card, Row, Col, Modal, Button } from "antd";
+import { Card, Row, Col, Modal } from "antd";
 import "./MindfulnessPage.css";
 
 const topics = [
   {
     title: "Sleep & Restfulness",
     description: [
-      "Mindful bedtime routines",
-      "Body scan meditation for better sleep",
-      "Letting go of “sleep pressure” anxiety",
-      "Breathing exercises to relax before bed",
-      "Digital detox for quality rest"
+      "Create a calming bedtime routine",
+      "Body scan meditation for deep rest",
+      "Release tension before sleep",
+      "Breathing exercises to relax",
+      "Limit screen time before bed"
     ],
-    image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=600",
-    videoUrl: "https://www.youtube.com/embed/ZToicYcHIOU"
+    image: "https://media.post.rvohealth.io/wp-content/uploads/sites/3/2022/06/go_to_sleep_easily_732x549_thumb-732x549.jpg",
+    videoUrl: "https://www.youtube.com/embed/DFEnruF-dts"
   },
   {
-    title: "Overthinking & Mental Clutter",
+    title: "Overthinking Detox",
     description: [
       "Grounding techniques to stay present",
-      "Journaling to clear your mind",
-      "Mindful observation (focusing on one thing at a time)",
-      "Learning to pause before reacting",
-      "Setting “worry time” boundaries"
+      "Journaling to clear mental clutter",
+      "Mindful observation of one thought at a time",
+      "Pause before reacting to situations",
+      "Set specific ‘worry time’ limits"
     ],
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600",
-    videoUrl: "https://www.youtube.com/embed/5bJXj5R9QYk"
+    image: "https://cdn-ilbffbh.nitrocdn.com/KlZFioVYcrbsnbuHVuaGOnGVBtqRmadn/assets/images/optimized/rev-692bf8c/simipsychologicalgroup.com/wp-content/uploads/2024/02/man-thinking-1080x675.jpg",
+    videoUrl: "https://www.youtube.com/embed/MH6uK2-ieb0"
   },
   {
-    title: "Negative Thoughts & Self-Talk",
+    title: "Reframing Negative Thoughts",
     description: [
-      "Reframing self-critical thoughts",
-      "Loving-kindness meditation (Metta)",
-      "Gratitude practice to shift focus",
-      "Noticing thought patterns without judgment",
-      "Affirmations rooted in mindfulness"
+      "Challenge and reframe self-critical thoughts",
+      "Practice loving-kindness meditation",
+      "Use gratitude to shift perspective",
+      "Observe patterns without judgment",
+      "Repeat positive affirmations daily"
     ],
-    image: "https://images.unsplash.com/photo-1499084732479-de2c02d45fc4?w=600",
-    videoUrl: "https://www.youtube.com/embed/sZP2sGyoiE8"
+    image: "https://bayareacbtcenter.com/wp-content/uploads/2024/09/Untitled-design-358-1024x791.png",
+    videoUrl: "https://www.youtube.com/embed/My3_Bmg88gE"
   },
   {
-    title: "Stress & Emotional Regulation",
+    title: "Mindful Breathing",
     description: [
-      "Mindful breathing for quick stress relief",
-      "Labeling emotions instead of suppressing them",
-      "Progressive muscle relaxation",
-      "Using the 5 senses to anchor in the moment",
-      "Mindful walking or movement"
+      "Use slow breaths to calm your mind",
+      "Box breathing for quick stress relief",
+      "Alternate nostril breathing",
+      "Focus on the rise and fall of breath",
+      "Anchor attention to breathing rhythm"
     ],
-    image: "https://images.unsplash.com/photo-1508780709619-79562169bc64?w=600",
-    videoUrl: "https://www.youtube.com/embed/inpok4MKVLM"
+    image: "https://media.post.rvohealth.io/wp-content/uploads/2019/02/Female_Sitting_Breathing_1200x628-facebook.jpg",
+    videoUrl: "https://www.youtube.com/embed/v-w-vSvi-24"
   },
   {
-    title: "Everyday Mindfulness",
+    title: "Gratitude Awareness",
     description: [
-      "Eating with awareness (mindful eating)",
-      "Mindful listening in conversations",
-      "Mindful mornings: starting your day with intention",
-      "Nature mindfulness (outdoor meditation)",
-      "Mindfulness at work to improve focus"
+      "Write down 3 things you're grateful for",
+      "Practice gratitude before meals",
+      "Appreciate small wins in daily life",
+      "Express thanks to someone daily",
+      "End the day with gratitude reflection"
     ],
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600",
-    videoUrl: "https://www.youtube.com/embed/SEfs5TJZ6Nk"
+    image: "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/a68505e0-92d3-4eb4-a9ce-f96c3776fb74/power-of-gratitude-3x2.jpg?w=600",
+    videoUrl: "https://www.youtube.com/embed/RhuhLc69hF0"
   },
   {
     title: "Grounding in the Present",
     description: [
-      "Focusing on one sense at a time",
-      "Observing surroundings without judgment",
-      "Using touch to connect with the moment",
-      "Listening to ambient sounds",
-      "Mindful walking outdoors"
+      "Focus on one sense at a time",
+      "Observe surroundings without judgment",
+      "Feel textures around you",
+      "Listen to ambient sounds",
+      "Mindfully walk outdoors"
     ],
-    image: "https://images.unsplash.com/photo-1500534314209-a26db0f5c7f9?w=600",
-    videoUrl: "https://www.youtube.com/embed/x1sQkEfAdfY"
+    image: "https://stablemassage.com.au/wp-content/uploads/2020/06/grounding-exercise-1024x683.jpg?w=600",
+    videoUrl: "https://www.youtube.com/embed/LLeqY9ingRY"
   }
 ];
+
 
 export default function MindfulnessPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -90,7 +91,7 @@ export default function MindfulnessPage() {
 
   const handleClose = () => {
     setIsModalVisible(false);
-    setSelectedVideo(""); // pause video
+    setSelectedVideo("");
     setSelectedTitle("");
   };
 
