@@ -26,4 +26,3 @@ dist-ssr
 .vercel
 
 Prushal_django.pem
-deploy.sh
