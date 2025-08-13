@@ -139,7 +139,7 @@ const toggleUserStatus = async (user) => {
 
   return (
     <>
-    <div>
+    <div style={{ padding: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Users List</h2>
         <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsAddModalVisible(true)}>

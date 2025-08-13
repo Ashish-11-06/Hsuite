@@ -126,7 +126,7 @@ const Treatment = () => {
 
   return (
     <>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "20px", marginLeft: "20px" }}>
       <h1>Predefined Treatment</h1>
       <Button type="secondary" onClick={showModal}>Help ?</Button>
 

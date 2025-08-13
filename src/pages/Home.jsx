@@ -66,7 +66,7 @@ const Home = () => {
   };
 
   return (
-    <Content style={{ position: "relative", height: "100vh", heightoverflowY: "hidden", overflowX: "hidden"}}>
+    <Content style={{ position: "relative", height: "calc(100vh - 60px)", heightoverflowY: "hidden", overflowX: "hidden" }}>
       {/* Background image layer */}
       <div
         style={{
@@ -75,17 +75,18 @@ const Home = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundImage: `url("/home.jpg")`, // public folder image
+          backgroundImage: `url("https://thevillageshealth.com/wp-content/uploads/2020/12/Mindfulness-1.jpg")`, // URL wrapped in url()
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "brightness(0.6)", // dims only background
+          filter: "brightness(0.6)", // dims only the background
           zIndex: 0,
         }}
+
       />
 
       {/* Foreground content */}
-      <div style={{ position: "relative", zIndex: 1, padding: "60px", height: "100%" , overflow: "hidden"}}>
+      <div style={{ position: "relative", zIndex: 1, padding: "60px", height: "100%", overflow: "hidden" }}>
         <Row gutter={[10]} align="start">
           <Col>
             <Link to="/books">
