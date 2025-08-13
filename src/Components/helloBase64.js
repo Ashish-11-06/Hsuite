@@ -1,0 +1,3 @@
+// helloBase64.js
+export const helloBase64 =
+"UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUQAAABEQkQ6y0NDQkNDP/79v3/+/f7+8fHx8e/v7/Pz8/Pu7u7r6+vr5+fn4+Pj39/f29vb19fX09PTz8/Py8vLx8fHw8PDv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj39/f3d3d29vb19fX09PTy8vLx8fHv7+/u7u7t7e3s7Ozr6+vp6enp5eXl4+Pj3";

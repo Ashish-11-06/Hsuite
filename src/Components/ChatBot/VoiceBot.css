@@ -1,0 +1,80 @@
+.voicebot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+.voicebot-toggle {
+  background: #0078ff;
+  color: white;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  transition: background 0.2s;
+}
+.voicebot-toggle:hover {
+  background: #005fcc;
+}
+
+.voicebot-window {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.voicebot-header {
+  background: #0078ff;
+  color: white;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voicebot-messages {
+  padding: 15px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.voicebot-message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+.voicebot-message.user {
+  background: #0078ff;
+  color: white;
+  align-self: flex-end;
+}
+.voicebot-message.bot {
+  background: #f1f1f1;
+  color: #333;
+  align-self: flex-start;
+}
+
+.voicebot-controls {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+}
+
+.mic-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}

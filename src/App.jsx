@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import { Layout } from "antd";
 import { Navigate } from "react-router-dom";
 import HeaderComponent from "./Components/HeaderComponent.jsx";
-import FooterComponent from "./Components/FooterComponent.jsx";
 import MainContent from "./Components/MainContent.jsx";
 import "./App.css";
 import Login from "./pages/Login.jsx";
@@ -23,6 +22,7 @@ import PatientMainContent from "./Demo/Components/PatientMainContent.jsx";
 import ProtectedRoutePatient from "./Demo/Components/ProtectedRoutePatient.jsx";
 import PatientHeader from "./Demo/Components/PatientHeader.jsx";
 import WebSiteRoute from "./website/websiteRoute.jsx";
+import VoiceBot from "./Components/ChatBot/VoiceBot.jsx";
 
 const { Header, Content, Footer } = Layout;
 
@@ -91,7 +91,6 @@ function App() {
     <Router>
       {/* Add inactivity check inside Router so we can use navigate */}
       <InactivityHandler />
-
       <Routes>
         {/* 🔑 Main Login Route */}
         <Route

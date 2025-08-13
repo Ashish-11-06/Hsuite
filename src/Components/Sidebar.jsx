@@ -139,6 +139,10 @@ const getSelectedKey = () => {
           <Link to="/work">Work Organisation</Link>
         </Menu.Item> */}
 
+         <Menu.Item key="7" icon={<AuditOutlined />} title="Mindfulness">
+          <Link to="/mindfulness">Mindfulness</Link>
+        </Menu.Item>
+
 
         {userRole === "Admin" && (
           <Menu.Item key="5" icon={<TeamOutlined />}>

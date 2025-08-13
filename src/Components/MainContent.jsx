@@ -26,6 +26,7 @@ import ViewResults from "../pages/ViewResults.jsx";
 import AddTreatment from "../pages/AddTreatment.jsx";
 import OngoingCounTreatment from "../pages/OngoingCounTreatment.jsx";
 import DemoMainContent from "../Demo/Components/DemoMainContent.jsx";
+import MindfulnessPage from "../pages/MindFulnessPage.jsx";
 
 const MainContent = () => {
   return (
@@ -57,9 +58,11 @@ const MainContent = () => {
       <Route path="/therapy" element={<Therapies />} />
       <Route path="/therapies/:counsellorId" element={<Therapies />} />
       <Route path="/viewresult" element={<ViewResults />} />
-      <Route path="//view-results/:userId" element={<ViewResults />} />
+      <Route path="/view-results/:userId" element={<ViewResults />} />
       <Route path="/addtreatment" element={<AddTreatment />} />
       <Route path="/ongocountreatment" element={<OngoingCounTreatment />} />
+
+      <Route path="/mindfulness" element={<MindfulnessPage />} />
 
     </Routes>
   );
