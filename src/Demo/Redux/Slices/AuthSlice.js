@@ -8,6 +8,7 @@ export const postUserRegistration = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await AuthApi.UserRegistration(formData);
+      message.success(response.data.message || "Registeration successful!");
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error during registration");

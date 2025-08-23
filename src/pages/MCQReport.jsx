@@ -180,7 +180,9 @@ const MCQReport = () => {
 
   return (
     <>
-    <div style={{ position: "relative", margin: "-18px" }}>
+    
+    <Card style={{ margin: 40 }}>
+      <div style={{ position: "relative", margin: "10px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"
@@ -194,8 +196,9 @@ const MCQReport = () => {
     }}
   >Back</Button>
 </div>
-    <Card style={{ margin: 40 }}>
-      <Title level={3}>MCQ Performance Report</Title>
+      <Title level={3}
+      style={{ textAlign: 'center', marginBottom: '20px' }}
+      >MCQ Performance Report</Title>
       {loading ? (
         <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />
       ) : !results?.length ? (

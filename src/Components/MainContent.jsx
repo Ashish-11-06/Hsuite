@@ -1,4 +1,4 @@
-import { Routes, Route, Router } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Books from "../pages/Books.jsx";
@@ -25,20 +25,230 @@ import Therapies from "../pages/Therapies.jsx";
 import ViewResults from "../pages/ViewResults.jsx";
 import AddTreatment from "../pages/AddTreatment.jsx";
 import OngoingCounTreatment from "../pages/OngoingCounTreatment.jsx";
-import DemoMainContent from "../Demo/Components/DemoMainContent.jsx";
-import NotAuthorized from "../pages/NotAuthorized.jsx";
+import MindfulnessPage from "../pages/MindFulnessPage.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import MedicalProtectedRoute from "./MedicalProtectedRoute.jsx";
+import MHHome from "../pages/MHHome.jsx";
+import MindVideo from "../pages/MindVideo.jsx";
+import Blog from "../pages/Blog.jsx";
+import MHProfile from "../pages/MHProfile.jsx";
 
-const MainContent = () => {
+const MainContent = ({ isMedical }) => {
+  if (isMedical) {
+    // 🔹 only for /medicalHealth/*
+    return (
+      <Routes>
+        {/* Public routes */}
+        <Route index element={<MHHome />} />
+        <Route path="mindfulness" element={<MindfulnessPage />} />
+        <Route path="mindvideo" element={<MindVideo />} />
+        <Route path="blog" element={<Blog />} />
+
+        {/* Protected routes */}
+        <Route
+          path="assessment"
+          element={
+            <MedicalProtectedRoute>
+              <Assessment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="createset"
+          element={
+            <MedicalProtectedRoute>
+              <Createset />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="assessments"
+          element={
+            <MedicalProtectedRoute>
+              <Assessments />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="report"
+          element={
+            <MedicalProtectedRoute>
+              <Report />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="createmcq"
+          element={
+            <MedicalProtectedRoute>
+              <CreateMCQ />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="mcqtest"
+          element={
+            <MedicalProtectedRoute>
+              <MCQTest />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="mcqreport"
+          element={
+            <MedicalProtectedRoute>
+              <MCQReport />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="createegogram"
+          element={
+            <MedicalProtectedRoute>
+              <CreateEgogram />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="testegogram"
+          element={
+            <MedicalProtectedRoute>
+              <EgogramTest />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="egogramreport"
+          element={
+            <MedicalProtectedRoute>
+              <EgogramReport />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="automation"
+          element={
+            <MedicalProtectedRoute>
+              <CodingAutomation />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="clinical"
+          element={
+            <MedicalProtectedRoute>
+              <ClinicalNotes />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="work"
+          element={
+            <MedicalProtectedRoute>
+              <WorkOrganisation />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="treatment"
+          element={
+            <MedicalProtectedRoute>
+              <Treatment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="treatment/:treatmentId"
+          element={
+            <MedicalProtectedRoute>
+              <Treatment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="counsellor"
+          element={
+            <MedicalProtectedRoute>
+              <Counsellor />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="counsellortreatment"
+          element={
+            <MedicalProtectedRoute>
+              <CounsellorTreatment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="therapy"
+          element={
+            <MedicalProtectedRoute>
+              <Therapies />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="therapies/:counsellorId"
+          element={
+            <MedicalProtectedRoute>
+              <Therapies />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="viewresult"
+          element={
+            <MedicalProtectedRoute>
+              <ViewResults />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="view-results/:userId"
+          element={
+            <MedicalProtectedRoute>
+              <ViewResults />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="addtreatment"
+          element={
+            <MedicalProtectedRoute>
+              <AddTreatment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+          path="ongocountreatment"
+          element={
+            <MedicalProtectedRoute>
+              <OngoingCounTreatment />
+            </MedicalProtectedRoute>
+          }
+        />
+        <Route
+        path="mhprofile"
+        element={
+          <MedicalProtectedRoute>
+            <MHProfile />
+          </MedicalProtectedRoute>
+        }
+         />
+      </Routes>
+    );
+  }
+
+  // 🔹 default (non-medical)
   return (
     <Routes>
-      {/* <Route path="/login" element={<Login />}/> */}
       <Route path="/" element={<Home />} />
-      <Route path="/books" element={<Books />} />
       <Route path="/about" element={<About />} />
+      <Route path="/books" element={<Books />} />
       <Route path="/codes" element={<Codes />} />
-      <Route path="/profile" element={<Profile />}></Route>
-      {/* <Route path="/users" element={<Users />}></Route> */}
+      <Route path="/profile" element={<Profile />} />
       <Route
         path="/users"
         element={
@@ -47,31 +257,6 @@ const MainContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/assessents" element={<Assessments />}></Route>
-      <Route path="/report" element={<Report />}></Route>
-      <Route path="/createset" element={<Createset />}></Route>
-      <Route path="/createmcq" element={<CreateMCQ />}></Route>
-      <Route path="/mcqtest" element={<MCQTest />}></Route>
-      <Route path="/mcqreport" element={<MCQReport />}></Route>
-      <Route path="/assessment" element={<Assessment />}/>
-      <Route path="/createegogram" element={<CreateEgogram />}/>
-      <Route path="/testegogram" element={<EgogramTest />}/>
-      <Route path="/egogramreport" element={<EgogramReport />}/>
-      <Route path="/automation" element={<CodingAutomation />} />
-      <Route path="/clinical" element={<ClinicalNotes />} />
-      <Route path="/work" element={< WorkOrganisation />} />
-      <Route path="/treatment" element={<Treatment />} />
-      <Route path="/treatment/:treatmentId" element={<Treatment />} />
-      <Route path="/counsellor" element={<Counsellor />} />
-      <Route path="/counsellortreatment" element={<CounsellorTreatment />} />
-      <Route path="/therapy" element={<Therapies />} />
-      <Route path="/therapies/:counsellorId" element={<Therapies />} />
-      <Route path="/viewresult" element={<ViewResults />} />
-      <Route path="//view-results/:userId" element={<ViewResults />} />
-      <Route path="/addtreatment" element={<AddTreatment />} />
-      <Route path="/ongocountreatment" element={<OngoingCounTreatment />} />
-      <Route path="/not-authorized" element={<NotAuthorized />} />
-
     </Routes>
   );
 };

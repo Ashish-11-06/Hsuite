@@ -43,7 +43,7 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await authAPI.loginUser(credentials);
       //console.log("🔹 Login Response:", response.data);
-      
+
       if (!response.data || !response.data.token || !response.data.user) {
         return rejectWithValue("Invalid login response");
       }
@@ -69,9 +69,9 @@ export const sendResetOTP = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: 
-        error.response?.data?.message || 
-        error.response?.data.error ||"Failed to send OTP",
+        message:
+          error.response?.data?.message ||
+          error.response?.data.error || "Failed to send OTP",
         error: error.response?.data
       });
     }
@@ -92,7 +92,7 @@ export const verifyResetOTP = createAsyncThunk(
     } catch (error) {
       return rejectWithValue({
         message: error.response?.data?.message ||
-        error.response?.data.error || "OTP verification failed",
+          error.response?.data.error || "OTP verification failed",
         error: error.response?.data
       });
     }
@@ -112,8 +112,8 @@ export const resetPassword = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue({
-        message: error.response?.data?.message || 
-        error.response?.data.error ||"Password reset failed",
+        message: error.response?.data?.message ||
+          error.response?.data.error || "Password reset failed",
         error: error.response?.data
       });
     }
@@ -122,8 +122,8 @@ export const resetPassword = createAsyncThunk(
 
 //Counsellor thunk
 export const CompleteCounsellorProfile = createAsyncThunk(
-  "auth/completeCounsellorProfile", 
-  async(profileData, { rejectWithValue}) => {
+  "auth/completeCounsellorProfile",
+  async (profileData, { rejectWithValue }) => {
     try {
       const response = await authAPI.CompleteCounsellor(profileData);
       return response.data;
@@ -138,16 +138,25 @@ export const UpdateCounsellorProfile = createAsyncThunk(
   "auth/updateCounsellorProfile",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      // console.log('Sending to API - ID:', id);
-      // console.log('Sending to API - Data:', data);
-      
       const response = await authAPI.UpdateCounsellorProfile(id, data);
-      
-      // console.log('API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('API error:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data || "Failed to update profile");
+    }
+  }
+);
+
+export const getDashboardStats = createAsyncThunk(
+  "dashboard/getStats",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.GetDashboard();
+      return response.data; // ✅ directly returning stats data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch dashboard stats"
+      );
     }
   }
 );
@@ -173,10 +182,10 @@ const authSlice = createSlice({
       step: 1 // 1 = email, 2 = OTP, 3 = new password
     },
     updateCounsellorProfile: {
-  loading: false,
-  success: false,
-  error: null
-},
+      loading: false,
+      success: false,
+      error: null
+    },
 
   },
   reducers: {
@@ -235,24 +244,24 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.currentUserId = action.payload.id; 
-    
+        state.currentUserId = action.payload.id;
+
         //console.log("🔹 Login Successful:", action.payload); // Debugging Log
-    
+
         localStorage.setItem("token", action.payload.token); // 🛠 Ensure token is stored
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         // 🏥 Store hospital ID
         localStorage.setItem("role", action.payload.user.role);
-    
+
         window.location.href = "/"; // 🔥 Force Redirect After Login
-    })
-    
+      })
+
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-     // Send Reset OTP
+      // Send Reset OTP
       .addCase(sendResetOTP.pending, (state) => {
         state.resetPassword.loading = true;
         state.resetPassword.error = null;
@@ -299,30 +308,43 @@ const authSlice = createSlice({
       .addCase(CompleteCounsellorProfile.pending, (state) => {
         state.counsellorProfile.loading = true;
         state.counsellorProfile.error = null;
-        state.counsellorProfile.success= false;
+        state.counsellorProfile.success = false;
       })
       .addCase(CompleteCounsellorProfile.fulfilled, (state) => {
         state.counsellorProfile.loading = false;
         state.counsellorProfile.success = true;
       })
-      .addCase(CompleteCounsellorProfile.rejected, (state,action) => {
+      .addCase(CompleteCounsellorProfile.rejected, (state, action) => {
         state.counsellorProfile.loading = false;
         state.counsellorProfile.error = action.payload || "failed to complete profile";
       })
 
       .addCase(UpdateCounsellorProfile.pending, (state) => {
-  state.updateCounsellorProfile.loading = true;
-  state.updateCounsellorProfile.error = null;
-  state.updateCounsellorProfile.success = false;
-})
-.addCase(UpdateCounsellorProfile.fulfilled, (state) => {
-  state.updateCounsellorProfile.loading = false;
-  state.updateCounsellorProfile.success = true;
-})
-.addCase(UpdateCounsellorProfile.rejected, (state, action) => {
-  state.updateCounsellorProfile.loading = false;
-  state.updateCounsellorProfile.error = action.payload || "Failed to update profile";
-})
+        state.updateCounsellorProfile.loading = true;
+        state.updateCounsellorProfile.error = null;
+        state.updateCounsellorProfile.success = false;
+      })
+      .addCase(UpdateCounsellorProfile.fulfilled, (state) => {
+        state.updateCounsellorProfile.loading = false;
+        state.updateCounsellorProfile.success = true;
+      })
+      .addCase(UpdateCounsellorProfile.rejected, (state, action) => {
+        state.updateCounsellorProfile.loading = false;
+        state.updateCounsellorProfile.error = action.payload || "Failed to update profile";
+      })
+
+      .addCase(getDashboardStats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getDashboardStats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats = action.payload;
+      })
+      .addCase(getDashboardStats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
 
   },
 });

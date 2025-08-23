@@ -42,7 +42,7 @@ const AddPrescriptionModal = ({ open, onClose, patientId, userId }) => {
       if (!patients.length) dispatch(fetchAllPatients());
       if (!users.length) dispatch(GetAllUsers());
     }
-  }, [open, dispatch, pharmacyMedicines]);
+  }, [open, dispatch]);
 
   useEffect(() => {
     if (!open) {

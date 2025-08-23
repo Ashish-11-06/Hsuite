@@ -61,7 +61,7 @@ const Pharmacy = () => {
             });
             setEditablePrescriptions(editable);
         } catch (error) {
-            message.error("Failed to fetch pharmacy bills");
+            // message.error("Failed to fetch pharmacy bills");
             setPrescriptions([]);
         } finally {
             setLoadingPrescriptions(false);

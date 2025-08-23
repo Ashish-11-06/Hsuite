@@ -10,7 +10,12 @@ const AddCurrentHospitalModal = ({ visible, onClose, patientId, onSuccess }) => 
   const [form, setForm] = useState({ diagnosis_name: "", doctor: null });
   const { users } = useSelector((state) => state.users);
 
-  const doctorOptions = users?.filter((user) => user.designation === "doctor");
+  // const doctorOptions = users?.filter((user) => user.designation === "doctor");
+
+  const doctorOptions = Array.isArray(users)
+  ? users.filter((user) => user.designation === "doctor")
+  : users?.results?.filter((user) => user.designation === "doctor") || [];
+
 
   const handleSubmit = async () => {
     if (!form.diagnosis_name || !form.doctor) {

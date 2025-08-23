@@ -43,7 +43,7 @@ const MCQTest = () => {
 
   return (
     <>
-     <div style={{ position: "relative", margin: "-18px" }}>
+     <div style={{ position: "relative", margin: "20px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"

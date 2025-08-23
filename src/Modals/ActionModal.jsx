@@ -13,7 +13,7 @@ const ActionModal = ({ visible, onClose, quizResult, userId }) => {
   };
 
   const handleCounsellorClick = () => {
-    navigate("/counsellor", { state: { quizResult, userId } });
+    navigate("/medicalHealth/counsellor", { state: { quizResult, userId } });
     onClose();
   };
 

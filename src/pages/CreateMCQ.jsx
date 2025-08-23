@@ -189,7 +189,7 @@ const CreateMCQ = () => {
 
   return (
     <>
-   <div style={{ position: "relative", margin: "-18px" }}>
+   <div style={{ position: "relative", margin: "20px" }}>
   <Button
     icon={<ArrowLeftOutlined />}
     type="primary"
@@ -204,8 +204,9 @@ const CreateMCQ = () => {
   >Back</Button>
 </div>
     <div style={{ 
-      maxWidth: "1200px", 
-      margin: "40px auto",
+      // maxWidth: "1200px", 
+      margin: "40px",
+      marginTop: "70px",
       padding: "0 20px",
       minHeight: "calc(100vh - 40px)"
     }}>

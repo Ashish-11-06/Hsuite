@@ -13,10 +13,12 @@ const Report = () => {
   const navigate = useNavigate();
   const { data: quizHistory, loading, error } = useSelector((state) => state.quiz);
   const [filteredQuiz, setFilteredQuiz] = useState(null);
-  const { user } = useSelector((state) => state.auth);
+  // const { user } = useSelector((state) => state.mhAuth);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showTreatModal, setShowTreatModal] = useState(false);
+  const user = JSON.parse(localStorage.getItem("medicalUser"));
+  const User = user?.id || null;
 
   useEffect(() => {
     dispatch(getQuizReportHistory());
@@ -24,6 +26,7 @@ const Report = () => {
 
   useEffect(() => {
     if (user?.id) {
+      // console.log("✅ Dispatching with User ID:", user.id);
       dispatch(getQuizReportHistory());
     }
   }, [dispatch, user?.id]);
@@ -49,6 +52,7 @@ const Report = () => {
       </Card>
     );
   }
+ 
 
   const quizNames = quizHistory?.quiz_history
     ? [...new Set(quizHistory.quiz_history.map(item => item.quiz_name))]
@@ -160,7 +164,9 @@ const Report = () => {
 
   return (
     <>
-      <div style={{ position: "relative", margin: "-18px" }}>
+     
+      <Card style={{ margin: 40 }}>
+         <div style={{ position: "relative" }}>
         <Button
           icon={<ArrowLeftOutlined />}
           type="primary"
@@ -173,10 +179,12 @@ const Report = () => {
             color: "white",
           }}
         >Back</Button>
-      </div>
-      <Card style={{ margin: 40 }}>
-        <Title level={3}>Quiz Reports</Title>
+         <Title level={3} 
+         style={{ textAlign: 'center', marginBottom: '20px' }}>
+         Quiz Reports</Title>
 
+      </div>
+       
         <div style={{ marginBottom: 20 }}>
           <Button
             type={!filteredQuiz ? "primary" : "default"}

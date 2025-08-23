@@ -40,6 +40,10 @@ const authAPI = {
       'Content-Type': 'multipart/form-data'
     }
   });
+  },
+
+  GetDashboard: () => {
+    return axiosInstance.get('books/dashboard-stats/');
   }
 };
 

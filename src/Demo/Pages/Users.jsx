@@ -114,7 +114,7 @@ const Users = () => {
         </Button>
       }
     >
-      <Table rowKey="id" columns={columns} dataSource={users} loading={loading} />
+      <Table rowKey="id" columns={columns} dataSource={Array.isArray(users) ? users : []} loading={loading} />
       <AddUserModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
       <EditUsersModal
         visible={isEditVisible}

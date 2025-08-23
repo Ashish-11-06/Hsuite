@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Table, Typography, Spin, Alert, Button, Space, Popconfirm, message, Input } from "antd";
 import { fetchBooks, deleteBook } from "../Redux/Slices/bookSlice";
-import {EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import AddBookModal from "../Modals/AddBookModal";
 import EditBookModal from "../Modals/EditBookModal"; // Import edit modal
 
@@ -13,7 +13,7 @@ const Books = () => {
   const { books, status, error } = useSelector((state) => state.books);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for Add modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for Edit modal
-   const currentUser = useSelector((state) => state.auth.user);
+  const currentUser = useSelector((state) => state.auth.user);
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing
   const [searchTerm, setSearchTerm] = useState(""); // 🔍 Add search term state
 
@@ -44,11 +44,11 @@ const Books = () => {
       .catch(() => message.error("Failed to delete book"));
   };
 
-    // 🔍 Filter books based on search term
-    const filteredBooks = books.filter((book) =>
-      book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  // 🔍 Filter books based on search term
+  const filteredBooks = books.filter((book) =>
+    book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     book.version.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  );
 
   // Define table columns
   const columns = [
@@ -61,13 +61,28 @@ const Books = () => {
       }),
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      onHeaderCell: () => ({
-        style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
-      }),
-    },
+  title: "Name",
+  dataIndex: "name",
+  key: "name",
+  render: (text) => {
+    const words = text.split(" ");
+    const chunked = [];
+    for (let i = 0; i < words.length; i += 5) {
+      chunked.push(words.slice(i, i + 5).join(" "));
+    }
+    return (
+      <span>
+        {chunked.map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+      </span>
+    );
+  },
+  onHeaderCell: () => ({
+    style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" },
+  }),
+},
+
     {
       title: "Author",
       dataIndex: "author",
@@ -81,17 +96,17 @@ const Books = () => {
       title: "Code Sets", // 📌 Add Code Sets Column
       dataIndex: "code_sets",
       key: "code_sets",
-      render: (code_sets) => 
-       // code_sets?.length > 0 ? code_sets.map((set) => set.name).join(", ") : "No Code Sets",
-      code_sets?.length > 0 ? (
-        <ul style={{ paddingLeft: 20, margin: 0 }}>
-          {code_sets.map((set, index) => (
-            <li key={index}>{set.name}</li>
-          ))}
-        </ul>
-      ) : (
-        "No Code Sets"
-      ),
+      render: (code_sets) =>
+        // code_sets?.length > 0 ? code_sets.map((set) => set.name).join(", ") : "No Code Sets",
+        code_sets?.length > 0 ? (
+          <ul style={{ paddingLeft: 20, margin: 0 }}>
+            {code_sets.map((set, index) => (
+              <li key={index}>{set.name}</li>
+            ))}
+          </ul>
+        ) : (
+          "No Code Sets"
+        ),
       onHeaderCell: () => ({
         style: { backgroundColor: "#d9f7be", fontWeight: "bold", textAlign: "center" }, // Light green header
       }),
@@ -116,9 +131,9 @@ const Books = () => {
       render: (text, record) => (
         <Space>
           {/* Contributor & Admin can edit */}
-          <Button 
-          icon={<EditOutlined />}
-            type="primary" 
+          <Button
+            icon={<EditOutlined />}
+            type="primary"
             onClick={() => showEditModal(record)}
             style={{ backgroundColor: "#ff9f00", borderColor: "#ff9f00", color: "black" }}
           >
@@ -133,10 +148,10 @@ const Books = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button 
-              icon={<DeleteOutlined />}
-              type="primary" 
-              style={{ backgroundColor: "#d90027", borderColor: "#d90027" }}>
+              <Button
+                icon={<DeleteOutlined />}
+                type="primary"
+                style={{ backgroundColor: "#d90027", borderColor: "#d90027" }}>
                 Delete
               </Button>
             </Popconfirm>
@@ -144,31 +159,42 @@ const Books = () => {
         </Space>
       ),
     });
-    
+
   }
-  
+
   return (
     <div style={{ padding: 20 }}>
       <Title level={2}>Books List</Title>
 
-       {/* 🔍 Search Bar */}
-       <Input
-        placeholder="Search books by name or version..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginBottom: 16, width: "300px", marginRight: "65%" }}
-      />
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          alignItems: "center",
+          marginBottom: 16
+        }}
+      >
 
-      {/* Button to open the modal */}
-      {(userRole === "Admin" || userRole === "Edit") && (
-      <Button 
-      icon ={<PlusOutlined />}
-      type="primary" 
-      onClick={showModal} s
-      tyle={{ marginBottom: 20 }}>
-        Add Book
-      </Button>
-      )}
+        {/* 🔍 Search Bar */}
+        <Input
+          placeholder="Search books by name or version..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ marginBottom: 16, width: "300px", marginRight: "65%" }}
+        />
+
+        {/* Button to open the modal */}
+        {(userRole === "Admin" || userRole === "Edit") && (
+          <Button
+            icon={<PlusOutlined />}
+            type="primary"
+            onClick={showModal} s
+            tyle={{ marginBottom: 20 }}>
+            Add Book
+          </Button>
+        )}
+      </div>
 
       {/* Show loading spinner */}
       {status === "loading" && <Spin size="large" style={{ display: "block", margin: "20px auto" }} />}
@@ -178,15 +204,16 @@ const Books = () => {
 
       {/* Show table when data is available */}
       {status === "succeeded" && (
-        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered 
-        style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
+        <Table columns={columns} dataSource={filteredBooks.map((book, index) => ({ ...book, key: index, updated_by: book.updated_by }))} bordered
+          scroll={{ x: "max-content" }}
+          style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}
         />
       )}
 
       {/* Add Book Modal */}
-      <AddBookModal open={isModalOpen} onClose={() => setIsModalOpen(false)} 
-       loggedInUserId={currentUser?.id} 
-        />
+      <AddBookModal open={isModalOpen} onClose={() => setIsModalOpen(false)}
+        loggedInUserId={currentUser?.id}
+      />
 
       {/* Edit Book Modal */}
       {selectedBook && (

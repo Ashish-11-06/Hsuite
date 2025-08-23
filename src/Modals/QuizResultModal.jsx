@@ -10,35 +10,59 @@ const { Title, Text } = Typography;
 const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
   const dispatch = useDispatch();
   const { quizResults, resultsLoading, resultsError } = useSelector((state) => state.quiz);
-  const { user } = useSelector((state) => state.auth);
+  // const { user } = useSelector((state) => state.auth);
+  const user = JSON.parse(localStorage.getItem("medicalUser"));
+  const User = user?.id || null;
 
   const [predefinedTreatModalVisible, setPredefinedTreatModalVisible] = useState(false);
 
-  useEffect(() => {
-    if (visible && questions?.length > 0) {
-      dispatch(resetResultsState());
+  // useEffect(() => {
+  //   if (visible && questions?.length > 0) {
+  //     dispatch(resetResultsState());
 
-      if (!user?.id) {
-        console.error("User not authenticated");
-        return;
-      }
+  //     if (!user?.id) {
+  //       console.error("User not authenticated");
+  //       return;
+  //     }
 
-      const answers = questions.map((question) => ({
-        question_id: question.id,
-        selected_category: selectedAnswers[question.id]
-          ? `category_${selectedAnswers[question.id].split("_")[1]}`
-          : "",
-      }));
+  //     const answers = questions.map((question) => ({
+  //       question_id: question.id,
+  //       selected_category: selectedAnswers[question.id]
+  //         ? `category_${selectedAnswers[question.id].split("_")[1]}`
+  //         : "",
+  //     }));
 
-      dispatch(
-        submitQuizResults({
-          quiz_id: questions[0].quiz,
-          answers,
-          user_id: user.id,
-        })
-      );
-    }
-  }, [visible, questions, selectedAnswers, dispatch, user]);
+  //     dispatch(
+  //       submitQuizResults({
+  //         quiz_id: questions[0].quiz,
+  //         answers,
+  //         user_id: user.id,
+  //       })
+        
+  //     );
+  //     console.log("Submitting quiz results for user ID:", user.id);
+  //   }
+  // }, [visible, questions, selectedAnswers, dispatch, user]);
+
+useEffect(() => {
+  if (visible && questions?.length > 0 && user?.id) {
+    const answers = questions.map((question) => ({
+      question_id: question.id,
+      selected_category: selectedAnswers[question.id]
+        ? `category_${selectedAnswers[question.id].split("_")[1]}`
+        : "",
+    }));
+
+    dispatch(
+      submitQuizResults({
+        quiz_id: questions[0].quiz,
+        answers,
+        user_id: user.id,
+      })
+    );
+  }
+}, [visible]); // ✅ runs only when modal opens
+
 
   useEffect(() => {
     return () => {
@@ -83,32 +107,32 @@ const QuizResultModal = ({ visible, onClose, questions, selectedAnswers }) => {
     });
 
     const chartData = Object.entries(categoryScores).map(([key, value]) => ({
-  category: key,
-  score: value,
-}));
+      category: key,
+      score: value,
+    }));
 
-const chartConfig = {
-  data: chartData,
-  xField: 'category',
-  yField: 'score',
- height: 350,
-    smooth: true,
-    area: {
-      style: {
-        fill: 'rgb(230, 247, 255)',
-        fillOpacity: 1,
+    const chartConfig = {
+      data: chartData,
+      xField: 'category',
+      yField: 'score',
+      height: 350,
+      smooth: true,
+      area: {
+        style: {
+          fill: 'rgb(230, 247, 255)',
+          fillOpacity: 1,
+        },
       },
-    },
-};
+    };
 
 
     return (
       <div>
-         {/* Chart Section */}
-    <div style={{ marginBottom: 20 }}>
-      <Title level={4}>Category Scores Overview</Title>
-      <Line {...chartConfig} />
-    </div>
+        {/* Chart Section */}
+        <div style={{ marginBottom: 20 }}>
+          <Title level={4}>Category Scores Overview</Title>
+          <Line {...chartConfig} />
+        </div>
 
         <Card style={{ marginBottom: 20 }}>
           <Title level={4} style={{ color: "#1890ff" }}>
@@ -189,8 +213,8 @@ const chartConfig = {
           <>
             {renderResults()}
             <div style={{ textAlign: "right", marginTop: 20 }}>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 onClick={() => setPredefinedTreatModalVisible(true)}
                 disabled={!quizResults}
               >
@@ -201,13 +225,13 @@ const chartConfig = {
           </>
         )}
       </Modal>
-      
+
       <ActionModal
-  visible={predefinedTreatModalVisible}
-  onClose={() => setPredefinedTreatModalVisible(false)}
-  quizResult={quizResults}
-  userId={user?.id}
-/>
+        visible={predefinedTreatModalVisible}
+        onClose={() => setPredefinedTreatModalVisible(false)}
+        quizResult={quizResults}
+        userId={user?.id}
+      />
 
     </>
   );

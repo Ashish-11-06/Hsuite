@@ -113,7 +113,7 @@ const AddPerticularsModal = ({ open, onClose, onSubmit, patientId }) => {
     }));
 
     const body = {
-      patient_id: patientId,
+      patient_id: patientId.id,
       perticulars: perticularsPayload,
     };
 

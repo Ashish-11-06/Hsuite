@@ -8,43 +8,41 @@ import {
   UsergroupAddOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import codeAPIs from "../Redux/API/codeApi";
-import userAPI from "../Redux/API/userApi";
+import { useDispatch, useSelector } from "react-redux";
+import { getDashboardStats } from "../Redux/Slices/authSlice";
 
 const { Title } = Typography;
 const { Content } = Layout;
 
 const Home = () => {
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
-  const user_id = currentUser?.id;
 
-  const [bookCount, setBookCount] = useState(0);
-  const [codeCount, setCodeCount] = useState(0);
-  const [userCount, setUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    books_count: 0,
+    codes_count: 0,
+    total_users_count: 0,
+    counsellors_count: 0,
+  });
 
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchStats = async () => {
       try {
-        const booksResponse = await codeAPIs.getBooks();
-        const codesResponse = await codeAPIs.getCodes(user_id);
-        const usersResponse = await userAPI.getUsers();
-
-        setBookCount(booksResponse.data.length);
-        setCodeCount(codesResponse.data.length);
-        setUserCount(usersResponse.data.length);
-      } catch (error) {
-        message.error("Failed to load data");
+        setLoading(true);
+        const result = await dispatch(getDashboardStats()).unwrap();
+        setStats(result); // result will be your API response
+      } catch (err) {
+        message.error(err?.message || "Failed to fetch dashboard stats");
       } finally {
         setLoading(false);
       }
     };
-    fetchCounts();
-  }, [user_id]);
+    fetchStats();
+  }, [dispatch]);
 
   const cardStyle = {
-    width: "200px",
+    width: "100%",
     height: "150px",
     backgroundColor: "rgb(223, 246, 255)",
     color: "#000",
@@ -66,8 +64,14 @@ const Home = () => {
   };
 
   return (
-    <Content style={{ position: "relative", height: "100vh", heightoverflowY: "hidden", overflowX: "hidden"}}>
-      {/* Background image layer */}
+    <Content
+      style={{
+        position: "relative",
+        minHeight: "calc(100vh - 60px)",
+        overflowX: "hidden"
+      }}
+    >
+      {/* Background */}
       <div
         style={{
           position: "absolute",
@@ -75,19 +79,27 @@ const Home = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundImage: `url("/home.jpg")`, // public folder image
+          backgroundImage: `url("https://thevillageshealth.com/wp-content/uploads/2020/12/Mindfulness-1.jpg")`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "brightness(0.6)", // dims only background
+          filter: "brightness(0.6)",
           zIndex: 0,
         }}
       />
 
-      {/* Foreground content */}
-      <div style={{ position: "relative", zIndex: 1, padding: "60px", height: "100%" , overflow: "hidden"}}>
-        <Row gutter={[10]} align="start">
-          <Col>
+      {/* Foreground */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          padding: "20px",
+          height: "100%",
+        }}
+      >
+        <Row gutter={[16, 16]}>
+          {/* Books */}
+          <Col xs={12} sm={8} md={6} lg={4}>
             <Link to="/books">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
@@ -96,13 +108,16 @@ const Home = () => {
                 {loading ? (
                   <Spin size="small" />
                 ) : (
-                  <Title level={3} style={{ color: "#000" }}>{bookCount}</Title>
+                  <Title level={3} style={{ color: "#000" }}>
+                    {stats.books_count}
+                  </Title>
                 )}
               </Card>
             </Link>
           </Col>
 
-          <Col>
+          {/* Codes */}
+          <Col xs={12} sm={8} md={6} lg={4}>
             <Link to="/codes">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
@@ -111,14 +126,17 @@ const Home = () => {
                 {loading ? (
                   <Spin size="small" />
                 ) : (
-                  <Title level={3} style={{ color: "#000" }}>{codeCount}</Title>
+                  <Title level={3} style={{ color: "#000" }}>
+                    {stats.codes_count}
+                  </Title>
                 )}
               </Card>
             </Link>
           </Col>
 
-          <Col>
-            <Link to="/assessents">
+          {/* Assessments */}
+          <Col xs={12} sm={8} md={6} lg={4}>
+            <Link to="/assessment">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
                   <ReadOutlined /> Assessments
@@ -127,18 +145,27 @@ const Home = () => {
             </Link>
           </Col>
 
-          <Col>
+          {/* Counsellors */}
+          <Col xs={12} sm={8} md={6} lg={4}>
             <Link to="/counsellor">
               <Card style={cardStyle}>
                 <Title level={5} style={titleStyle}>
                   <UsergroupAddOutlined /> Counsellors
                 </Title>
+                {loading ? (
+                  <Spin size="small" />
+                ) : (
+                  <Title level={3} style={{ color: "#000" }}>
+                    {stats.counsellors_count}
+                  </Title>
+                )}
               </Card>
             </Link>
           </Col>
 
+          {/* Users (Admin only) */}
           {currentUser?.role === "Admin" && (
-            <Col>
+            <Col xs={12} sm={8} md={6} lg={4}>
               <Link to="/users">
                 <Card style={cardStyle}>
                   <Title level={5} style={titleStyle}>
@@ -147,7 +174,9 @@ const Home = () => {
                   {loading ? (
                     <Spin size="small" />
                   ) : (
-                    <Title level={3} style={{ color: "#000" }}>{userCount}</Title>
+                    <Title level={3} style={{ color: "#000" }}>
+                      {stats.total_users_count}
+                    </Title>
                   )}
                 </Card>
               </Link>

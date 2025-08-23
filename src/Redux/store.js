@@ -11,6 +11,7 @@ import egoReducer from "./Slices/egoSlice";
 import personaltreatmentReducer from "./Slices/personaltreatmentSlice";
 import AIintegrationReducer from "./Slices/AIintegrationSlice";
 import CounsellorReducer from "./Slices/CounsellorSlice";
+import mhAuthReducer from "./Slices/MHAuthSlice";
 
 const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ const store = configureStore({
     personaltreatment: personaltreatmentReducer,
     aiintegration: AIintegrationReducer,
     counsellor: CounsellorReducer,
+    mhAuth: mhAuthReducer, 
   },
 });
 

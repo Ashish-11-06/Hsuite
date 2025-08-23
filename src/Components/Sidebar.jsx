@@ -14,14 +14,15 @@ import {
   SolutionOutlined,
   MedicineBoxOutlined,
   ClockCircleOutlined,
-  SafetyCertificateOutlined  ,
+  SafetyCertificateOutlined,
   ContainerOutlined,
   RobotOutlined,
-HeartOutlined
+  HeartOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../Redux/Slices/authSlice";
+import styled from "styled-components";
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -38,47 +39,72 @@ const Sidebar = () => {
     navigate("/login");
   };
 
-const getSelectedKey = () => {
-  if (location.pathname === "/") return "1";
-  if (location.pathname.startsWith("/books")) return "2";
-  if (location.pathname.startsWith("/codes")) return "3";
-  if (location.pathname.startsWith("/profile")) return "4";
-  if (location.pathname.startsWith("/users")) return "5";
-  if (
-    location.pathname.startsWith("/assessment") ||
-    location.pathname.startsWith("/createset") ||
-    location.pathname.startsWith("/assessents") ||
-    location.pathname.startsWith("/report") ||
-    location.pathname.startsWith("/createmcq") ||
-    location.pathname.startsWith("/mcqtest") ||
-    location.pathname.startsWith("/mcqreport") ||
-    location.pathname.startsWith("/createegogram") ||
-    location.pathname.startsWith("/testegogram") ||
-    location.pathname.startsWith("/egogramreport")
-  ) {
-    return "6";
+const CustomSider = styled(Layout.Sider)`
+  .ant-layout-sider-zero-width-trigger {
+    position: absolute;
+    top: 14px;
+    inset-inline-end: -40px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important; /* Transparent background */
+    border: none !important; /* Remove border */
+    color: black !important; /* Black icon lines */
+    box-shadow: none !important; /* No shadow */
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05); /* Light hover if you want */
+    }
   }
-  if (location.pathname.startsWith("/automation")) return "7";
-  if (location.pathname.startsWith("/clinical")) return "8";
-  if (location.pathname.startsWith("/work")) return "9";
-  if (location.pathname.startsWith("/treatment")) return "10";
-  if (location.pathname.startsWith("/counsellortreatment")) return "11";
-  if (
-    location.pathname.startsWith("/therapy") ||
-    location.pathname.startsWith("/viewresult") // Add this condition
-  ) {
-    return "12"; // This should match your Therapies menu item key
-  }
-  if (location.pathname.startsWith("/ongocountreatment")) return "13";
-  if (location.pathname.startsWith("/counsellor")) return "14";
-  return "1";
-};
+`;
+
+  const getSelectedKey = () => {
+    if (location.pathname === "/") return "1";
+    if (location.pathname.startsWith("/books")) return "2";
+    if (location.pathname.startsWith("/codes")) return "3";
+    if (location.pathname.startsWith("/profile")) return "4";
+    if (location.pathname.startsWith("/users")) return "5";
+    if (
+      location.pathname.startsWith("/assessment") ||
+      location.pathname.startsWith("/createset") ||
+      location.pathname.startsWith("/assessents") ||
+      location.pathname.startsWith("/report") ||
+      location.pathname.startsWith("/createmcq") ||
+      location.pathname.startsWith("/mcqtest") ||
+      location.pathname.startsWith("/mcqreport") ||
+      location.pathname.startsWith("/createegogram") ||
+      location.pathname.startsWith("/testegogram") ||
+      location.pathname.startsWith("/egogramreport")
+    ) {
+      return "6";
+    }
+    if (location.pathname.startsWith("/mindfulness")) return "7";
+    if (location.pathname.startsWith("/clinical")) return "8";
+    if (location.pathname.startsWith("/work")) return "9";
+    if (location.pathname.startsWith("/treatment")) return "10";
+    if (location.pathname.startsWith("/counsellortreatment")) return "11";
+    if (
+      location.pathname.startsWith("/therapy") ||
+      location.pathname.startsWith("/viewresult") // Add this condition
+    ) {
+      return "12"; // This should match your Therapies menu item key
+    }
+    if (location.pathname.startsWith("/ongocountreatment")) return "13";
+    if (location.pathname.startsWith("/counsellor")) return "14";
+    return "1";
+  };
 
 
   return (
-    <Sider>
-      <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center" }}>
-        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+    <CustomSider breakpoint="md" collapsedWidth="0">
+      <div className="logo" style={{ textAlign: "center", padding: "20px", color: "black", height: "66px", fontSize: "18px", fontWeight: "bold", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1000 }}>
+        <Link to="/" style={{ textDecoration: "none", color: "black"}}>
           HSuite
         </Link>
       </div>
@@ -99,21 +125,21 @@ const getSelectedKey = () => {
           <Link to="/codes">Codes</Link>
         </Menu.Item>
 
-        <Menu.Item key="6" icon={<AuditOutlined />} title="Assessments">
+        {/* <Menu.Item key="6" icon={<AuditOutlined />} title="Assessments">
           <Link to="/assessment">Assessments</Link>
         </Menu.Item>
 
-       {userRole === "Counsellor" && (
-        <Menu.Item key="12" icon={<HeartOutlined />} title="Therapies">
-          <Link to="/therapy">Therapies</Link>
-        </Menu.Item>
-       )}
+        {userRole === "Counsellor" && (
+          <Menu.Item key="12" icon={<HeartOutlined />} title="Therapies">
+            <Link to="/therapy">Therapies</Link>
+          </Menu.Item>
+        )}
 
         <SubMenu key="treatmentMenu" icon={<SafetyCertificateOutlined />} title="Treatment">
-          <Menu.Item key="10" icon = {<ContainerOutlined />} title="Predefined Treatment">
+          <Menu.Item key="10" icon={<ContainerOutlined />} title="Predefined Treatment">
             <Link to="/treatment">Predefined Treatment</Link>
           </Menu.Item>
-           <Menu.Item key="14" icon={<IdcardOutlined />} title="Counsellors">
+          <Menu.Item key="14" icon={<IdcardOutlined />} title="Counsellors">
             <Link to="/counsellor" >Counsellors</Link>
           </Menu.Item>
           <Menu.Item key="11" icon={<MedicineBoxOutlined />} title="Counsellor Treatment">
@@ -122,9 +148,9 @@ const getSelectedKey = () => {
           <Menu.Item key="13" icon={<ClockCircleOutlined />} title="Ongoing Counsellor Treatment">
             <Link to="/ongocountreatment">Ongoing Counsellor Treatment</Link>
           </Menu.Item>
-        </SubMenu>
+        </SubMenu> */}
 
-       {/* {userRole === "Admin" && (
+        {/* {userRole === "Admin" && (
          <Menu.Item key="7" icon={<RobotOutlined />} title="Coding Automation">
           <Link to="/automation">Coding Automation</Link>
         </Menu.Item>
@@ -137,6 +163,10 @@ const getSelectedKey = () => {
         
         <Menu.Item key="9" icon={<AuditOutlined />}>
           <Link to="/work">Work Organisation</Link>
+        </Menu.Item> */}
+
+        {/* <Menu.Item key="7" icon={<AuditOutlined />} title="Mindfulness">
+          <Link to="/mindfulness">Mindfulness</Link>
         </Menu.Item> */}
 
 
@@ -169,7 +199,7 @@ const getSelectedKey = () => {
           </Popconfirm>
         </Menu>
       )} */}
-    </Sider>
+    </CustomSider>
   );
 };
 

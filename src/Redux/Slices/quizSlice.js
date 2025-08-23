@@ -137,28 +137,6 @@ export const submitQuizResults = createAsyncThunk(
   }
 );
 
-// export const getQuizReportHistory = createAsyncThunk(
-//   "quizReport/fetchHistory",
-//   async (_, { getState, rejectWithValue }) => {
-//     try {
-//       // Get user ID from your Redux state (assuming it's stored in auth slice)
-//       const { auth } = getState();
-//       const user_id = auth.user?.id;
-      
-//       if (!user_id) {
-//         return rejectWithValue("User not authenticated");
-//       }
-      
-//       const response = await quizAPI.getQuizReportHistory(user_id); 
-//       return response.data;      
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || "Error fetching quiz report");
-//     }
-//   }
-// );
-
-// quizSlice.js
-
 export const getQuizReportHistory = createAsyncThunk(
   "quizReport/fetchHistory",
   async (passedUserId, { getState, rejectWithValue }) => {

@@ -8,10 +8,10 @@ const { Title } = Typography;
 
 const Assessment = () => {
   const navigate = useNavigate();
-  const userRole = localStorage.getItem("role");
+  const userRole = localStorage.getItem("medicalRole");
   const [modalVisible, setModalVisible] = useState(false);
   const [currentTest, setCurrentTest] = useState("");
-    const [actionModalVisible, setActionModalVisible] = useState(false); // ✅ Action modal state
+  const [actionModalVisible, setActionModalVisible] = useState(false); // ✅ Action modal state
 
   const testDescriptions = {
     personality: {
@@ -117,20 +117,20 @@ const Assessment = () => {
             bordered={false}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {userRole === "Admin" && (
+              {userRole === "admin" && (
                 <Button
-                icon ={<PlusOutlined />} 
-                onClick={() => navigate("/createset")}>
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate("/medicalHealth/createset")}>
                   Create Set
                 </Button>
               )}
-              <Button 
-              icon ={<FileDoneOutlined />}
-              onClick={() => navigate("/assessents")}>Take Test</Button>
+              <Button
+                icon={<FileDoneOutlined />}
+                onClick={() => navigate("/medicalHealth/assessments")}>Take Test</Button>
 
               <Button
-              icon ={<BarChartOutlined />}
-              onClick={() => navigate("/report")}>View Report</Button>
+                icon={<BarChartOutlined />}
+                onClick={() => navigate("/medicalHealth/report")}>View Report</Button>
 
             </div>
           </Card>
@@ -148,22 +148,22 @@ const Assessment = () => {
             bordered={false}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {userRole === "Admin" && (
-                <Button 
-                icon ={<PlusOutlined />}
-                onClick={() => navigate("/createmcq")}>
+              {userRole === "admin" && (
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate("/medicalHealth/createmcq")}>
                   Create MCQ
                 </Button>
               )}
               <Button
-              icon ={<FileDoneOutlined />} 
-              onClick={() => navigate("/mcqtest")}
+                icon={<FileDoneOutlined />}
+                onClick={() => navigate("/medicalHealth/mcqtest")}
               >Take Test
               </Button>
 
               <Button
-              icon ={<BarChartOutlined />} 
-              onClick={() => navigate("/mcqreport")}>View Report</Button>
+                icon={<BarChartOutlined />}
+                onClick={() => navigate("/medicalHealth/mcqreport")}>View Report</Button>
             </div>
           </Card>
         </Col>
@@ -180,28 +180,28 @@ const Assessment = () => {
             bordered={false}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {userRole === "Admin" && (
-                <Button 
-                icon ={<PlusOutlined />}
-                onClick={() => navigate("/createegogram")}>
+              {userRole === "admin" && (
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate("/medicalHealth/createegogram")}>
                   Create Egogram
                 </Button>
               )}
-              <Button icon ={<FileDoneOutlined />} onClick={() => navigate("/testegogram")}>Take Test</Button>
-              <Button icon ={<BarChartOutlined />} onClick={() => navigate("/egogramreport")}>View Report</Button>
+              <Button icon={<FileDoneOutlined />} onClick={() => navigate("/medicalHealth/testegogram")}>Take Test</Button>
+              <Button icon={<BarChartOutlined />} onClick={() => navigate("/medicalHealth/egogramreport")}>View Report</Button>
             </div>
           </Card>
         </Col>
       </Row>
 
-       {/* Actions Button */}
+      {/* Actions Button */}
       {/* <div style={{ marginTop: 24, textAlign: "center" }}>
         <Button type="primary" onClick={() => setActionModalVisible(true)}>
           Actions
         </Button>
       </div> */}
 
-   {/* Info Modal */}
+      {/* Info Modal */}
       <Modal
         title={testDescriptions[currentTest]?.title || "Test Information"}
         visible={modalVisible}
@@ -212,7 +212,7 @@ const Assessment = () => {
         {testDescriptions[currentTest]?.content || ""}
       </Modal>
 
-       {/* Action Modal */}
+      {/* Action Modal */}
       {/* <ActionModal
         visible={actionModalVisible}
         onClose={() => setActionModalVisible(false)}

@@ -40,37 +40,37 @@ const QuizList = () => {
     }));
   };
 
-const goToNextQuestion = () => {
-  const percentCompleted = getCompletionPercentage();
+  const goToNextQuestion = () => {
+    const percentCompleted = getCompletionPercentage();
 
-  if (currentQuestionIndex < testQuestions.length - 1) {
-    setCurrentQuestionIndex((prev) => prev + 1);
-    setSecondsLeft(15);
+    if (currentQuestionIndex < testQuestions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setSecondsLeft(15);
 
-    if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
-      const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
-      setRandomOptions(twoOptions);
-    }
-  } else {
-    clearInterval(timerRef.current);
-    
-    if (percentCompleted >= 80) {
-      setViewModalVisible(false);
-      setResultModalVisible(true);
+      if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
+        const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
+        setRandomOptions(twoOptions);
+      }
     } else {
-      Modal.warning({
-        title: "Test Not Completed",
-        content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
-        onOk: () => {
-          setViewModalVisible(false);
-          setResultModalVisible(false);
-          setSelectedAnswers({});
-          setCurrentQuestionIndex(0);
-        }
-      });
+      clearInterval(timerRef.current);
+
+      if (percentCompleted >= 80) {
+        setViewModalVisible(false);
+        setResultModalVisible(true);
+      } else {
+        Modal.warning({
+          title: "Test Not Completed",
+          content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+          onOk: () => {
+            setViewModalVisible(false);
+            setResultModalVisible(false);
+            setSelectedAnswers({});
+            setCurrentQuestionIndex(0);
+          }
+        });
+      }
     }
-  }
-};
+  };
   const getRandomTwoOptions = (question) => {
     if (!question) return [];
     const options = [];
@@ -83,57 +83,57 @@ const goToNextQuestion = () => {
     return shuffled.slice(0, 2);
   };
 
-    const getCompletionPercentage = () => {
+  const getCompletionPercentage = () => {
     const totalQuestions = testQuestions.length;
     const answeredCount = Object.keys(selectedAnswers).length;
     return Math.round((answeredCount / totalQuestions) * 100);
   };
 
-useEffect(() => {
-  if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
-    setSecondsLeft(15);
-    clearInterval(timerRef.current);
+  useEffect(() => {
+    if (viewModalVisible && Array.isArray(testQuestions) && testQuestions.length > 0) {
+      setSecondsLeft(15);
+      clearInterval(timerRef.current);
 
-    timerRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev === 1) {
-          const isLastQuestion = currentQuestionIndex === testQuestions.length - 1;
-          const percentCompleted = getCompletionPercentage();
+      timerRef.current = setInterval(() => {
+        setSecondsLeft((prev) => {
+          if (prev === 1) {
+            const isLastQuestion = currentQuestionIndex === testQuestions.length - 1;
+            const percentCompleted = getCompletionPercentage();
 
-          clearInterval(timerRef.current);
+            clearInterval(timerRef.current);
 
-          if (isLastQuestion) {
-            if (percentCompleted >= 80) {
-              setViewModalVisible(false);
-              setResultModalVisible(true);
+            if (isLastQuestion) {
+              if (percentCompleted >= 80) {
+                setViewModalVisible(false);
+                setResultModalVisible(true);
+              } else {
+                Modal.warning({
+                  title: "Test Not Completed",
+                  content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+                  onOk: () => {
+                    setViewModalVisible(false);
+                    setResultModalVisible(false);
+                    setSelectedAnswers({});
+                    setCurrentQuestionIndex(0);
+                  }
+                });
+              }
             } else {
-              Modal.warning({
-                title: "Test Not Completed",
-                content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
-                onOk: () => {
-                  setViewModalVisible(false);
-                  setResultModalVisible(false);
-                  setSelectedAnswers({});
-                  setCurrentQuestionIndex(0);
-                }
-              });
+              goToNextQuestion();
             }
-          } else {
-            goToNextQuestion();
           }
-        }
-        return prev - 1;
-      });
-    }, 1000); // Usually, timer should be 1000ms (1s) instead of 1500ms unless intentional
+          return prev - 1;
+        });
+      }, 1000); // Usually, timer should be 1000ms (1s) instead of 1500ms unless intentional
 
-    if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
-      const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
-      setRandomOptions(twoOptions);
+      if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex]) {
+        const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex]);
+        setRandomOptions(twoOptions);
+      }
     }
-  }
 
-  return () => clearInterval(timerRef.current);
-}, [currentQuestionIndex, viewModalVisible, testQuestions]);
+    return () => clearInterval(timerRef.current);
+  }, [currentQuestionIndex, viewModalVisible, testQuestions]);
 
 
   const currentQuestion = Array.isArray(testQuestions) ? testQuestions[currentQuestionIndex] : null;
@@ -267,45 +267,45 @@ useEffect(() => {
               {renderDots()}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-               {/* Next/Finish Button */}
+              {/* Next/Finish Button */}
               <Button
-  icon={<ArrowRightOutlined />}
-  type="primary"
-  onClick={() => {
-    const percentCompleted = getCompletionPercentage();
+                icon={<ArrowRightOutlined />}
+                type="primary"
+                onClick={() => {
+                  const percentCompleted = getCompletionPercentage();
 
-    if (currentQuestionIndex === testQuestions.length - 1) {
-      if (percentCompleted >= 80) {
-        clearInterval(timerRef.current);
-        setViewModalVisible(false);
-        setResultModalVisible(true);
-      } else {
-        Modal.warning({
-          title: "Test Not Completed",
-          content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
-          onOk: () => {
-            setViewModalVisible(false);
-            setResultModalVisible(false);
-            setSelectedAnswers({});
-            setCurrentQuestionIndex(0);
-          }
-        });
-      }
-    } else {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      setSecondsLeft(15);
+                  if (currentQuestionIndex === testQuestions.length - 1) {
+                    if (percentCompleted >= 80) {
+                      clearInterval(timerRef.current);
+                      setViewModalVisible(false);
+                      setResultModalVisible(true);
+                    } else {
+                      Modal.warning({
+                        title: "Test Not Completed",
+                        content: `You have completed only ${percentCompleted}% of the test (minimum 80% required). Your test will not be saved. Please retake the test.`,
+                        onOk: () => {
+                          setViewModalVisible(false);
+                          setResultModalVisible(false);
+                          setSelectedAnswers({});
+                          setCurrentQuestionIndex(0);
+                        }
+                      });
+                    }
+                  } else {
+                    setCurrentQuestionIndex((prev) => prev + 1);
+                    setSecondsLeft(15);
 
-      if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
-        const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
-        setRandomOptions(twoOptions);
-      }
-    }
-  }}
-  style={{ backgroundColor: "#1890ff", padding: "10px", width: 100 }}
-  size="medium"
->
-  {currentQuestionIndex === testQuestions.length - 1 ? "Finish" : "Next"}
-</Button>
+                    if (selectedQuizType === "statement-based" && testQuestions[currentQuestionIndex + 1]) {
+                      const twoOptions = getRandomTwoOptions(testQuestions[currentQuestionIndex + 1]);
+                      setRandomOptions(twoOptions);
+                    }
+                  }
+                }}
+                style={{ backgroundColor: "#1890ff", padding: "10px", width: 100 }}
+                size="medium"
+              >
+                {currentQuestionIndex === testQuestions.length - 1 ? "Finish" : "Next"}
+              </Button>
             </div>
           </div>,
         ]}
